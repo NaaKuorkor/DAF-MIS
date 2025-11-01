@@ -10,13 +10,24 @@ class TblStudent extends Authenticatable
 {
     protected $table = 'tblstudent';
 
+    protected $primaryKey = 'studentid';
+
+    public $timestamps = false;
+
     protected $fillable = [
-        'user_id',
-        'student_id',
+        'userid',
+        'studentid',
         'fname',
         'mname',
         'lname',
         'gender',
+        'residence',
+        'referral',
+        'employment_status',
+        'qualification',
+        'certificate',
+        'payment',
+        'job_preference',
     ];
 
     protected function casts(): array
@@ -29,23 +40,23 @@ class TblStudent extends Authenticatable
         parent::boot();
 
         static::creating(function ($student) {
-            //If student_id is empty, execute generateId function
+            //If studentid is empty, execute generateId function
             //Incase there is the need for an overide
-            if (empty($student->student_id)) {
-                $student->student_id = self::generateId();
+            if (empty($student->studentid)) {
+                $student->studentid = self::generateId();
             }
         });
     }
 
     private static function generateId(){
         //Get student with the highest id
-        $lastStudent = self::orderBy('student_id', 'desc')->first();
+        $lastStudent = self::orderBy('studentid', 'desc')->first();
 
         if (!$lastStudent) {
             return 'S001';
         }
 
-        $lastNumber = (int) substr($lastStudent->student_id, 1);
+        $lastNumber = (int) substr($lastStudent->studentid, 1);
         $newNumber = ++$lastNumber;
 
         //Make increment and add to the string again
@@ -53,6 +64,6 @@ class TblStudent extends Authenticatable
     }
 
     public function user() {
-        return $this->belongsTo(TblUser::class, 'user_id', 'user_id');
+        return $this->belongsTo(TblUser::class, 'userid', 'userid');
     }
 }

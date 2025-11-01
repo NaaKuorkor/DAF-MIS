@@ -12,13 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblstaff', function (Blueprint $table) {
-            $table->foreignId('user_id')->primary()->conatrained('tbluser');
-            $table->string('staff_id')->unique();
+            $table->foreignId('userid')->constrained('tbluser', 'userid');
+            $table->string('staffid')->unique()->primary();
             $table->string('fname', 50);
             $table->string('mname', 50)->nullable();
             $table->string('lname', 50);
-            $table->string('gender', 10);
-            $table->strint('position', 50);
+            $table->enum('gender', ['M', 'F']);
+            $table->string('position', 50);
+            $table->string('residence');
         });
     }
 

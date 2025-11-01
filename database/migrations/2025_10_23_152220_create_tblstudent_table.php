@@ -12,12 +12,19 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblstudent', function (Blueprint $table) {
-            $table->foreignId('user_id')->constrained('tbluser');
-            $table->string('student_id')->unique()->primary();
+            $table->foreignId('userid')->constrained('tbluser', 'userid');
+            $table->string('studentid')->unique()->primary();
             $table->string('fname');
-            $table->string('mname');
+            $table->string('mname')->nullable();
             $table->string('lname');
-            $table->string('gender');
+            $table->enum('gender', ['M', 'F']);
+            $table->string('residence');
+            $table->string('referral')->nullable();
+            $table->string('employment_status');
+            $table->string('qualification')->nullable();
+            $table->string('certificate');
+            $table->string('payment')->nullable();
+            $table->string('job_preference')->nullable();
         });
     }
 

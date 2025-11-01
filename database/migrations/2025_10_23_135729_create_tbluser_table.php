@@ -12,18 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tbluser', function (Blueprint $table) {
-            $table->id('user_id');
+            $table->id('userid');
             $table->string('email', 255)->unique();
-            $table->enum('user_type', ['ADM', 'STA', 'STU']);
+            $table->enum('user_type', ['STA', 'STU']);
             $table->string('password');
             $table->string('phone', 15)->nullable();
-            $table->string('role', 15);
             $table->char('deleted', 1)->default('0');
             $table->string('createuser', 255)->nullable();
             $table->timestamp('createdate')->useCurrent();
             $table->string('modifyuser', 255)->nullable();
             $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
-            $table->remember_token();
+            $table->rememberToken();
         });
     }
 

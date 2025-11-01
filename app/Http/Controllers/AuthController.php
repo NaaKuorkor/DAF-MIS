@@ -4,97 +4,86 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TblUser;
-use App\Models\TblStudent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 
 class AuthController extends Controller
 {
-    public function showRegisterForm () {
-        return view('student.register');
-        //shows the register view
-    }
-
-    public function register (Request $request) {
-
-        //Form validation
-        $validateData = $request->validate([
-            'fname' => 'required|string|max:255',
-            'mname' => 'nullable|string|max:255',
-            'sname' => 'required|string|max:255',
-            'email' => 'required|email',
-            'phone' => 'required|string|max:15',
-            'password' =>'required|confirmed|min:6',
-            'gender' => 'required|string',
-            'cohort_id' => 'required|string',
-            'course_id' => 'required|string',
-        ]);
-
-        //Create student to be inserted into the databases
-
-        DB::transaction(function() use($validateData){
-
-            $user = TblUser::create([
-                'email' => $validateData['email'],
-                'phone' => $validateData['phone'],
-                'password' => Hash::make($validateData['password']),
-                'user_type' => 'STU',
-                'deleted' => 0,
-                'createuser' => auth()->user()->email ?? 'system',
-                'modifyuser' => auth()-> user()->email ?? 'system',
-            ]);
-
-            $student = TblStudent::create([
-                'user_id' => $user->user_id,
-                'fname' => $validateData['fname'],
-                'mname' => $validateData['mname'] ?? null,
-                'sname' => $validateData['sname'],
-                'gender' => $validateData['gender'],
-            ]);
-
-
-
-        });
-
-
-        return redirect()->route('student.dashboard')->with('success', 'Registration successful!');
-    }
-
-    public function showLoginForm() {
-        return view('student.login');
-    }
-
     public function login (Request $request) {
-        //Validate data
-        $data = $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
+
+        $userData = $request->validate([
+            'email' => "email|required",
+            'password'=> "required",
         ]);
 
-        if (Auth::guard('student')->attempt($data)) {
-            $request->session()->regenerate();
+        //Check if it details are in Db
+        try{
+            $user = TblUser::where('email', $userData['email'])->first();
 
-            return redirect()->intended('dashboard');
+            if (!$user){
+                return back()->withErrors(['email' => 'User not found'])->onlyInput($request->only('email'));
+            }
 
-        }return back()->withErrors([
-            'email' => "Incorrect email or password used"
-        ])->onlyInput('email');
+            if (!Hash::check($request->password, $user->password)){
+                return back()->withErrors(['email' => 'Incorrect Credentials!'])->onlyInput($request->only('email'));
+            }
+
+            $guard = null;
+
+            //Log user in
+            if ($user->user_type === 'STU'){
+               $guard = 'student';
+            }else if ($user->user_type === 'STA'){
+                $guard = 'staff';
+            }
+
+            $remember = $request->has('remember');
+            Auth::guard($guard)->login($user, $remember);
 
 
+            //Redirect to next page
+            if ($guard === 'student'){
+                return redirect()->intended('dashboard');
+            }
+            else if($guard === 'staff'){
+        return redirect()->intended('staff.dashboard');
+            }
 
+        }catch(\Exception $e){
+            Log::error('Login failed', [
+                $e->getMessage(),
+                $e->getTraceAsString(),
+            ]);
+
+            return back()->withErrors(['email' => 'Login failed'])->onlyInput($request->only('email'));
+        }
     }
 
-    public function logout (Request $request) {
-        Auth::guard('student')->logout();
+
+
+    public function logout (Request $request, $guard) {
+        if (!in_array($guard, ['student', 'staff'])){
+            return redirect()->route('login.form')->with('error', 'Invalid logout request');
+        }
+
+        if(Auth::guard($guard)->check()) {
+            Auth::guard($guard)->logout();
+        }
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();//Generates new csrf token
 
-        return redirect()->route('login.form')->with('success', "Logged out successfully.");
+
+        if($guard === 'student'){
+            return redirect()->route('login.form')->with('success', 'Successfully logged out!');
+        }
+        if($guard === 'staff'){
+            return redirect()->route('staff.login.form')->with('success', 'Successfully logged out!');
+        }
+
+        return redirect()->route('login.form')->with('success', 'Successfully logged out');
+
     }
 
-    public function showDashboard () {
-        return view('dashboard');
-    }
 }

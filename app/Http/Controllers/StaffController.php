@@ -8,32 +8,12 @@ use App\Models\TblStaff;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
-class AdminAuthController extends Controller
+class StaffController extends Controller
 {
     public function showStaffLogin(){
         return view("staff.login");
     }
 
-    public function staffLogin(Request $request) {
-        //Validate data
-        $staffData = $request->validate([
-            'email' => 'email|required',
-            'password' => 'required'
-        ]);
-
-        //Check if data is in database
-        $staff = TblUser::where("email", $staffData['email'])->first();
-
-        if (!$staff || !Hash::check($staffData['password'], $staff->password)) {
-            return back()->withErrors(['email' => "Incorrect credentials."])->onlyInput('email');
-        }
-
-        //Login with the staff guard and regenerate session
-        Auth::guard('staff')->login($staff);
-        $request->session()->regenerate();
-
-        return redirect()->route('staff.dashboard')->with('success', 'Successfully logged in!');
-    }
 
     public function showStaffDashboard() {
         return view("staff.dashboard");
@@ -50,7 +30,6 @@ class AdminAuthController extends Controller
             'position' => 'string|required|max:100',
             'phone' => 'string|required|max:15',
             'password' => 'required|string|min:6',
-            'department' => 'required|string|max:100',
             'user_type' => 'required|string',
         ]);
 
@@ -72,7 +51,7 @@ class AdminAuthController extends Controller
             'lname' => $staffData['lname'],
             'gender' => $staffData['gender'],
             'position' => $staffData['position'],
-            'department' => $staffData['department'],
+
         ]);
 
         return redirect()->route('staff.dashboard')->with('success', "New admin created successfully!");

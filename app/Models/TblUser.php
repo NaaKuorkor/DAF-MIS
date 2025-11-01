@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Foundation\Facades\Auth;
+use Illuminate\Support\Facades\Auth;
 use App\Models\TblStaff;
 use App\Models\TblStudent;
 use App\Models\TblRole;
@@ -19,13 +19,17 @@ class TblUser extends Authenticatable
     use HasFactory, Notifiable;
 
     protected $table = 'tbluser';
+
+    protected $primaryKey ='userid';
+
+    public $timestamps = false;
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
     protected $fillable = [
-        'user_id',
+        'userid',
         'email',
         'password',
         'phone',
@@ -49,7 +53,7 @@ class TblUser extends Authenticatable
      *
     * @return array<string, string>
     *
-    * */init
+    * */
 
     protected function casts(): array
     {
@@ -60,19 +64,20 @@ class TblUser extends Authenticatable
         parent::boot();
 
         static::creating(function($user) {
-            if(empty($user->createuser){
+            if(empty($user->createuser)){
                 $user->createuser = Auth::check() ? Auth::user()->email : 'system';
-            })
+            }
+
         });
     }
 
 
     public function staff() {
-        return $this->hasOne(TblStaff::class, 'user_id', 'user_id');
+        return $this->hasOne(TblStaff::class, 'userid', 'userid');
     }
 
     public function student() {
-        return $this->hasOne(TblStudent::class, 'user_id, user_id');
+        return $this->hasOne(TblStudent::class, 'userid', 'userid');
     }
 
 
