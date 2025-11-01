@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"  content="width=device-width, initial-scale=1.0">
-        <script src="https://cdn.tailwindcss.com"></script>
-        <title>Admin Login</title>
-    </head>
-    <body class="min-h-screen flex items-center justify-center bg-purple-200">
+@extends('layouts.app')
+
+@session('title', 'Staff Login')
+
+@session('content')
 
         <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
 
@@ -56,5 +52,4 @@
             </form>
 
         </div>
-   </body>
-</html>
+@endsession
