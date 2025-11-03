@@ -10,7 +10,7 @@
     <form method="POST" action="{{ route('register') }}" >
         @csrf
 
-        <div id="first">
+        <div id="first" class="transition-full duration-500 ease-in-out">
 
             <h3 class="text-xl text-purple-600 text-center mb-4 ">Personal Information</h3>
 
@@ -20,26 +20,26 @@
             </div>
 
             <div class="mb-4">
-                <label for="firstname" class="block text-gray-600">First Name</label>
-                <input type="text" id="firstname" name="firstname" placeholder="Enter first name" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <label for="fname" class="block text-gray-600">First Name</label>
+                <input type="text" id="fname" name="fname" placeholder="Enter first name" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
-                <label for="middlename" class="block text-gray-600">Middle Name(if any)</label>
-                <input type="text" id="middlename" name="middlename" placeholder="Optional if you do not have any" class="focus:outine-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <label for="mname" class="block text-gray-600">Middle Name(if any)</label>
+                <input type="text" id="mname" name="mname" placeholder="Optional if you do not have any" class="focus:outine-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
 
             <div class="mb-4">
-                <label for="surname" class="block text-gray-600">Surname</label>
-                <input type="text" id="surname" name="surname" placeholder="Enter surname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <label for="lname" class="block text-gray-600">Surname</label>
+                <input type="text" id="lname" name="lname" placeholder="Enter surname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                 <label for='gender' class="block text-gray-600">Gender</label>
                 <select id="gender" name="gender" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
                 </select>
             </div>
 
@@ -65,7 +65,7 @@
 
         </div>
 
-        <div id="second" class="hidden">
+        <div id="second" class="hidden transition-all opacity-0 translate-x-10 ease-in-out duration-500">
 
             <h3 class="text-xl text-purple-600 text-center ">Other Information</h3>
 
@@ -96,8 +96,8 @@
             </div>
 
             <div class="mb-4">
-                <label for="employment-status" class="block text-gray-600">Employment Status</label>
-                <select id="employment-status" name="employment-status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <label for="employment_status" class="block text-gray-600">Employment Status</label>
+                <select id="employment_status" name="employment_status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                     <option value="unemployed">Unemployed</option>
                     <option value="self-employed">Self-employed</option>
                     <option value="employed">Employed</option>

@@ -7,6 +7,7 @@ use App\Models\TblUser;
 use App\Models\TblStaff;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class StaffController extends Controller
 {

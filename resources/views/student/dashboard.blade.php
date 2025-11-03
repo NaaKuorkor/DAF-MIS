@@ -1,9 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset='UTF-8'>
-        <meta name="viewport" content='width=device-width, initial-scale=1.0'>
-    </head>
-    <body></body>
-</html>
+@extends('layouts.app')
+
+@section('title', 'Dashboard')
+
+@section('content')
+
+<header class="fixed top-0 left-0 shadow-md bg-white flex justify between z-50 p-4 h-20 w-full">
+    <div class="flex justify-end ">
+     <button class="bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold h-10 w-40 text-center">Logout</button>
+
+    </div>
+
+</header>
+
+
+@endsection
 

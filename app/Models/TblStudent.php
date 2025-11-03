@@ -48,9 +48,9 @@ class TblStudent extends Authenticatable
         });
     }
 
-    private static function generateId(){
+    public static function generateId(){
         //Get student with the highest id
-        $lastStudent = self::orderBy('studentid', 'desc')->first();
+        $lastStudent = self::orderByRaw("CAST(SUBSTRING(studentid, 2) AS UNSIGNED) DESC")->first();
 
         if (!$lastStudent) {
             return 'S001';
