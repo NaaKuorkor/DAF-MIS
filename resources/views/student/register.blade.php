@@ -21,7 +21,7 @@
 
             <div class="mb-4">
                 <label for="fname" class="block text-gray-600">First Name</label>
-                <input type="text" id="fname" name="fname" placeholder="Enter first name" required value="{{ old('fname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 focus:invalid:ring-red-500  border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="text" id="fname" name="fname" placeholder="Enter first name" required value="{{ old('fname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
@@ -32,7 +32,7 @@
 
             <div class="mb-4">
                 <label for="lname" class="block text-gray-600">Surname</label>
-                <input type="text" id="lname" name="lname" placeholder="Enter surname" required value="{{ old('lname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="text" id="lname" name="lname" placeholder="Enter surname" required value="{{ old('lname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
@@ -46,17 +46,17 @@
 
             <div class="mb-4">
                 <label for="email" class="block text-gray-600">Email</label>
-                <input type="email" id="email" name="email" placeholder="eg.123@gmail.com" value="{{ old('email') }}" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="email" id="email" name="email" placeholder="eg.123@gmail.com" value="{{ old('email') }}" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                  <label for="password" class="block text-gray-600">Password</label>
-                <input type="password" id="password" minlength=8 required autocomplete="new-password" name="password" value="{{ old('password') }}" placeholder="At least 8 characters" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="password" id="password" minlength=8 required autocomplete="new-password" name="password" value="{{ old('password') }}" placeholder="At least 8 characters" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-8">
                 <label for="confirm" class="block text-gray-600">Re-enter Password</label>
-                <input type="password" id="confirm" name="password_confirmation" minlength=8 required autocomplete="new-password" value="{{ old('password_confirmation') }}" placeholder="Confirm password" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="password" id="confirm" name="password_confirmation" minlength=8 required autocomplete="new-password" value="{{ old('password_confirmation') }}" placeholder="Confirm password" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="flex justify-center mt-4">
@@ -76,7 +76,7 @@
 
             <div class="mb-4">
                 <label for="phone" class="block text-gray-600">Phone Number</label>
-                <input type="number" id="phone" name="phone" placeholder="eg.0240000000" required minlength="10" value="{{ old('phone') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
+                <input type="number" id="phone" name="phone" placeholder="eg.0240000000" required minlength="10" value="{{ old('phone') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
@@ -112,9 +112,7 @@
                 </select>
             </div>
 
-            @error
 
-            @enderror
 
             <div class="flex justify-between mt-4">
                 <button type="button" id="backBtn" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Back</button>

@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class StudentController extends Controller
 {
-    public function showRegisterForm()
-    {
-        return view('student.register');
-        //shows the register view
-    }
+
 
     public function register(Request $request)
     {
@@ -42,34 +38,35 @@ class StudentController extends Controller
 
             //Create student to be inserted into the databases
 
-            $idCount = TblUser::count();
-            $userid = null;
-
-            if ($idCount === 0) {
-                $userid = 'U0000000001';
-            } else {
-                $newNum = $idCount + 1;
-                $userid = 'U' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
-            }
+            DB::transaction(function () use ($validateData) {
 
 
+                $idCount =  DB::table('tbluser')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
 
+                $userid = null;
 
-            $studentCount = TblStudent::count();
-            $studentid = null;
-
-            if ($studentCount === 0) {
-                $studentid = 'S0000000001';
-            } else {
-                $newNum = $studentCount + 1;
-                $studentid = 'S' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
-            }
+                if ($idCount === 0) {
+                    $userid = 'U0000000001';
+                } else {
+                    $newNum = $idCount + 1;
+                    $userid = 'U' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
+                }
 
 
 
 
+                $studentCount =  DB::table('tblstudent')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
 
-            DB::transaction(function () use ($validateData, $userid, $studentid) {
+                $studentid = null;
+
+                if ($studentCount === 0) {
+                    $studentid = 'S0000000001';
+                } else {
+                    $newNum = $studentCount + 1;
+                    $studentid = 'S' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
+                }
+
+
 
                 $user = TblUser::create([
                     'userid' => $userid,
@@ -94,6 +91,8 @@ class StudentController extends Controller
                     'employment_status' => $validateData['employment_status'],
                     'certificate' => $validateData['certificate'],
                 ]);
+
+                DB::statement('UNLOCK TABLES');
             });
 
 
@@ -104,18 +103,9 @@ class StudentController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
 
+            DB::statement('UNLOCK TABLES');
+
             return back()->withErrors("Registration failed. Try again")->withInput();
         }
-    }
-
-    public function showLoginForm()
-    {
-        return view('student.login');
-    }
-
-
-    public function showDashboard()
-    {
-        return view('student.dashboard');
     }
 }

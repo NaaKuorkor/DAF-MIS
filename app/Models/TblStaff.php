@@ -29,33 +29,4 @@ class TblStaff extends Authenticatable
     {
         return [];
     }
-
-    protected static function boot() {
-        parent::boot();
-
-        static::creating(function($staff) {
-            if (empty($staff->staffid)){
-                $staff->staffid = self::generateId();
-            }
-        });
-    }
-
-    private static function generateId() {
-
-        $lastStaff = self::orderBy('staffid', 'desc')->first();
-
-        if (!$lastStaff) {
-            return 'STF001';
-        }
-
-        $lastNumber = (int) substr($lastStaff->staffid, 3);
-        $newNumber = ++$lastNumber;
-
-        return 'STF' .str_pad($newNumber, 3, '0', STR_PAD_LEFT);
-    }
-
-    public function user(){
-        return $this->belongsTo(TblUser::class, 'userid', 'userid');
-    }
-
 }

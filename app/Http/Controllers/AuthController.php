@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TblUser;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 
@@ -51,11 +52,61 @@ class AuthController extends Controller
             }
         } catch (\Exception $e) {
             Log::error('Login failed', [
-                $e->getMessage(),
-                $e->getTraceAsString(),
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return back()->withErrors(['email' => 'Login failed'])->onlyInput($request->only('email'));
+        }
+    }
+
+
+
+    public function apiLogin(): JsonResponse
+    {
+        $userData = $request->validate([
+            'email' => "email|required",
+            'password' => "required",
+        ]);
+
+        try {
+            $user = TblUser::where('email', $userData['email'])->first();
+
+            if (!$user) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => 'User not found!'
+                ], 404);
+            }
+
+            if (!Hash::check($request->password, $user->password)) {
+                return  response()->json([
+                    'ok' => false,
+                    'message' => 'Incorrect Password'
+                ], 401);
+            }
+
+            $guard = null;
+
+            //Log user in
+            if ($user->user_type === 'STU') {
+                $guard = 'student';
+            } else if ($user->user_type === 'STA') {
+                $guard = 'staff';
+            }
+
+            $remember = $request->has('remember');
+            Auth::guard($guard)->login($user, $remember);
+        } catch (\Exception $e) {
+            Log::error("Login failed", [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'ok' => false,
+                'message' => 'Login failed'
+            ], 401);
         }
     }
 

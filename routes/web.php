@@ -4,38 +4,37 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\RoutingController;
 
 //Base route
-Route::get('/', [StudentController::class, 'showLoginForm']);
+Route::get('/', [RoutingController::class, 'showLoginForm']);
 
 //User routes
-Route::get('/register',[StudentController::class, 'showRegisterForm'])->middleware('guest')->name('register.form');
+Route::get('/register', [RoutingController::class, 'showRegisterForm'])->middleware('guest')->name('register.form');
 
-Route::post('/register',[StudentController::class, 'register'])->middleware('guest')->name('register');
+Route::post('/register', [StudentController::class, 'register'])->middleware('guest')->name('register');
 
 
-Route::get('/login', [StudentController::class, 'showLoginForm'])->middleware('guest:student')->name('login.form');
+Route::get('/login', [RoutingController::class, 'showLoginForm'])->middleware('guest:student')->name('login.form');
 
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest:student')->name('login');
 
-Route::get('/dashboard', [StudentController::class, 'showDashboard'])->middleware('auth:student')->name('dashboard');
+Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth:student')->name('dashboard');
 
 
 
 //Admin routesi
 Route::middleware('guest:staff')->group(function () {
 
-    Route::get('/staff/login', [StaffController::class, 'showStaffLogin'])->name('staff.login.form');
+    Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
 
     Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
-
 });
 
 
-Route::middleware('auth:staff')->group(function(){
+Route::middleware('auth:staff')->group(function () {
 
-        Route::get('/staff/dashboard', [StaffController::class, 'showStaffDashboard'])->name('staff.dashboard');
+    Route::get('/staff/dashboard', [RoutingController::class, 'showStaffDashboard'])->name('staff.dashboard');
 });
 
 Route::post('/logout/{guard}', [AuthController::class, 'logout'])->name('logout');
-
