@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tbluser', function (Blueprint $table) {
-            $table->id('userid');
+            $table->string('userid')->unique()->primary();
             $table->string('email', 255)->unique();
             $table->enum('user_type', ['STA', 'STU']);
             $table->string('password');

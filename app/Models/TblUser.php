@@ -10,7 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TblStaff;
 use App\Models\TblStudent;
-use App\Models\TblRole;
+use Laravel\Sanctum\HasApiTokens;
 #use Illuminate\Contracts\Auth\MustVerifyEmail;
 
 class TblUser extends Authenticatable
@@ -20,7 +20,10 @@ class TblUser extends Authenticatable
 
     protected $table = 'tbluser';
 
-    protected $primaryKey ='userid';
+    protected $primaryKey = 'userid';
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     public $timestamps = false;
     /**
@@ -51,34 +54,34 @@ class TblUser extends Authenticatable
     /**
      * Get the attributes that should be cast.
      *
-    * @return array<string, string>
-    *
-    * */
+     * @return array<string, string>
+     *
+     * */
 
     protected function casts(): array
     {
         return [];
     }
 
-    protected static function boot (){
+    protected static function boot()
+    {
         parent::boot();
 
-        static::creating(function($user) {
-            if(empty($user->createuser)){
+        static::creating(function ($user) {
+            if (empty($user->createuser)) {
                 $user->createuser = Auth::check() ? Auth::user()->email : 'system';
             }
-
         });
     }
 
 
-    public function staff() {
+    public function staff()
+    {
         return $this->hasOne(TblStaff::class, 'userid', 'userid');
     }
 
-    public function student() {
+    public function student()
+    {
         return $this->hasOne(TblStudent::class, 'userid', 'userid');
     }
-
-
 }

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblstaff', function (Blueprint $table) {
-            $table->foreignId('userid')->constrained('tbluser', 'userid');
+            $table->string('userid');
+            $table->foreign('userid')->references('userid')->on('tbluser');
             $table->string('staffid')->unique()->primary();
             $table->string('fname', 50);
             $table->string('mname', 50)->nullable();

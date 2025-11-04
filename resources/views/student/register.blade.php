@@ -21,42 +21,42 @@
 
             <div class="mb-4">
                 <label for="fname" class="block text-gray-600">First Name</label>
-                <input type="text" id="fname" name="fname" placeholder="Enter first name" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="text" id="fname" name="fname" placeholder="Enter first name" required value="{{ old('fname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 focus:invalid:ring-red-500  border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                 <label for="mname" class="block text-gray-600">Middle Name(if any)</label>
-                <input type="text" id="mname" name="mname" placeholder="Optional if you do not have any" class="focus:outine-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="text" id="mname" name="mname" placeholder="Optional if you do not have any" value="{{ old('mname') }}"class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
             </div>
 
 
             <div class="mb-4">
                 <label for="lname" class="block text-gray-600">Surname</label>
-                <input type="text" id="lname" name="lname" placeholder="Enter surname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="text" id="lname" name="lname" placeholder="Enter surname" required value="{{ old('lname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                 <label for='gender' class="block text-gray-600">Gender</label>
-                <select id="gender" name="gender" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
-                    <option value="M">Male</option>
-                    <option value="F">Female</option>
+                <select id="gender" name="gender" value="{{ old('gender') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                    <option value="M" @selected(old('gender') == 'M')>Male</option>
+                    <option value="F" @selected(old('gender') == 'F')>Female</option>
                 </select>
             </div>
 
 
             <div class="mb-4">
                 <label for="email" class="block text-gray-600">Email</label>
-                <input type="email" id="email" name="email" placeholder="eg.123@gmail.com" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="email" id="email" name="email" placeholder="eg.123@gmail.com" value="{{ old('email') }}" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                  <label for="password" class="block text-gray-600">Password</label>
-                <input type="password" id="password" minlength=8 required autocomplete="new-password" name="password" placeholder="At least 8 characters" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="password" id="password" minlength=8 required autocomplete="new-password" name="password" value="{{ old('password') }}" placeholder="At least 8 characters" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-8">
                 <label for="confirm" class="block text-gray-600">Re-enter Password</label>
-                <input type="password" id="confirm" name="password_confirmation" minlength=8 required autocomplete="new-password" placeholder="Confirm password" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="password" id="confirm" name="password_confirmation" minlength=8 required autocomplete="new-password" value="{{ old('password_confirmation') }}" placeholder="Confirm password" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="flex justify-center mt-4">
@@ -76,41 +76,45 @@
 
             <div class="mb-4">
                 <label for="phone" class="block text-gray-600">Phone Number</label>
-                <input type="number" id="phone" name="phone" placeholder="eg.0240000000" required minlength="10" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="number" id="phone" name="phone" placeholder="eg.0240000000" required minlength="10" value="{{ old('phone') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                 <label for="residence" class="block text-gray-600">Residence</label>
-                <input type="text" id="residence" name="residence" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="text" id="residence" name="residence" value="{{ old('residence') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md">
             </div>
 
             <div class="mb-4">
                 <label for="referral" class="block text-gray-600">Referral Source</label>
-                <select id='referral' name="referral" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
-                    <option value="Social Media">Social Media</option>
-                    <option value="Alumni">DAF Alumni</option>
-                    <option value="Website">Website</option>
-                    <option value="Institution">Institution</option>
-                    <option value="Other">Other</option>
+                <select id='referral' name="referral"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                    <option value="Social Media" @selected(old('referral') == 'Social Media')>Social Media</option>
+                    <option value="Alumni"  @selected(old('referral') == "Alumni")>DAF Alumni</option>
+                    <option value="Website"  @selected(old('referral') == 'Website')>Website</option>
+                    <option value="Institution"  @selected(old('referral') == 'Institution')>Institution</option>
+                    <option value="Other"  @selected(old('referral') == 'Other')>Other</option>
                 </select>
             </div>
 
             <div class="mb-4">
                 <label for="employment_status" class="block text-gray-600">Employment Status</label>
                 <select id="employment_status" name="employment_status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
-                    <option value="unemployed">Unemployed</option>
-                    <option value="self-employed">Self-employed</option>
-                    <option value="employed">Employed</option>
+                    <option value="unemployed"  @selected(old('employment_status') == 'unemployed')>Unemployed</option>
+                    <option value="self-employed"  @selected(old('employment_status') == 'self-employed')>Self-employed</option>
+                    <option value="employed"  @selected(old('employment_status') == 'employed')>Employed</option>
                 </select>
             </div>
 
             <div class="mb-8">
                 <label for="certificate" class="block text-gray-600">Would you like to be awarded a certificate after the course?</label>
                 <select id="certificate" name="certificate" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
-                    <option value="Y">Yes</option>
-                    <option value="N">No</option>
+                    <option value="Y"  @selected(old('certificate') == 'Y')>Yes</option>
+                    <option value="N" @selected(old('certificate') == 'N')>No</option>
                 </select>
             </div>
+
+            @error
+
+            @enderror
 
             <div class="flex justify-between mt-4">
                 <button type="button" id="backBtn" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Back</button>
