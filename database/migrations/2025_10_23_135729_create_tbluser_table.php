@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('password');
             $table->string('phone', 15)->nullable();
             $table->char('deleted', 1)->default('0');
-            $table->string('picture', 255)->default(null);
+            $table->string('picture', 255)->nullable();
             $table->char('status', 1)->default('1');
-            $table->string('unit', 10)->default(null);
+            $table->string('unit', 10)->nullable();
             $table->string('account_code', 20)->default('100');
             $table->char('country', 3)->default('GH');
             $table->string('createuser', 255)->nullable();

@@ -6,5 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class TblModule extends Model
 {
-    //
+    protected $primaryKey = 'mod_id';
+
+    protected $fillable = [
+
+    ]
 }

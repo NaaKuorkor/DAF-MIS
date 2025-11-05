@@ -99,7 +99,6 @@
                 <label for="employment_status" class="block text-gray-600">Employment Status</label>
                 <select id="employment_status" name="employment_status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                     <option value="unemployed"  @selected(old('employment_status') == 'unemployed')>Unemployed</option>
-                    <option value="self-employed"  @selected(old('employment_status') == 'self-employed')>Self-employed</option>
                     <option value="employed"  @selected(old('employment_status') == 'employed')>Employed</option>
                 </select>
             </div>

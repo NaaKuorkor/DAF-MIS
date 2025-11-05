@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblrole', function (Blueprint $table) {
-            $table->string('role_id')->primary();
+            $table->string('role_id')->unique()->primary();
             $table->string('role_name');
             $table->string('role_description');
         });
