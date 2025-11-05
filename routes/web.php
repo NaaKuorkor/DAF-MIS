@@ -38,3 +38,6 @@ Route::middleware('auth:staff')->group(function () {
 });
 
 Route::post('/logout/{guard}', [AuthController::class, 'logout'])->name('logout');
+
+Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name('verification.notice');
+Route::get('/email/verify/{id}/{hash}', [RoutingController::class, 'showVerifySuccess'])->middleware(['auth', 'signed'])->name('verification.verify');

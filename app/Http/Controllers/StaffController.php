@@ -12,15 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
-    public function showStaffLogin()
-    {
-        return view("staff.login");
-    }
-
-
-    public function showStaffDashboard()
-    {
-        return view("staff.dashboard");
     }
 
     public function createStaff(Request $request)
@@ -110,15 +101,7 @@ class StaffController extends Controller
         }
     }
 
-    public function logout(Request $request)
-    {
-        Auth::guard('staff')->logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect()->route('staff.login.form')->with('success', 'Logged out successfully!');
-    }
 
     public function deleteStaff() {}
 

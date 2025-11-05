@@ -38,7 +38,7 @@ class StudentController extends Controller
 
             //Create student to be inserted into the databases
 
-            DB::transaction(function () use ($validateData) {
+            DB::transaction(function () use ($validateData, &$user) {
 
 
                 $idCount =  DB::table('tbluser')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
@@ -75,9 +75,12 @@ class StudentController extends Controller
                     'password' => Hash::make($validateData['password']),
                     'user_type' => 'STU',
                     'deleted' => 0,
-                    'createuser' => auth()->user()->email ?? 'system',
-                    'modifyuser' => auth()->user()->email ?? 'system',
+                    'createuser' => $validateData['email'],
+                    'modifyuser' => $validateData['email'],
                 ]);
+
+
+
 
                 $student = TblStudent::create([
                     'userid' => $user->userid,
@@ -92,11 +95,16 @@ class StudentController extends Controller
                     'certificate' => $validateData['certificate'],
                 ]);
 
+
                 DB::statement('UNLOCK TABLES');
             });
 
+            $user->sendEmailVerificationNotification();
+            Auth::login($user);
 
-            return redirect()->route('dashboard')->with('success', 'Registration successful!');
+
+
+            return redirect()->route('verification.notice');
         } catch (\Exception $e) {
             Log::error('Registration Failed!', [
                 'message' => $e->getMessage(),

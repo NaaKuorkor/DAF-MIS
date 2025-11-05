@@ -11,9 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\TblStaff;
 use App\Models\TblStudent;
 use Laravel\Sanctum\HasApiTokens;
-#use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-class TblUser extends Authenticatable
+class TblUser extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;

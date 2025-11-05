@@ -12,8 +12,21 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblmodule', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->string('mod_id')->unique()->primary();
+            $table->char('mod_position', 10);
+            $table->string('mod_name', 20);
+            $table->string('mod_label', 20);
+            $table->string('mod_url', 50);
+            $table->integer('is_child')->default(0);
+            $table->string('pmod_id', 10)->nullable();
+            $table->integer('has_child')->default(0);
+            $table->string('icon_class', 125);
+            $table->char('mod_status', 1)->default('1');
+            $table->string('mod_icon', 50);
+            $table->string('createuser');
+            $table->timestamp('createdate')->useCurrent();
+            $table->string('modifyuser');
+            $table->timestamp('modifydate')->useCurrentOnUpdate();
         });
     }
 

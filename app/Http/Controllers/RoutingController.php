@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
 class RoutingController extends Controller
@@ -32,5 +33,16 @@ class RoutingController extends Controller
     public function showDashboard()
     {
         return view('student.dashboard');
+    }
+
+    public function showVerifyEmail()
+    {
+        return view('verifyEmail');
+    }
+
+    public function showVerifySuccess(EmailVerificationRequest $request)
+    {
+        $request->fulfill();
+        return view('verifySuccess');
     }
 }
