@@ -12,8 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblcohort', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->string('cohort_id')->unique();
+            $table->foreign('course_id')->references('course_id')->on('tblcourse');
+            $table->foreign('duration')->references('duration')->on('tblcourse');
+
+            $table->primary(['cohort_id', 'course_id']);
+
+            $table->string('description');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->number('student_limit');
+            $table->char('is_completed')->default(0);
+            $table->char('deleted', 1)->default('0');
+            $table->string('createuser');
+            $table->timestamp('createdate')->useCurrent();
+            $table->string('modifyuser');
+            $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

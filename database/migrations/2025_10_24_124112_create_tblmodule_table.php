@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblmodule', function (Blueprint $table) {
-            $table->string('mod_id')->unique()->primary();
+            $table->string('modid')->unique()->primary();
             $table->char('mod_position', 10);
             $table->string('mod_name', 20);
             $table->string('mod_label', 20);

@@ -12,8 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblcohort_registration', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+            $table->string('transid')->unique()->primary();
+            $table->foreign('userid')->references('userid')->on('tbluser');
+            $table->foreign('cohort_id')->references('cohort_id')->on('tblcohort');
+            $table->char('is_completed');
+            $table->string('createuser');
+            $table->timestamp('createdate')->useCurrent();
+            $table->string('modifyuser');
+            $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }
 
