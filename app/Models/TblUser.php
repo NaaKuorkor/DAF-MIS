@@ -84,4 +84,9 @@ class TblUser extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(TblStudent::class, 'userid', 'userid');
     }
+
+    public function role()
+    {
+        return $this->hasOne(TblRole::class, 'role_id', 'user_type');
+    }
 }

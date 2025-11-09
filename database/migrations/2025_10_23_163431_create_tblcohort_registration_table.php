@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tblcohort_registration', function (Blueprint $table) {
             $table->string('transid')->unique()->primary();
-            $table->foreign('userid')->references('userid')->on('tbluser');
+            $table->foreign('studentid')->references('studentid')->on('tblstudent');
             $table->foreign('cohort_id')->references('cohort_id')->on('tblcohort');
             $table->char('is_completed');
             $table->string('createuser');

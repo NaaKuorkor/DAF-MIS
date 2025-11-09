@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TblUser;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class TblStaff extends Authenticatable
+
+class TblStaff extends Model
 {
     protected $table = 'tblstaff';
 
@@ -28,5 +28,10 @@ class TblStaff extends Authenticatable
     protected function casts(): array
     {
         return [];
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(TblUser::class, 'userid', 'userid');
     }
 }

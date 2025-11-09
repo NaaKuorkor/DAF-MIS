@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('tbluser_module_priviledges', function (Blueprint $table) {
             $table->string('userid', 50);
             $table->char('modid', 5);
-            $table->char('mod_create', 1)->default('0');
-            $table->char('mod_read', 1)->default('0');
-            $table->char('mod_update', 1)->default('0');
-            $table->char('mod_delete', 1)->default('0');
-            $table->char('mod_report', 1)->default('0');
+            $table->boolean('mod_create', 1)->default('0');
+            $table->boolean('mod_read', 1)->default('0');
+            $table->boolean('mod_update', 1)->default('0');
+            $table->boolean('mod_delete', 1)->default('0');
+            $table->boolean('mod_report', 1)->default('0');
             $table->string('createuser', 50)->nullable();
             $table->timestamp('createdate')->useCurrent();
             $table->string('modifyuser', 50)->nullable();

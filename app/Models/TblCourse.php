@@ -3,13 +3,22 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TblStudent;
+use App\Models\TblCourseRegistration;
+use App\Models\TblCohort;
 
 class TblCourse extends Model
 {
     protected $table = 'tblcourse';
 
+    protected $primaryKey = 'course_id';
+
+    public $incrementing = false;
+
+    public $timestamps = false;
+
     protected $fillable = [
-        'courseid',
+        'course_id',
         'course_name',
         'duration',
     ];
@@ -19,7 +28,22 @@ class TblCourse extends Model
         return [];
     }
 
-    public function user() {
-            return $this->
+
+    //Each course has many students via egistrations
+    public function students()
+    {
+        return $this->belongsToMany(TblStudent::class, 'tblcourse_registration', 'course_id', 'studentid');
+    }
+
+    //Each course has many registrations
+    public function courseRegistrations()
+    {
+        return $this->hasMany(TblCourseRegistration::class, 'course_id', 'course_id');
+    }
+
+    //Each course can have many cohorts
+    public function cohort()
+    {
+        return $this->hasMany(TblCohort::class, 'course_id', 'course_id');
     }
 }

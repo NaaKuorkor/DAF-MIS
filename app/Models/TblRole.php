@@ -10,7 +10,7 @@ class TblRole extends Model
     protected $table = 'tblrole';
 
     protected $fillable = [
-        'role_name',
+        'role_id',
         'role_description',
     ];
 
@@ -19,7 +19,8 @@ class TblRole extends Model
         return [];
     }
 
-    public function user() {
-        return $this->hasMany(TblUser::class, 'role', 'role_id');
+    public function user()
+    {
+        return $this->hasMany(TblUser::class, 'user_type', 'role_id');
     }
 }
