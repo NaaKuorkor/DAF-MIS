@@ -35,7 +35,7 @@ class TestSeeder extends Seeder
 
         ]);
 
-        $staffUser =TblUser::create([
+        $staffUser = TblUser::create([
             'email' => 'fredbigs@gmail.com',
             'password' => Hash::make('987654321'),
             'phone' => '0987654321',

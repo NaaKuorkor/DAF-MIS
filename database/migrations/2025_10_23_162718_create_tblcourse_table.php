@@ -11,6 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
+
         Schema::create('tblcourse', function (Blueprint $table) {
             $table->string('course_id')->unique()->primary();
             $table->string('course_name');

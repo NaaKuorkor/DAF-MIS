@@ -13,15 +13,16 @@ return new class extends Migration
     {
         Schema::create('tblcohort', function (Blueprint $table) {
             $table->string('cohort_id')->unique();
+            $table->string('course_id');
             $table->foreign('course_id')->references('course_id')->on('tblcourse');
-            $table->foreign('duration')->references('duration')->on('tblcourse');
+
 
             $table->primary(['cohort_id', 'course_id']);
 
             $table->string('description');
             $table->date('start_date');
             $table->date('end_date');
-            $table->number('student_limit');
+            $table->integer('student_limit');
             $table->char('is_completed')->default(0);
             $table->char('deleted', 1)->default('0');
             $table->string('createuser');

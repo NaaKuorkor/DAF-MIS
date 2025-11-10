@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('tbluser', function (Blueprint $table) {
             $table->string('userid')->unique()->primary();
             $table->string('email', 255)->unique();
-            $table->enum('user_type', ['STA', 'STU']);
+            $table->enum('user_type', ['STA', 'STU', 'ADM']);
             $table->string('password');
             $table->string('phone', 15)->nullable();
             $table->char('deleted', 1)->default('0');

@@ -21,7 +21,6 @@ return new class extends Migration
             $table->enum('gender', ['M', 'F']);
             $table->string('residence');
             $table->string('referral')->nullable();
-            $table->foreign('course_id')->references('course_id')->on('tblcourse');
             $table->string('employment_status');
             $table->string('qualification')->nullable();
             $table->string('certificate');

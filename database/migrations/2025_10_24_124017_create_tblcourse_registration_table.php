@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('tblcourse_registration', function (Blueprint $table) {
             $table->string('transid')->unique()->primary();
+            $table->string('course_id');
+            $table->string('studentid');
             $table->foreign('course_id')->references('course_id')->on('tblcourse');
             $table->foreign('studentid')->references('studentid')->on('tblstudent');
             $table->char('is_completed')->default(0);
