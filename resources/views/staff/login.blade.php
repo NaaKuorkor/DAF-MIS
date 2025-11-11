@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
-@session('title', 'Staff Login')
+@section('title', 'Staff Login')
 
-@session('content')
+@section('content')
 
         <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
 
@@ -52,4 +52,5 @@
             </form>
 
         </div>
-@endsession
+
+@endsection

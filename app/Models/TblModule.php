@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TblUser;
 
 class TblModule extends Model
 {
     protected $table = 'tblmodule';
 
-    protected $primaryKey = 'mod_id';
+    protected $primaryKey = 'modid';
 
     public $incrementing = false;
 
@@ -27,4 +28,10 @@ class TblModule extends Model
         'mod_status',
         'mod_icon',
     ];
+
+    public function users()
+    {
+        return $this->belongsToMany(TblUser::class, 'tbluser_module_priviledges', 'modid', 'userid')
+            ->withPivot('mod_create', 'mod_read', 'mod_update', 'mod_delete', 'mod_report');
+    }
 }

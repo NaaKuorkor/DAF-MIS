@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Auth;
 use App\Models\TblStaff;
 use App\Models\TblStudent;
+use App\Models\TblModule;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 
@@ -23,6 +24,7 @@ class TblUser extends Authenticatable implements MustVerifyEmail
     protected $primaryKey = 'userid';
 
     public $incrementing = false;
+
     protected $keyType = 'string';
 
     public $timestamps = false;
@@ -88,5 +90,15 @@ class TblUser extends Authenticatable implements MustVerifyEmail
     public function role()
     {
         return $this->hasOne(TblRole::class, 'role_id', 'user_type');
+    }
+
+
+    //A user has access to many modules and a module has many users
+    public function modules()
+    {
+        return $this->belongsToMany(TblModule::class, 'tbluser_module_priviledges', 'userid', 'modid')
+            ->withPivot('mod_create', 'mod_read', 'mod_update', 'mod_delete') //Adds these columns as priviledge flags of the user
+            ->where('tblmodule.mod_status', '1') //This only returns active modules
+            ->orderBy('tblmodule.mod_position', 'asc');   // THis arranges them in ascending order
     }
 }

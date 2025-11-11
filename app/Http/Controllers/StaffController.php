@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
-    }
+
 
     public function createStaff(Request $request)
     {
@@ -102,12 +102,22 @@ class StaffController extends Controller
     }
 
 
+    public function dashboardMenu()
+    {
+        $user = auth()->user();
 
-    public function deleteStaff() {}
+        $modules = $user->modules()->wherePivot('mod_read', 1)
+            ->orderBy('mod_position', 'asc')->get();
 
-    public function viewUsers() {}
+        return view('staff.dashboard', compact('modules'));
+    }
 
-    public function deleteUser() {}
 
-    public function viewStaff() {}
+    //public function deleteStaff() {}
+
+    //public function viewUsers() {}
+
+    //public function deleteUser() {}
+
+    //public function viewStaff() {}
 }

@@ -7,6 +7,7 @@ use App\Models\TblUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 
 class AuthController extends Controller
@@ -18,6 +19,7 @@ class AuthController extends Controller
             'email' => "email|required",
             'password' => "required",
         ]);
+
 
         //Check if it details are in Db
         try {
@@ -36,7 +38,7 @@ class AuthController extends Controller
             //Log user in
             if ($user->user_type === 'STU') {
                 $guard = 'student';
-            } else if ($user->user_type === 'STA') {
+            } else if ($user->user_type === 'STA' || $user->user_type === 'ADM') {
                 $guard = 'staff';
             }
 
@@ -48,7 +50,7 @@ class AuthController extends Controller
             if ($guard === 'student') {
                 return redirect()->intended('dashboard');
             } else if ($guard === 'staff') {
-                return redirect()->intended('staff.dashboard');
+                return redirect()->intended(route('staff.dashboard'));
             }
         } catch (\Exception $e) {
             Log::error('Login failed', [
@@ -62,7 +64,7 @@ class AuthController extends Controller
 
 
 
-    public function apiLogin(): JsonResponse
+    public function apiLogin(Request $request)
     {
         $userData = $request->validate([
             'email' => "email|required",
@@ -121,6 +123,7 @@ class AuthController extends Controller
         if (Auth::guard($guard)->check()) {
             Auth::guard($guard)->logout();
         }
+
 
         $request->session()->invalidate();
         $request->session()->regenerateToken(); //Generates new csrf token

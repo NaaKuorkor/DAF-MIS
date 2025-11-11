@@ -6,5 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class TblUserModulePriviledges extends Model
 {
-    //
+    protected $table = 'tbluser_module_priviledges';
+
+    protected $primaryKey = null;
+
+    public $incrementing = false;
+
+    public $timestamps = false;
+
+    protected $fillable = [];
 }

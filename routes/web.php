@@ -26,7 +26,11 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::middleware('guest:staff')->group(function () {
 
     Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
+
+    //Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
 });
+
+Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
 
 
 Route::middleware('auth:staff')->group(function () {

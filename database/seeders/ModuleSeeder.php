@@ -6,6 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
 use App\Models\TblModule;
+use App\Models\TblUserModulePriviledges;
 
 class ModuleSeeder extends Seeder
 {
@@ -124,5 +125,84 @@ class ModuleSeeder extends Seeder
 
         //Insert all in database
         TblModule::insert($modules);
+
+        $modulePriviledges = [
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD001',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+            ],
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD002',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+            ],
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD003',
+                'mod_create' => 1,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+
+            ],
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD004',
+                'mod_create' => 1,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+
+            ],
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD005',
+                'mod_create' => 1,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+            ],
+            [
+                'userid' => 'U0000000001',
+                'modid' => 'MOD006',
+                'mod_create' => 1,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 1,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+            ]
+        ];
+
+        TblUserModulePriviledges::insert($modulePriviledges);
     }
 }

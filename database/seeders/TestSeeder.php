@@ -18,37 +18,22 @@ class TestSeeder extends Seeder
     public function run(): void
     {
         $user = TblUser::create([
-            'email' => 'johndoe@gmail.com',
-            'phone' => '0123456789',
-            'password' => Hash::make('123456789'),
-            'user_type' => 'STU',
+            'userid' => 'U0000000001',
+            'email' => 'naakuorkor2@gmail.com',
+            'phone' => '0595319756',
+            'password' => Hash::make('Decode@20'),
+            'user_type' => 'ADM',
             'deleted' => 0,
         ]);
 
-        $user->student()->create([
-            'fname' => 'John',
-            'lname' => 'Doe',
-            'gender' => 'M',
+        $user->staff()->create([
+            'staffid' => 'STF0000000001',
+            'fname' => 'Dorothy',
+            'lname' => 'Amon',
+            'gender' => 'F',
             'residence' => 'Dansoman',
-            'employment_status' => 'Unemployed',
-            'certificate' => 'Pending',
+            'position' => 'Developer',
 
-        ]);
-
-        $staffUser = TblUser::create([
-            'email' => 'fredbigs@gmail.com',
-            'password' => Hash::make('987654321'),
-            'phone' => '0987654321',
-            'user_type' => 'STA',
-            'deleted' => 0,
-        ]);
-
-        $staffUser->staff()->create([
-            'fname' => 'Fred',
-            'lname' => 'Bigs',
-            'gender' => 'M',
-            'position' => 'Accountant',
-            'residence' => 'Abeka',
         ]);
     }
 }
