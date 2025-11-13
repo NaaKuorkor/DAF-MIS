@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use App\Models\TblModule;
 
 class TblUserModulePriviledges extends Model
 {

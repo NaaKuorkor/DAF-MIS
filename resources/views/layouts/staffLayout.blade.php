@@ -11,5 +11,19 @@
     <body>
         <x-d-header />
 
+        <div class='flex p-2 gap-4  h-screen'>
+            <!--Side bar-->
+            <div class="w-12 h-auto flex flex-col border border-solid border-black rounded-lg shadow-lg  p-4">
+                <form method="POST" action="#">
+                    @csrf
+                    <button type='submit' class="w-50 bg-gray-200 rounded-lg m-5 p-4">Overview</button>
+                </form>
+            </div>
+
+            <!--//Main Content-->
+            <div class='w-3/4 h-auto rounded-lg flex flex-1 border border-solid border-black flex-col shadow-lg '>
+
+            </div>
+        </div>
     </body>
 </html>
