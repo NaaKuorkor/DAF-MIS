@@ -5,6 +5,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoutingController;
+use App\Http\Controllers\DashboardController;
+use GuzzleHttp\Middleware;
 
 //Base route
 Route::get('/', [RoutingController::class, 'showLoginForm']);
@@ -43,3 +45,15 @@ Route::post('/logout/{guard}', [AuthController::class, 'logout'])->name('logout'
 Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name('verification.notice');
 
 Route::get('/email/verify/{id}/{hash}', [RoutingController::class, 'showVerifySuccess'])->middleware(['auth', 'signed'])->name('verification.verify');
+
+
+//Api routes
+Route::get('/user/modules', [DashboardController::class, 'fetchModules'])->middleware('auth:staff');
+
+Route::get('/staff/overview', [DashboardController::class, 'overviewContent']);
+Route::get('/staff/staff', [RoutingController::class, 'showStaffMngt']);
+Route::get('/staff/students', [RoutingController::class, 'showOverview']);
+Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
+Route::get('/staff/myAccount', [RoutingController::class, 'showMyAccount']);
+Route::get('/staff/courses', [RoutingController::class, 'showCourseMngt']);
+Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);

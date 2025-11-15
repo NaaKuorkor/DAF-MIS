@@ -45,4 +45,39 @@ class RoutingController extends Controller
         $request->fulfill();
         return view('verifySuccess');
     }
+
+    public function showOverview()
+    {
+        return view('components.overview');
+    }
+
+    public function showStudentMngt()
+    {
+        return view('components.student_mngt');
+    }
+
+    public function showStaffMngt()
+    {
+        return view('components.staff_mngt');
+    }
+
+    public function showCourseMngt()
+    {
+        return view('components.course_mngt');
+    }
+
+    public function showTaskMngt()
+    {
+        return view('components.task_mngt');
+    }
+
+    public function showMyAccount()
+    {
+        return view('components.my-account');
+    }
+
+    public function showCohortMngt()
+    {
+        return view('components.cohort_mngt');
+    }
 }

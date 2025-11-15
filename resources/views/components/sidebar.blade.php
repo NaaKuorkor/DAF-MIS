@@ -1,6 +1,6 @@
-<div class=" h-auto flex flex-1 flex-col border border-solid border-black rounded-lg shadow-lg m-10 p-4">
+<div class="w-1/4 h-auto flex flex-col border border-solid border-black rounded-lg shadow-lg  p-4" id="sidebar">
     <form method="POST" action="#">
         @csrf
-        <button type='submit' class="w-50 bg-gray-200 rounded-lg m-5 p-4">Overview</button>
+        <button type='submit' class="w-auto bg-gray-200 scale-100 rounded-lg m-5 p-4 transition-all ease-in-out duration-200">Overview</button>
     </form>
 </div>

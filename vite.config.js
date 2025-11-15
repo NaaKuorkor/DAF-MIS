@@ -10,4 +10,14 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    server: {
+        proxy: {
+            '/api': 'http://daf-mis.test',
+            '/user': 'http://daf-mis.test',
+            '/student': 'http://daf-mis.test',
+            '/staff': 'http://daf-mis.test',
+            '/login': 'http://daf-mis.test',
+            '/sanctum': 'http://daf-mis.test',
+        }
+    }
 });
