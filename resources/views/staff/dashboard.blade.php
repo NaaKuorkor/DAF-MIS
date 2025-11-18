@@ -1,4 +1,4 @@
-@extends ('layouts.staffLayout')
+@extends ('layouts.dashboardLayout')
 
 @section ('title', 'Staff Dashboard')
 

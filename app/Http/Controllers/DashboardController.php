@@ -14,11 +14,7 @@ class DashboardController extends Controller
 {
     public function fetchModules()
     {
-        $user = Auth::guard('staff')->user();
-
-        Log::info('Auth User:', ['user' => $user]);
-        Log::info('Auth Check:', ['check' => Auth::guard('staff')->check()]);
-
+        $user = Auth::user();
 
 
         //Check if user is authenticated

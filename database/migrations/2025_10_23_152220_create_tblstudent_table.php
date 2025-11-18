@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('referral')->nullable();
             $table->string('employment_status');
             $table->string('qualification')->nullable();
-            $table->string('certificate');
+            $table->enum('certificate', ['Y', 'N']);
             $table->string('payment')->nullable();
             $table->string('job_preference')->nullable();
         });

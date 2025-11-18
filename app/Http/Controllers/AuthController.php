@@ -33,23 +33,14 @@ class AuthController extends Controller
                 return back()->withErrors(['password' => 'Incorrect Password!'])->withInput();
             }
 
-            $guard = null;
-
-            //Log user in
-            if ($user->user_type === 'STU') {
-                $guard = 'student';
-            } else if ($user->user_type === 'STA' || $user->user_type === 'ADM') {
-                $guard = 'staff';
-            }
-
             $remember = $request->has('remember');
-            Auth::guard($guard)->login($user, $remember);
+            Auth::login($user, $remember);
 
 
             //Redirect to next page
-            if ($guard === 'student') {
+            if ($user->user_type === 'STU') {
                 return redirect()->intended('dashboard');
-            } else if ($guard === 'staff') {
+            } else if ($user->user_type === 'STA' || $user->user_type === 'ADM') {
                 return redirect()->intended(route('staff.dashboard'));
             }
         } catch (\Exception $e) {
@@ -64,64 +55,12 @@ class AuthController extends Controller
 
 
 
-    public function apiLogin(Request $request)
+
+    public function staffLogout(Request $request)
     {
-        $userData = $request->validate([
-            'email' => "email|required",
-            'password' => "required",
-        ]);
 
-        try {
-            $user = TblUser::where('email', $userData['email'])->first();
-
-            if (!$user) {
-                return response()->json([
-                    'ok' => false,
-                    'message' => 'User not found!'
-                ], 404);
-            }
-
-            if (!Hash::check($request->password, $user->password)) {
-                return  response()->json([
-                    'ok' => false,
-                    'message' => 'Incorrect Password'
-                ], 401);
-            }
-
-            $guard = null;
-
-            //Log user in
-            if ($user->user_type === 'STU') {
-                $guard = 'student';
-            } else if ($user->user_type === 'STA') {
-                $guard = 'staff';
-            }
-
-            $remember = $request->has('remember');
-            Auth::guard($guard)->login($user, $remember);
-        } catch (\Exception $e) {
-            Log::error("Login failed", [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'ok' => false,
-                'message' => 'Login failed'
-            ], 401);
-        }
-    }
-
-
-
-    public function logout(Request $request, $guard)
-    {
-        if (!in_array($guard, ['student', 'staff'])) {
-            return redirect()->route('login.form')->with('error', 'Invalid logout request');
-        }
-
-        if (Auth::guard($guard)->check()) {
-            Auth::guard($guard)->logout();
+        if (Auth::check()) {
+            Auth::logout();
         }
 
 
@@ -129,13 +68,45 @@ class AuthController extends Controller
         $request->session()->regenerateToken(); //Generates new csrf token
 
 
-        if ($guard === 'student') {
-            return redirect()->route('login.form')->with('success', 'Successfully logged out!');
-        }
-        if ($guard === 'staff') {
-            return redirect()->route('staff.login.form')->with('success', 'Successfully logged out!');
+        return redirect()->route('staff.login.form')->with('success', 'Successfully logged out');
+    }
+
+
+    public function studentLogout(Request $request)
+    {
+
+        if (Auth::check()) {
+            Auth::logout();
         }
 
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken(); //Generates new csrf token
+
         return redirect()->route('login.form')->with('success', 'Successfully logged out');
+    }
+
+    public function forgotPassword(Request $request)
+    {
+
+        //Get user email
+        $email = $request->validate(['email' => 'email||required']);
+
+        //CHeck if user email is in db
+        try {
+            $email = TblUser::where('email', $email['email'])->first();
+
+            if (!$email) {
+                return back()->withErrors(['email' => 'User not found'])->withInput();
+            }
+            //If yes, send an email
+
+            return redirect()->route();
+        } catch (\Exception $e) {
+            Log::error('Failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
     }
 }

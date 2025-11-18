@@ -1,3 +1,5 @@
+props(['names', 'email', 'logout'])
+
 <div x-data="{
         dropdownOpen: false
     }"
@@ -25,7 +27,7 @@
                 @csrf
                 <button type='submit'  class="relative w-full flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Profile</button>
             </form>
-            <form method='POST' action="{{ route('logout', ['guard' => 'staff']) }}" >
+            <form method='POST' action="{{ route('staff.logout') }}" >
                 @csrf
                 <button type='submit'  class="relative w-full flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Logout</button>
             </form>

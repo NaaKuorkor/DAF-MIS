@@ -17,30 +17,28 @@ Route::get('/register', [RoutingController::class, 'showRegisterForm'])->middlew
 
 
 
-Route::get('/login', [RoutingController::class, 'showLoginForm'])->middleware('guest:student')->name('login.form');
+Route::get('/login', [RoutingController::class, 'showLoginForm'])->middleware('guest')->name('login.form');
 
-Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth:student')->name('dashboard');
+Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth')->name('dashboard');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
 
 //Admin routesi
-Route::middleware('guest:staff')->group(function () {
 
-    Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
 
-    //Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
-});
+Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
 
 Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
 
 
-Route::middleware('auth:staff')->group(function () {
+Route::middleware('auth')->group(function () {
 
     Route::get('/staff/dashboard', [RoutingController::class, 'showStaffDashboard'])->name('staff.dashboard');
 });
 
-Route::post('/logout/{guard}', [AuthController::class, 'logout'])->name('logout');
+Route::post('/staff/logout', [AuthController::class, 'staffLogout'])->name('staff.logout');
+Route::post('/student/logout', [AuthController::class, 'studentLogout'])->name('student.logout');
 
 Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name('verification.notice');
 
@@ -48,12 +46,12 @@ Route::get('/email/verify/{id}/{hash}', [RoutingController::class, 'showVerifySu
 
 
 //Api routes
-Route::get('/user/modules', [DashboardController::class, 'fetchModules'])->middleware('auth:staff');
+Route::get('/modules', [DashboardController::class, 'fetchModules'])->middleware('auth');
 
-Route::get('/staff/overview', [DashboardController::class, 'overviewContent']);
-Route::get('/staff/staff', [RoutingController::class, 'showStaffMngt']);
-Route::get('/staff/students', [RoutingController::class, 'showOverview']);
+Route::get('/overview', [DashboardController::class, 'overviewContent']);
+Route::get('/staff/staff-info', [RoutingController::class, 'showStaffMngt']);
+Route::get('/staff/student-info', [RoutingController::class, 'showStudentMngt']);
 Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
-Route::get('/staff/myAccount', [RoutingController::class, 'showMyAccount']);
-Route::get('/staff/courses', [RoutingController::class, 'showCourseMngt']);
+Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
+Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
 Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);

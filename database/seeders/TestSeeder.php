@@ -17,16 +17,16 @@ class TestSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = TblUser::create([
+        $staff = TblUser::create([
             'userid' => 'U0000000001',
-            'email' => 'naakuorkor2@gmail.com',
+            'email' => 'naakuorkor72@gmail.com',
             'phone' => '0595319756',
             'password' => Hash::make('Decode@20'),
             'user_type' => 'ADM',
             'deleted' => 0,
         ]);
 
-        $user->staff()->create([
+        $staff->staff()->create([
             'staffid' => 'STF0000000001',
             'fname' => 'Dorothy',
             'lname' => 'Amon',
@@ -34,6 +34,27 @@ class TestSeeder extends Seeder
             'residence' => 'Dansoman',
             'position' => 'Developer',
 
+        ]);
+
+        $student = TblUser::create([
+            'userid' => 'U0000000002',
+            'email' => 'naakuorkor2@gmail.com',
+            'phone' => '0242167206',
+            'password' => Hash::make('Decode@20'),
+            'user_type' => 'STU',
+            'deleted' => 0,
+
+        ]);
+
+        $student->student()->create([
+            'studentid' => 'STU0000000001',
+            'fname' => 'Naa',
+            'lname' => 'Kuorkor',
+            'gender' => 'F',
+            'residence' => 'La',
+            'employment_status' => 'Unemployed',
+            'certificate' => 'Y',
+            'referral' => 'Website'
         ]);
     }
 }

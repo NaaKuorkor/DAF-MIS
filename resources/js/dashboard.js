@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function getModules() {
         try{
             //get modules
-            const response= await axios.get('/user/modules');
+            const response= await axios.get('/modules');
             console.log('Modules:', response.data)
             const modules = response.data;
             //Display modules on dashboard
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function displayOverview(){
         try{
             //get html for overview
-            const response= await axios.get('/staff/overview');
+            const response= await axios.get('/overview');
             const cards = response.data;
             //Display content on dashboard
             dashboardContent.innerHTML = cards;

@@ -19,9 +19,9 @@ class ModuleSeeder extends Seeder
             [
                 'modid' => 'MOD001',
                 'mod_position' => '1',
-                'mod_name' => 'Dashboard',
-                'mod_label' => 'Dashboard',
-                'mod_url' => '/staff/overview',
+                'mod_name' => 'Overview',
+                'mod_label' => 'Overview',
+                'mod_url' => '/overview',
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,
@@ -73,7 +73,7 @@ class ModuleSeeder extends Seeder
                 'mod_position' => '4',
                 'mod_name' => 'Course Management',
                 'mod_label' => 'Courses',
-                'mod_url' => '/staff/courses',
+                'mod_url' => '/courses',
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,
@@ -124,7 +124,7 @@ class ModuleSeeder extends Seeder
                 'modid' => 'MOD007',
                 'mod_position' => '7',
                 'mod_name' => 'Account Management',
-                'mod_label' => 'Tasks',
+                'mod_label' => 'My Account',
                 'mod_url' => '/my-account',
                 'is_child' => 0,
                 'pmod_id' => null,
@@ -218,6 +218,44 @@ class ModuleSeeder extends Seeder
                 'createuser' => 'system',
                 'modifydate' => Carbon::now(),
                 'modifyuser' => 'system'
+            ],
+            [
+                'userid' => 'U0000000002',
+                'modid' => 'MOD001',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 0,
+                'mod_delete' => 0,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+
+            ],
+            [
+                'userid' => 'U0000000002',
+                'modid' => 'MOD004',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 0,
+                'mod_delete' => 0,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+            ],
+            [
+                'userid' => 'U0000000002',
+                'modid' => 'MOD007',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 0,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+
             ]
         ];
 
