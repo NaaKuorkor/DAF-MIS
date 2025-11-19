@@ -19,7 +19,7 @@ Route::get('/register', [RoutingController::class, 'showRegisterForm'])->middlew
 
 Route::get('/login', [RoutingController::class, 'showLoginForm'])->middleware('guest')->name('login.form');
 
-Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth')->name('dashboard');
+Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth', 'student')->name('dashboard');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
@@ -32,7 +32,7 @@ Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('
 Route::post('/staff/login', [AuthController::class, 'login'])->name('staff.login');
 
 
-Route::middleware('auth')->group(function () {
+Route::middleware('auth', 'staff')->group(function () {
 
     Route::get('/staff/dashboard', [RoutingController::class, 'showStaffDashboard'])->name('staff.dashboard');
 });

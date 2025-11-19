@@ -1,4 +1,3 @@
-props(['names', 'email', 'logout'])
 
 <div x-data="{
         dropdownOpen: false
@@ -8,8 +7,8 @@ props(['names', 'email', 'logout'])
     <button x-on:click="dropdownOpen=true" class="inline-flex justify-center items-center py-2 px-4 h-12 w-full text-sm font-medium bg-white rounded-md border transition-colors text-neutral-700 hover:bg-neutral-100 active:bg-white focus:bg-white focus:outline-none disabled:opacity-50 disabled:pointer-events-none">
         <img src="https://cdn.devdojo.com/images/may2023/adam.jpeg" class="object-cover w-8 h-8 rounded-full border border-neutral-200" />
         <span class="flex flex-col flex-shrink-0 items-start ml-2 h-full leading-none translate-y-px">
-            <span>Dorothy</span>
-            <span class="text-xs font-light text-neutral-400">@dorothyamon</span>
+            <span>{{ $userData['name'] }}</span>
+            <span class="text-xs font-light text-neutral-400">{{ $userData['email'] }}</span>
         </span>
     </button>
 
@@ -27,7 +26,7 @@ props(['names', 'email', 'logout'])
                 @csrf
                 <button type='submit'  class="relative w-full flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Profile</button>
             </form>
-            <form method='POST' action="{{ route('staff.logout') }}" >
+            <form method='POST' action="{{ route($userData['logout']) }}" >
                 @csrf
                 <button type='submit'  class="relative w-full flex cursor-default select-none hover:bg-neutral-100 items-center rounded px-2 py-1.5 text-sm outline-none transition-colors data-[disabled]:pointer-events-none data-[disabled]:opacity-50">Logout</button>
             </form>

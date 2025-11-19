@@ -29,7 +29,22 @@ class DashboardController extends Controller
 
     public function getContent($route)
     {
-        $view = view('module.$route')->render();
+        $user = Auth::user();
+        $fname = $user->fname;
+        $lname = $user->lname;
+        $fullname = $fname . ' ' . $lname;
+        $email = $user->email;
+        $type = $user->usertype;
+        $logout = null;
+
+        //Check usertype to assign the right logout
+        if ($type === 'STU') {
+            $logout = 'student.logout';
+        } else {
+            $logout = 'staff.logout';
+        }
+
+        $view = view('module.$route', compact('fullname', 'email', 'logout'))->render();
 
         return response($view);
     }
