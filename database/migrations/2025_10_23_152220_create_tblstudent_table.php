@@ -26,6 +26,10 @@ return new class extends Migration
             $table->enum('certificate', ['Y', 'N']);
             $table->string('payment')->nullable();
             $table->string('job_preference')->nullable();
+            $table->string('createuser');
+            $table->timestamp('createdate')->useCurrent();
+            $table->string('modifyuser')->default(null);
+            $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

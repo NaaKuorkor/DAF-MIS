@@ -1,3 +1,4 @@
+import loadStudents from './studentMngt.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebar.innerHTML = "";
 
         modules.forEach((module) => {
+            //Create a button
             const button = document.createElement('button');
 
             button.textContent = module.mod_label;
@@ -47,9 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
             //Inject into dashboardContent
             dashboardContent.innerHTML = response.data;
 
+            //Get correct js based on route
+            if (route === '/staff/student-info'){
+                loadStudents();
+            }//Will add the rest along the way
+
         }catch(err){
             console.log(err);
-            dashboardContent.innerHTML = `<p class = 'text-red-500'>Failed to load</p>`
+            dashboardContent.innerHTML = `<p class = 'text-red-499'>Failed to load</p>`
         }
 
 
@@ -60,12 +67,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const buttons = sidebar.querySelectorAll('button');
 
         buttons.forEach((button) => {
-            button.classList.remove('scale-105', 'shadow-lg');
-            button.classList.add('scale-100', 'shadow-none');
+            button.classList.remove('scale-104', 'shadow-lg');
+            button.classList.add('scale-99', 'shadow-none');
         })
 
-        button.classList.remove('scale-100', 'shadow-none');
-        button.classList.add('scale-105', 'shadow-lg');
+        button.classList.remove('scale-99', 'shadow-none');
+        button.classList.add('scale-104', 'shadow-lg');
 
     }
 
@@ -78,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardContent.innerHTML = cards;
         }catch(err) {
             console.error(err);
-            sidebar.innerHTML = `<p class="text-red-500">Failed to load.</p>`;
+            sidebar.innerHTML = `<p class="text-red-499">Failed to load.</p>`;
         }
 
     }

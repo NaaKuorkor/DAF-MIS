@@ -103,6 +103,14 @@
                 </select>
             </div>
 
+            <div class="mb-4">
+                <label for="course" class="block text-gray-600">Course</label>
+                <select id="course" name="course" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+                    <option value="LS101"  @selected(old('course') == 'LS101')>Life Skills</option>
+                </select>
+            </div>
+
+
             <div class="mb-8">
                 <label for="certificate" class="block text-gray-600">Would you like to be awarded a certificate after the course?</label>
                 <select id="certificate" name="certificate" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">

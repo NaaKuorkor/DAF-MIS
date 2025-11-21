@@ -13,7 +13,7 @@ Route::get('/', [RoutingController::class, 'showLoginForm']);
 
 //User routes
 Route::get('/register', [RoutingController::class, 'showRegisterForm'])->middleware('guest')->name('register.form');
-
+Route::post('/register', [StudentController::class, 'register'])->middleware('guest')->name('register');
 
 
 
@@ -55,3 +55,4 @@ Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
 Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
 Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
 Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);
+Route::get('/staff/studentTable', [StaffController::class, 'studentTableContent']);

@@ -21,6 +21,10 @@ return new class extends Migration
             $table->enum('gender', ['M', 'F']);
             $table->string('position', 50);
             $table->string('residence');
+            $table->string('createuser');
+            $table->timestamp('createdate')->useCurrent();
+            $table->string('modifyuser')->default(null);
+            $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }
 

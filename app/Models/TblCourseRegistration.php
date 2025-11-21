@@ -9,14 +9,13 @@ class TblCourseRegistration extends Model
 {
     protected $table = 'tblcourse_registration';
 
-    protected $primaryKey = 'transid';
+    protected $primaryKey = ['studentid', 'course_id'];
 
     public $incrementing = false;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'transid',
         'studentid',
         'course_id',
         'is_completed'

@@ -12,12 +12,48 @@ export default defineConfig({
     ],
     server: {
         proxy: {
-            '/api': 'http://daf-mis.test',
-            '/user': 'http://daf-mis.test',
-            '/student': 'http://daf-mis.test',
-            '/staff': 'http://daf-mis.test',
-            '/login': 'http://daf-mis.test',
-            '/sanctum': 'http://daf-mis.test',
+            '/api': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/user': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/register': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/student': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/staff': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/login': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
+        '/sanctum': {
+            target: 'http://daf-mis.test',
+            changeOrigin: true,
+            credentials: 'include',
+            followRedirects: true,
+        },
         }
     }
 });

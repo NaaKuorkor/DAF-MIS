@@ -14,6 +14,10 @@ class TblStudent extends Model
 
     protected $primaryKey = 'studentid';
 
+    public $incrementing = false;
+
+    public $keytype = 'string';
+
     public $timestamps = false;
 
     protected $fillable = [

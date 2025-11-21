@@ -1,70 +1,32 @@
-<div class="flex flex-col">
+<div class="flex flex-col p-6">
+    <div class='flex flex-col gap-4'>
+        <h1 class="font-bold text-4xl">Students</h1>
 
-<div class="flex flex-col">
-    <div class="overflow-x-auto">
-        <div class="inline-block min-w-full">
-            <div class="overflow-hidden">
-                <table class="min-w-full divide-y divide-neutral-200/70">
-                    <thead>
-                        <tr class="text-neutral-800">
-                            <th class="px-5 py-3 text-xs font-medium text-left uppercase">Name</th>
-                            <th class="px-5 py-3 text-xs font-medium text-left uppercase">Phone</th>
-                            <th class="px-5 py-3 text-xs font-medium text-left uppercase">Gender</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Address</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Course Registered</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Cohort</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Completion date</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Certificate</th>
-                            <th class="px-5 py-3 text-xs font-medium text-right uppercase">Actions</th>
+        <input class='border border-gray-400 rounded-lg w-70 p-2' type='text' placeholder="Search">
+    </div>
 
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-neutral-200/70">
-                        <tr class="text-neutral-600 bg-neutral-50">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">Richard Hendricks</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">30</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">Pied Piper HQ, Palo Alto</td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a class="text-blue-600 hover:text-blue-700" href="#">Edit</a>
-                            </td>
-                        </tr>
-                        <tr class="text-neutral-800">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">Erlich Bachman</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">40</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">5230 Penfield Ave, Woodland Hills</td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a class="text-blue-600 hover:text-blue-700" href="#">Edit</a>
-                            </td>
-                        </tr>
-                        <tr class="text-neutral-800 bg-neutral-50">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">Monica Hall</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">35</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">2030 Stewart Drive, Sunnyvale</td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a class="text-blue-600 hover:text-blue-700" href="#">Edit</a>
-                            </td>
-                        </tr>
-                        <tr class="text-neutral-800">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">Dinesh Chugtai</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">28</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">Pied Piper HQ, Palo Alto</td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a class="text-blue-600 hover:text-blue-700" href="#">Edit</a>
-                            </td>
-                        </tr>
-                        <tr class="text-neutral-800 bg-neutral-50">
-                            <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">Gilfoyle</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">32</td>
-                            <td class="px-5 py-4 text-sm whitespace-nowrap">Pied Piper HQ, Palo Alto</td>
-                            <td class="px-5 py-4 text-sm font-medium text-right whitespace-nowrap">
-                                <a class="text-blue-600 hover:text-blue-700" href="#">Edit</a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+    <div class="flex flex-col ">
+        <div class="overflow-x-auto">
+            <div class="inline-block min-w-full">
+                <div class="overflow-hidden">
+                    <table class="min-w-full divide-y divide-neutral-200/70">
+                        <thead>
+                            <tr class="text-neutral-800">
+                               <th class="px-5 py-3 text-xs font-medium text-center uppercase">Name</th>
+                                <th class="px-5 py-3 text-xs font-medium text-center uppercase">Course Registered</th>
+                                <th class="px-5 py-3 text-xs font-medium text-center uppercase">Cohort</th>
+                                <th class="px-5 py-3 text-xs font-medium text-center uppercase">Registration date</th>
+                                <th class="px-5 py-3 text-xs font-medium text-center uppercase">Referral</th>
+                                <th class="px-5 py-3 text-xs font-medium text-center uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-200/70" id="tableRows">
+
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>

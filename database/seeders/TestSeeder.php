@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\TblCohort;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\TblStaff;
-use App\Models\TblStudent;
+use App\Models\TblCourse;
 use App\Models\TblUser;
 use Illuminate\Support\Facades\Hash;
 
@@ -33,12 +34,13 @@ class TestSeeder extends Seeder
             'gender' => 'F',
             'residence' => 'Dansoman',
             'position' => 'Developer',
-
+            'createuser' => 'system',
+            'modifyuser' => 'system'
         ]);
 
         $student = TblUser::create([
             'userid' => 'U0000000002',
-            'email' => 'naakuorkor2@gmail.com',
+            'email' => 'naakotey52@gmail.com',
             'phone' => '0242167206',
             'password' => Hash::make('Decode@20'),
             'user_type' => 'STU',
@@ -54,7 +56,48 @@ class TestSeeder extends Seeder
             'residence' => 'La',
             'employment_status' => 'Unemployed',
             'certificate' => 'Y',
-            'referral' => 'Website'
+            'referral' => 'Website',
+            'createuser' => 'system',
+            'modifyuser' => 'system'
+        ]);
+
+        TblCourse::create([
+            'course_id' => 'LS101',
+            'course_name' => 'Life Skills 101',
+            'description' => 'Skills meant to equip the youth for the corporate world ahead',
+            'duration' => '4 days',
+            'createuser' => 'system',
+            'modifyuser' => 'system',
+        ]);
+
+        TblCohort::create([
+            'cohort_id' => 'CLS1',
+            'course_id' => 'LS101',
+            'description' => 'First cohort in November',
+            'start_date' => '2025-11-5',
+            'end_date' => '2025-11-10',
+            'student_limit' => 20,
+            'createuser' => 'system',
+            'modifyuser' => 'system',
+
+        ]);
+
+
+        $studentInstance = $student->student()->first();
+
+        $studentInstance->course_registration()->create([
+            'course_id' => 'LS101',
+            'studentid' =>  $studentInstance->studentid,
+            'createuser' => 'system',
+            'modifyuser' => 'system',
+        ]);
+
+        $studentInstance->cohort_registration()->create([
+            'cohort_id' => 'CLS1',
+            'studentid' => $studentInstance->studentid,
+            'createuser' => 'system',
+            'modifyuser' => 'system',
+
         ]);
     }
 }

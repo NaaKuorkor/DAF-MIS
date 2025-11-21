@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Models\TblStaff;
+use App\Models\TblStudent;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -102,17 +103,29 @@ class StaffController extends Controller
     }
 
 
-    public function dashboardMenu()
+    public function studentTableContent()
     {
-        $user = auth()->user();
 
-        $modules = $user->modules()->wherePivot('mod_read', 1)
-            ->orderBy('mod_position', 'asc')->get();
+        $students = TblStudent::with(
+            'cohort_registration.cohort',
+            'course_registration.course'
+        )->orderBy('createdate', 'desc')
+            ->paginate(10);
 
-        return view('staff.dashboard', compact('modules'));
+        $students->getCollection()->transform(function ($student) {
+            return [
+                'name' => $student->fname . ' ' . $student->lname,
+                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
+                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
+                'referral' => $student->referral,
+                'registration_date' => $student->course_registration[0]->createdate,
+
+            ];
+        });
+
+
+        return response()->json($students);
     }
-
-
 
 
 

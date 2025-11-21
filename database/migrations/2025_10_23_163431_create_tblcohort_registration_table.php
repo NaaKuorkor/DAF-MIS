@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblcohort_registration', function (Blueprint $table) {
-            $table->string('transid')->unique()->primary();
             $table->string('studentid');
             $table->string('cohort_id');
             $table->foreign('studentid')->references('studentid')->on('tblstudent');
             $table->foreign('cohort_id')->references('cohort_id')->on('tblcohort');
-            $table->char('is_completed');
+            $table->primary(['studentid', 'cohort_id']);
+            $table->char('is_completed')->default('0');
             $table->string('createuser');
             $table->timestamp('createdate')->useCurrent();
             $table->string('modifyuser');

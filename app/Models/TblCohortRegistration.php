@@ -9,14 +9,13 @@ class TblCohortRegistration extends Model
 {
     protected $table = 'tblcohort_registration';
 
-    protected $primaryKey = 'transid';
+    protected $primaryKey = ['studentid', 'cohort_id'];
 
     public $incrementing = false;
 
     public $timestamps = false;
 
     protected $fillable = [
-        'transid',
         'studentid',
         'cohort_id',
         'is_completed',

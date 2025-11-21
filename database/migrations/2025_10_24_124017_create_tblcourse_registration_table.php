@@ -12,11 +12,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('tblcourse_registration', function (Blueprint $table) {
-            $table->string('transid')->unique()->primary();
+
             $table->string('course_id');
             $table->string('studentid');
             $table->foreign('course_id')->references('course_id')->on('tblcourse');
             $table->foreign('studentid')->references('studentid')->on('tblstudent');
+
+            $table->primary('studentid', 'course_id');
+
             $table->char('is_completed')->default(0);
             $table->string('createuser');
             $table->timestamp('createdate')->useCurrent();

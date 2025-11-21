@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TblCourseRegistration;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Models\TblStudent;
@@ -33,7 +34,7 @@ class StudentController extends Controller
                 'referral' => 'required|string',
                 'employment_status' => 'required|string',
                 'certificate' => 'required|string',
-
+                'course' => 'required|string'
             ]);
 
             //Create student to be inserted into the databases
@@ -66,6 +67,18 @@ class StudentController extends Controller
                     $studentid = 'S' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
                 }
 
+                $transCount =  DB::table('tblcourse_registration')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
+
+                $transid = null;
+
+                if ($transCount === 0) {
+                    $transid = 'TS0000000001';
+                } else {
+                    $newNum = $transCount + 1;
+                    $transid = 'TS' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
+                }
+
+
 
 
                 $user = TblUser::create([
@@ -93,6 +106,14 @@ class StudentController extends Controller
                     'referral' => $validateData['referral'],
                     'employment_status' => $validateData['employment_status'],
                     'certificate' => $validateData['certificate'],
+                ]);
+
+                TblCourseRegistration::create([
+                    'transid' => $transid,
+                    'studentid' => $student->studentid,
+                    'course_id' => $validateData['course'],
+                    'createuser' => $validateData['email'],
+                    'modifyuser' => $validateData['email'],
                 ]);
 
 
