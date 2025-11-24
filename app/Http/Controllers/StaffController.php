@@ -114,7 +114,7 @@ class StaffController extends Controller
 
         $students->getCollection()->transform(function ($student) {
             return [
-                'name' => $student->fname . ' ' . $student->lname,
+                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
                 'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
                 'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
                 'referral' => $student->referral,
@@ -127,25 +127,67 @@ class StaffController extends Controller
         return response()->json($students);
     }
 
+    public function alphaStudentFilter()
+    {
 
+        $students = TblStudent::with(
+            'cohort_registration.cohort',
+            'course_registration.course'
+        )->orderBy('name', 'desc')
+            ->paginate(10);
 
+        $students->getCollection()->transform(function ($student) {
+            return [
+                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
+                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
+                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
+                'referral' => $student->referral,
+                'registration_date' => $student->course_registration[0]->createdate,
+            ];
+        });
+    }
 
+    public function staffTableContent()
+    {
+        $staff = TblStaff::select(
+            'fname',
+            'mname',
+            'lname',
+            'department',
+            'position',
+        )->orderBy('createdate', 'desc')
+            ->paginate(10);
 
+        $staff->getCollection()->transform(function ($s) {
+            return [
+                'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
+                'department' => $s->department,
+                'position' => $s->position,
+            ];
+        });
 
+        return response()->json($staff);
+    }
 
+    public function alphaStaffFilter()
+    {
+        $staff = TblStaff::select(
+            'fname',
+            'mname',
+            'lname',
+            'department',
+            'position',
+        )->orderBy('lname', 'desc')
+            ->paginate(10);
 
+        $staff->getCollection()->transform(function ($s) {
+            return [
+                'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
+                'department' => $s->department,
+                'position' => $s->position,
+            ];
+        });
 
-
-
-
-
-
-
-    //public function deleteStaff() {}
-
-    //public function viewUsers() {}
-
-    //public function deleteUser() {}
-
-    //public function viewStaff() {}
+        return response()->json($staff);
+    }
 }

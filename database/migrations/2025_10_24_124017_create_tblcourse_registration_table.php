@@ -21,9 +21,9 @@ return new class extends Migration
             $table->primary('studentid', 'course_id');
 
             $table->char('is_completed')->default(0);
-            $table->string('createuser');
+            $table->string('createuser')->nullable()->default(null);
             $table->timestamp('createdate')->useCurrent();
-            $table->string('modifyuser')->default(null);
+            $table->string('modifyuser')->nullable()->default(null);
             $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }

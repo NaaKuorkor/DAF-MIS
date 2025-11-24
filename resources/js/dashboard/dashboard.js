@@ -1,4 +1,5 @@
 import loadStudents from './studentMngt.js';
+import loadStaff from './staffMngt.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');

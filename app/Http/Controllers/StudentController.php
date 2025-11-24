@@ -6,6 +6,7 @@ use App\Models\TblCourseRegistration;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Models\TblStudent;
+use App\Models\TblUserModulePriviledges;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -109,13 +110,55 @@ class StudentController extends Controller
                 ]);
 
                 TblCourseRegistration::create([
-                    'transid' => $transid,
                     'studentid' => $student->studentid,
                     'course_id' => $validateData['course'],
                     'createuser' => $validateData['email'],
                     'modifyuser' => $validateData['email'],
                 ]);
 
+
+                $modulePriviledges = [
+                    [
+                        'userid' => $user->userid,
+                        'modid' => 'MOD001',
+                        'mod_create' => 0,
+                        'mod_read' => 1,
+                        'mod_update' => 0,
+                        'mod_delete' => 0,
+
+                    ],
+                    [
+                        'userid' => $user->userid,
+                        'modid' => 'MOD004',
+                        'mod_create' => 0,
+                        'mod_read' => 1,
+                        'mod_update' => 0,
+                        'mod_delete' => 0,
+
+                    ],
+                    [
+                        'userid' => $user->userid,
+                        'modid' => 'MOD007',
+                        'mod_create' => 0,
+                        'mod_read' => 1,
+                        'mod_update' => 1,
+                        'mod_delete' => 0,
+
+                    ]
+                ];
+
+                foreach($modulePriviledges as $p){
+                    TblUserModulePriviledges::create([
+                        'userid' => $p['userid'],
+                        'modid' => $p['modid'],
+                        'mod_create' => $p['mod_create'],
+                        'mod_read' => $p['mod_read'],
+                        'mod_update' => $p['mod_update'],
+                        'mod_delete' => $p['mod_delete'],
+                        'createuser' => 'system',
+                        'modifyuser' => 'system',
+                    ]);
+                }
 
                 DB::statement('UNLOCK TABLES');
             });

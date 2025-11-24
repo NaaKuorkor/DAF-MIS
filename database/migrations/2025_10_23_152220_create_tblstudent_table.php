@@ -22,13 +22,12 @@ return new class extends Migration
             $table->string('residence');
             $table->string('referral')->nullable();
             $table->string('employment_status');
-            $table->string('qualification')->nullable();
             $table->enum('certificate', ['Y', 'N']);
             $table->string('payment')->nullable();
             $table->string('job_preference')->nullable();
-            $table->string('createuser');
+            $table->string('createuser')->default('system');
             $table->timestamp('createdate')->useCurrent();
-            $table->string('modifyuser')->default(null);
+            $table->string('modifyuser')->nullable()->default(null);
             $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }

@@ -1,8 +1,10 @@
 <div class="flex flex-col p-6">
     <div class='flex flex-col gap-4'>
         <h1 class="font-bold text-4xl">Students</h1>
-
-        <input class='border border-gray-400 rounded-lg w-70 p-2' type='text' placeholder="Search">
+        <div class="flex">
+            <input class='border border-gray-400 rounded-lg w-70 p-2 m-4' type='text' placeholder="Search">
+            <x-filter-button />
+        </div>
     </div>
 
     <div class="flex flex-col ">

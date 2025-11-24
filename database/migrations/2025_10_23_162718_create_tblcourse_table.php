@@ -18,9 +18,9 @@ return new class extends Migration
             $table->string('description');
             $table->string('duration', 20);
             $table->char('deleted', 1)->default('0');
-            $table->string('createuser');
+            $table->string('createuser')->nullable()->default(null);
             $table->timestamp('createdate')->useCurrent();
-            $table->string('modifyuser');
+            $table->string('modifyuser')->nullable()->default(null);
             $table->timestamp('modifydate')->useCurrent()->useCurrentOnUpdate();
         });
     }

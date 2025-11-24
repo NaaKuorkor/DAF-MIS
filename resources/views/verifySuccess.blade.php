@@ -4,7 +4,7 @@
 
 @section('content')
 
-<div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
+<div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md items-center">
     <h1 class="text-3xl font-bold text-purple-600 mb-6 text-center ">Success</h1>
 
     <p class=="text-xl text-black text-center mt-4 mb-6">Email has been verified. You are all set. Go ahead and login!</p>

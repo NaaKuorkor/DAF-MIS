@@ -1,14 +1,14 @@
-console.log('script loaded!!!!');
 
 export default function loadStudents() {
-    console.log('DOM loaded');
 
     const rows = document.getElementById('tableRows');
+    const az = document.getElementById('A-Z');
+    const date = document.getElementById('date');
 
-    async function getStudents(){
+    async function studentsDateFilter(){
         try{
             //Get info from route
-            const response = await axios.get('/staff/studentTable');
+            const response = await axios.get('/staff/studentTable/date');
             //Just to check the pagination response
             console.log(response.data.data);
             //Get only the array with the data needed to be injected
@@ -19,7 +19,7 @@ export default function loadStudents() {
         }catch(err){
             console.log('Failed to load student info');
             console.log(err);
-            rows.innerHTML = `<P class="text-red-500">Failed to load</P>`;
+            rows.innerHTML = `<p class="text-red-500">Failed to load</p>`;
         }
 
     }
@@ -45,6 +45,21 @@ export default function loadStudents() {
 
         rows.innerHTML = html;
     }
+
+    async function studentsAlphabetFilter(){
+        try{
+            const response = await axios.get('/staff/studentTable/A-Z');
+
+            renterTable(response.data.data);
+        }catch(err){
+            console.log('Failed to load student info');
+            console.log(err);
+            rows.innerHTML= `<p class="text-red-500">Failed to load</p>`;
+        }
+    }
+
+    az.addEventListener('click', studentsAlphabetFilter());
+    date.addEventListener('click', studentsDateFilter());
 
     getStudents();
 }

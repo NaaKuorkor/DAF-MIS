@@ -15,5 +15,14 @@ class TblUserModulePriviledges extends Model
 
     public $timestamps = false;
 
-    protected $fillable = [];
+    protected $fillable = [
+        'userid',
+        'modid',
+        'mod_create',
+        'mod_read',
+        'mod_update',
+        'mod_delete',
+        'createuser',
+        'modifyuser',
+    ];
 }

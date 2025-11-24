@@ -45,9 +45,8 @@ Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name(
 Route::get('/email/verify/{id}/{hash}', [RoutingController::class, 'showVerifySuccess'])->middleware(['auth', 'signed'])->name('verification.verify');
 
 
-//Api routes
+//Staff dashboard routes
 Route::get('/modules', [DashboardController::class, 'fetchModules'])->middleware('auth');
-
 Route::get('/overview', [DashboardController::class, 'overviewContent']);
 Route::get('/staff/staff-info', [RoutingController::class, 'showStaffMngt']);
 Route::get('/staff/student-info', [RoutingController::class, 'showStudentMngt']);
@@ -55,4 +54,7 @@ Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
 Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
 Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
 Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);
-Route::get('/staff/studentTable', [StaffController::class, 'studentTableContent']);
+Route::get('/staff/studentTable/date', [StaffController::class, 'studentTableContent']);
+Route::get('/staff/staffTable/date', [StaffController::class, 'staffTableContent']);
+Route::get('/staff/staffTable/A-Z', [StaffController::class, 'alphaStaffFilter']);
+Route::get('/staff/studentTable/A-Z', [StaffController::class, 'alphaStudentFilter']);
