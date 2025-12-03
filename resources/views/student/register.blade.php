@@ -36,6 +36,11 @@
             </div>
 
             <div class="mb-4">
+                <label for="age" class="block text-gray-600">Age</label>
+                <input type="number" id="age" name="age" required value="{{ old('age') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
+            </div>
+
+            <div class="mb-4">
                 <label for='gender' class="block text-gray-600">Gender</label>
                 <select id="gender" name="gender" value="{{ old('gender') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                     <option value="M" @selected(old('gender') == 'M')>Male</option>

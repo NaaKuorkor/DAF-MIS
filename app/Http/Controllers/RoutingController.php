@@ -40,12 +40,6 @@ class RoutingController extends Controller
         return view('verifyEmail');
     }
 
-    public function showVerifySuccess(EmailVerificationRequest $request)
-    {
-        $request->fulfill();
-        return view('verifySuccess');
-    }
-
     public function showOverview()
     {
         return view('components.overview');

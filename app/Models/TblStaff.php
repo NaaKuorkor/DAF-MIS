@@ -21,6 +21,7 @@ class TblStaff extends Model
         'mname',
         'lname',
         'gender',
+        'age',
         'residence',
         'position',
     ];

@@ -11,11 +11,26 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
+use App\Mail\Verify;
+use Illuminate\Support\Facades\Http;
 
 class StudentController extends Controller
 {
+    public function sendSMS($phone, $message)
+    {
+        //Add headers for arkesel
+        $response = Http::withHeaders([
+            'api-key' => env('ARKESEL_SMS_API_KEY'),
+        ])->post(env('ARKESEL_SMS_URL'), [
+            'sender' => env('ARKESEL_SMS_SENDER_ID'),
+            'message' => $message,
+            'recipients' => $phone
+        ]);
 
+        return $response->json();
+    }
 
     public function register(Request $request)
     {
@@ -29,8 +44,8 @@ class StudentController extends Controller
                 'lname' => 'required|string|max:255',
                 'email' => 'required|email',
                 'phone' => 'required|string|max:15',
-                'password' => 'required|confirmed|min:6',
                 'gender' => 'required|string',
+                'age' => 'required|integer',
                 'residence' => 'required|string',
                 'referral' => 'required|string',
                 'employment_status' => 'required|string',
@@ -38,9 +53,11 @@ class StudentController extends Controller
                 'course' => 'required|string'
             ]);
 
+            $password = $request->password ? Hash::make($request->password) : Hash::make($request->phone);
+
             //Create student to be inserted into the databases
 
-            DB::transaction(function () use ($validateData, &$user) {
+            DB::transaction(function () use ($validateData, &$user, &$student, $password) {
 
 
                 $idCount =  DB::table('tbluser')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
@@ -86,7 +103,7 @@ class StudentController extends Controller
                     'userid' => $userid,
                     'email' => $validateData['email'],
                     'phone' => $validateData['phone'],
-                    'password' => Hash::make($validateData['password']),
+                    'password' => $password,
                     'user_type' => 'STU',
                     'deleted' => 0,
                     'createuser' => $validateData['email'],
@@ -103,6 +120,7 @@ class StudentController extends Controller
                     'mname' => $validateData['mname'] ?? null,
                     'lname' => $validateData['lname'],
                     'gender' => $validateData['gender'],
+                    'age' => $validateData['age'],
                     'residence' => $validateData['residence'],
                     'referral' => $validateData['referral'],
                     'employment_status' => $validateData['employment_status'],
@@ -147,7 +165,7 @@ class StudentController extends Controller
                     ]
                 ];
 
-                foreach($modulePriviledges as $p){
+                foreach ($modulePriviledges as $p) {
                     TblUserModulePriviledges::create([
                         'userid' => $p['userid'],
                         'modid' => $p['modid'],
@@ -159,25 +177,72 @@ class StudentController extends Controller
                         'modifyuser' => 'system',
                     ]);
                 }
-
-                DB::statement('UNLOCK TABLES');
             });
 
-            $user->sendEmailVerificationNotification();
-            Auth::login($user);
+            //Create verification link to be sent to user
+            $verificationLink = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->userid, 'hash' => sha1($user->email)]
+            );
 
+            //Send mail with verification link.
+            Mail::to($user->email)->send(new Verify($student, $verificationLink));
 
+            if (!$request->password) {
+                //Change phone format to have the country code
+                $phone = preg_replace('/^0/', '233', $user->phone);
+                //Interpolate name, email and password within message
+                $message = "Thank you {$student->fname} for registering to be a part of DAF.\n Your login credentials are as follows.\n
+                Email : {$user->email}\n
+                Password : {$request->phone}\n
+                You have the liberty to change your password once you login.\n
+                Enjoy your time with us!
+                ";
 
-            return redirect()->route('verification.notice');
+                $response = $this->sendSMS($phone, $message);
+            }
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Account created successfully!'
+                ]);
+            } else {
+                return back()->with('Success', 'Account created successfully!');
+            }
         } catch (\Exception $e) {
             Log::error('Registration Failed!', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            DB::statement('UNLOCK TABLES');
-
-            return back()->withErrors("Registration failed. Try again")->withInput();
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Registration failed. Try again"
+                ]);
+            } else {
+                return back()->withErrors("Registration failed. Try again")->withInput();
+            }
         }
+    }
+
+
+
+    public function showVerifySuccess(Request $request, $id, $hash)
+    {
+
+        //Retrieves student from database
+        $user = TblUser::where('userid', $id)->firstOrFail();
+
+        if (!hash_equals((string) $hash, sha1($user->email))) {
+            return redirect('/register')->with('error', 'Invalid verification link.');
+        }
+
+        $user->email_verified_at = now();
+        $user->save();
+
+        return redirect('/login')->with('success', 'Email verified!');
     }
 }

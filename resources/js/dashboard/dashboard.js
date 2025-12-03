@@ -1,9 +1,11 @@
-import loadStudents from './studentMngt.js';
+import loadStudents, {handleStudentSubmit} from './studentMngt.js';
 import loadStaff from './staffMngt.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
     const dashboardContent = document.getElementById('dashboardContent');
+
+
 
     async function getModules() {
         try{
@@ -91,6 +93,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    document.addEventListener('submit', (e) => {
+        if (e.target.id === 'registerStudent'){
+            handleStudentSubmit(e);
+        }
+    } );
 
     getModules();
     displayOverview();

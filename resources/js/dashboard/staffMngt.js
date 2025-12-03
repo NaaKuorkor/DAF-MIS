@@ -1,4 +1,5 @@
 export default function loadStaff() {
+     console.log("staffmngt is loaded");
 
     const rows = document.getElementById('tableRows');
     const az = document.getElementById('A-Z');
@@ -6,7 +7,6 @@ export default function loadStaff() {
 
     async function staffDateFilter(){
         try{
-            console.log("staffmngt is loaded");
             //Get info from route
             const response = await axios.get('/staff/staffTable/date');
             //Just to check the pagination response
@@ -60,8 +60,8 @@ export default function loadStaff() {
 
     staffDateFilter();
 
-    az.addEventListener('click', staffAlphabeticFilter());
-    date.addEventListener('click', staffDateFilter());
+    az.addEventListener('click', staffAlphabeticFilter);
+    date.addEventListener('click', staffDateFilter);
 
 
    }

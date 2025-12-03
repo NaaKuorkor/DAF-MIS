@@ -27,6 +27,7 @@ class TblStudent extends Model
         'mname',
         'lname',
         'gender',
+        'age',
         'residence',
         'referral',
         'employment_status',

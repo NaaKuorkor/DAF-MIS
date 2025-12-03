@@ -6,14 +6,18 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoutingController;
 use App\Http\Controllers\DashboardController;
-use GuzzleHttp\Middleware;
+use App\Mail\Verify;
+use Illuminate\Support\Facades\Mail;
+use App\Http\Middleware\Student;
+use App\Models\TblUser;
 
 //Base route
 Route::get('/', [RoutingController::class, 'showLoginForm']);
 
 //User routes
 Route::get('/register', [RoutingController::class, 'showRegisterForm'])->middleware('guest')->name('register.form');
-Route::post('/register', [StudentController::class, 'register'])->middleware('guest')->name('register');
+Route::post('/register', [StudentController::class, 'register'])->name('register');
+Route::post('/staff/register', [StaffController::class, 'createStaff'])->name('register.staff');
 
 
 
@@ -42,7 +46,7 @@ Route::post('/student/logout', [AuthController::class, 'studentLogout'])->name('
 
 Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name('verification.notice');
 
-Route::get('/email/verify/{id}/{hash}', [RoutingController::class, 'showVerifySuccess'])->middleware(['auth', 'signed'])->name('verification.verify');
+Route::get('/email/verify/{id}/{hash}', [StudentController::class, 'showVerifySuccess'])->middleware(['signed'])->name('verification.verify');
 
 
 //Staff dashboard routes

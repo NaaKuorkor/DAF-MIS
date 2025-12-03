@@ -1,30 +1,4 @@
-export default function loadStudents() {
-
-    const rows = document.getElementById('tableRows');
-    const az = document.getElementById('A-Z');
-    const date = document.getElementById('date');
-
-    async function studentsDateFilter(){
-        try{
-            //Get info from route
-            const response = await axios.get('/staff/studentTable/date');
-            //Just to check the pagination response
-            console.log(response.data.data);
-            //Get only the array with the data needed to be injected
-            const info = response.data.data;
-
-            //Display within table
-            renderTable(info);
-        }catch(err){
-            console.log('Failed to load student info');
-            console.log(err);
-            rows.innerHTML = `<p class="text-red-500">Failed to load</p>`;
-        }
-
-    }
-
-    function getEdit(student){
-        return `<div x-data='{ modalOpen: false, student: ${JSON.stringify(student)} }'
+<div x-data="{ modalOpen: false, student: {{ json_encode($student)}} }"
     @keydown.escape.window="modalOpen = false"
     class="relative z-50 w-auto h-auto">
     <button @click="modalOpen=true"  class="bg-blue-300 items-center"><i class="fa-solid fa-pen-to-square" style="color:white"></i></button>
@@ -55,20 +29,20 @@ export default function loadStudents() {
                 </div>
                 <div class="relative w-auto">
 
-                    <form method="POST" action='/register' id="editStudent">
-                        <input type='hidden' name='_token'value="${document.querySelector('meta[name="csrf-token"]').content}">
+                    <form method="POST" action="{{ route('')}}" id="editStudent">
+                        @csrf
                         <div class="flex mb-4 space-x-4">
                             <div>
                                 <label for="fname" class="block text-gray-600">First Name</label>
-                                <input type="text" id="fname" name="fname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.fname">
+                                <input type="text" id="fname" name="fname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.fname">
                             </div>
                             <div>
                                 <label for="mname" class="block text-gray-600">Middle Name</label>
-                                <input type="text" id="mname" name="mname" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.mname">
+                                <input type="text" id="mname" name="mname" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.mname">
                             </div>
                             <div>
                                <label for="lname" class="block text-gray-600">Surname</label>
-                                <input type="text" id="lname" name="lname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.lname" >
+                                <input type="text" id="lname" name="lname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.lname" >
                             </div>
 
                         </div>
@@ -83,23 +57,23 @@ export default function loadStudents() {
                             </div>
                             <div>
                                 <label for="email" class="block text-gray-600">Email</label>
-                                <input type="email" id="email" name="email"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.email">
+                                <input type="email" id="email" name="email"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.email">
                             </div>
                             <div>
                                  <label for="age" class="block text-gray-600">Age</label>
-                                <input type="number" id="age" name="age"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.age">
+                                <input type="number" id="age" name="age"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.age">
                             </div>
                         </div>
 
                         <div class="flex mb-4 space-x-4">
                             <div>
                                 <label for="phone" class="block text-gray-600">Phone</label>
-                                <input type="number" id="phone" name="phone" required minlength="10"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.phone">
+                                <input type="number" id="phone" name="phone" required minlength="10"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" :value="student.phone">
                             </div>
 
                             <div>
                                 <label for="residence" class="block text-gray-600">Residence</label>
-                                <input type="text" id="residence" name="residence"  class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="student.residence">
+                                <input type="text" id="residence" name="residence"  class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" :value="student.residence">
                             </div>
                             <div>
                                 <label for="referral" class="block text-gray-600">Referral</label>
@@ -149,72 +123,4 @@ export default function loadStudents() {
             </div>
         </div>
     </template>
-</div>`
-    }
-
-    function renderTable(students){
-        let html = ""
-
-        students.forEach(student => {
-            //Add a row
-            //And attach full student object to the button
-            html += `
-            <tr class="text-neutral-600 odd:bg-neutral-50 even:bg-white">
-                <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">${student.name}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap">${student.course}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap">${student.cohort}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap">${student.registration_date}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap">${student.referral}</td>
-                <td class="px-5 py-4 whitespace-nowrap flex">
-                    ${getEdit(student)}
-                    <button class="bg-red-400 items-center"><i class="fa-regular fa-trash-can" style="color:white"></i></button>
-                </td>
-            </tr>`
-        });
-
-        rows.innerHTML = html;
-    }
-
-    async function studentsAlphabetFilter(){
-        try{
-            const response = await axios.get('/staff/studentTable/A-Z');
-
-            renderTable(response.data.data);
-        }catch(err){
-            console.log('Failed to load student info');
-            console.log(err);
-            rows.innerHTML= `<p class="text-red-500">Failed to load</p>`;
-        }
-    }
-
-
-
-
-    az.addEventListener('click', studentsAlphabetFilter);
-    date.addEventListener('click', studentsDateFilter);
-
-    studentsDateFilter();
-}
-
-export function handleStudentSubmit(e){
-        e.preventDefault();
-
-        const registerStudent = e.target;
-        const formData = new FormData(registerStudent);
-
-        axios.post(registerStudent.action, formData)
-        .then(
-            response => {
-                if(response.data.success) {
-                document.querySelector('[x-data]').__x.$data.modalOpen = false;
-                }
-            }
-        ).catch(error => {
-            if(error.response && error.response.data.message){
-                alert(error.response.data.message);
-            } else {
-                console.error(error);
-                }
-        });
-    }
-
+</div>

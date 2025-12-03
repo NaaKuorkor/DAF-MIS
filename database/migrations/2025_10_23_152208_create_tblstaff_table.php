@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('mname', 50)->nullable();
             $table->string('lname', 50);
             $table->enum('gender', ['M', 'F']);
+            $table->tinyInteger('age');
             $table->string('position', 50);
             $table->string('residence');
             $table->string('createuser')->nullable()->default(null);

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->string('userid')->unique()->primary();
             $table->string('email', 255)->unique();
             $table->enum('user_type', ['STA', 'STU', 'ADM']);
-            $table->string('password');
-            $table->string('phone', 15)->nullable();
+            $table->string('password')->nullable();
+            $table->string('phone', 15);
             $table->char('deleted', 1)->default('0');
             $table->string('picture', 255)->nullable();
             $table->char('status', 1)->default('1');

@@ -21,6 +21,6 @@
             </div>
         </div>
 
-       @vite(['resources/js/dashboard/dashboard.js'])
+
     </body>
 </html>

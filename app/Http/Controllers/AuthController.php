@@ -39,9 +39,9 @@ class AuthController extends Controller
 
             //Redirect to next page
             if ($user->user_type === 'STU') {
-                return redirect()->intended('dashboard');
+                return redirect()->intended('dashboard')->with('success', 'Successfully logged in!');
             } else if ($user->user_type === 'STA' || $user->user_type === 'ADM') {
-                return redirect()->intended(route('staff.dashboard'));
+                return redirect()->intended(route('staff.dashboard'))->with('success', 'Successfully logged in!');
             }
         } catch (\Exception $e) {
             Log::error('Login failed', [
@@ -86,6 +86,8 @@ class AuthController extends Controller
         return redirect()->route('login.form')->with('success', 'Successfully logged out');
     }
 
+    public function resetPassword(Request $request) {}
+
     public function forgotPassword(Request $request)
     {
 
@@ -101,7 +103,7 @@ class AuthController extends Controller
             }
             //If yes, send an email
 
-            return redirect()->route();
+            return redirect()->route('/');
         } catch (\Exception $e) {
             Log::error('Failed', [
                 'message' => $e->getMessage(),

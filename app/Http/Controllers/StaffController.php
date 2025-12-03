@@ -27,6 +27,7 @@ class StaffController extends Controller
                 'lname' => 'string|required|max:50',
                 'email' => 'email|required',
                 'gender' => 'string|required|max:1',
+                'age' => 'number|required',
                 'position' => 'string|required|max:100',
                 'phone' => 'string|required|max:15',
                 'password' => 'required|string|min:6',
@@ -82,6 +83,7 @@ class StaffController extends Controller
                     'mname' => $staffData['mname'] ?? null,
                     'lname' => $staffData['lname'],
                     'gender' => $staffData['gender'],
+                    'age' => $staffData['age'],
                     'position' => $staffData['position'],
 
                 ]);
@@ -89,7 +91,7 @@ class StaffController extends Controller
                 DB::statement('UNLOCK TABLES');
             });
 
-            return redirect()->route('staff.dashboard')->with('success', "New admin created successfully!");
+            return back()->with('success', "Staff created successfully!");
         } catch (\Exception $e) {
             Log::error('Staff registration failed', [
                 'message' => $e->getMessage(),
@@ -108,7 +110,8 @@ class StaffController extends Controller
 
         $students = TblStudent::with(
             'cohort_registration.cohort',
-            'course_registration.course'
+            'course_registration.course',
+            'user'
         )->orderBy('createdate', 'desc')
             ->paginate(10);
 
@@ -117,9 +120,19 @@ class StaffController extends Controller
                 'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
                 'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
                 'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                'referral' => $student->referral,
                 'registration_date' => $student->course_registration[0]->createdate,
-
+                'studentid' => $student->student_id,
+                'userid' => $student->user->userid,
+                'fname' => $student->fname,
+                'mname' => $student->mname,
+                'lname' => $student->lname,
+                'age' => $student->age,
+                'email' => $student->user->email,
+                'phone' => $student->user->phone,
+                'referral' => $student->referral,
+                'residence' => $student->residence,
+                'employment_status' => $student->employment_status,
+                'certificate' => $student->certificate,
             ];
         });
 
@@ -132,8 +145,9 @@ class StaffController extends Controller
 
         $students = TblStudent::with(
             'cohort_registration.cohort',
-            'course_registration.course'
-        )->orderBy('name', 'desc')
+            'course_registration.course',
+            'user'
+        )->orderBy('lname', 'asc')
             ->paginate(10);
 
         $students->getCollection()->transform(function ($student) {
@@ -141,28 +155,45 @@ class StaffController extends Controller
                 'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
                 'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
                 'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                'referral' => $student->referral,
                 'registration_date' => $student->course_registration[0]->createdate,
+                'studentid' => $student->student_id,
+                'userid' => $student->user->userid,
+                'fname' => $student->fname,
+                'mname' => $student->mname,
+                'lname' => $student->lname,
+                'age' => $student->age,
+                'email' => $student->user->email,
+                'phone' => $student->user->phone,
+                'referral' => $student->referral,
+                'residence' => $student->residence,
+                'employment_status' => $student->employment_status,
+                'certificate' => $student->certificate,
             ];
         });
+
+        return response()->json($students);
     }
 
     public function staffTableContent()
     {
-        $staff = TblStaff::select(
-            'fname',
-            'mname',
-            'lname',
-            'department',
-            'position',
+        $staff = TblStaff::with(
+            'user'
         )->orderBy('createdate', 'desc')
             ->paginate(10);
+
 
         $staff->getCollection()->transform(function ($s) {
             return [
                 'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
                 'department' => $s->department,
                 'position' => $s->position,
+                'fname' => $s->fname,
+                'mname' => $s->mname,
+                'lname' => $s->lname,
+                'gender' => $s->gender,
+                'age' => $s->age,
+                'staffid' => $s->staffid,
+                'userid' => $s->user->userid,
             ];
         });
 
@@ -171,12 +202,8 @@ class StaffController extends Controller
 
     public function alphaStaffFilter()
     {
-        $staff = TblStaff::select(
-            'fname',
-            'mname',
-            'lname',
-            'department',
-            'position',
+        $staff = TblStaff::with(
+            'user'
         )->orderBy('lname', 'desc')
             ->paginate(10);
 
@@ -185,9 +212,18 @@ class StaffController extends Controller
                 'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
                 'department' => $s->department,
                 'position' => $s->position,
+                'fname' => $s->fname,
+                'mname' => $s->mname,
+                'lname' => $s->lname,
+                'gender' => $s->gender,
+                'age' => $s->age,
+                'staffid' => $s->staffid,
+                'userid' => $s->user->userid,
             ];
         });
 
         return response()->json($staff);
     }
+
+    public function editStudent() {}
 }
