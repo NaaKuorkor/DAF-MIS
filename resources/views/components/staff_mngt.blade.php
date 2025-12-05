@@ -11,7 +11,6 @@
                 <x-add-staff-modal />
                 <button class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export to excelsheet</button>
             </div>
-
         </div>
     </div>
 

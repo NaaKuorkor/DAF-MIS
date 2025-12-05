@@ -6,10 +6,8 @@ use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoutingController;
 use App\Http\Controllers\DashboardController;
-use App\Mail\Verify;
-use Illuminate\Support\Facades\Mail;
-use App\Http\Middleware\Student;
-use App\Models\TblUser;
+use App\Http\Controllers\StaffMngtController;
+use App\Http\Controllers\StudentMngtController;
 
 //Base route
 Route::get('/', [RoutingController::class, 'showLoginForm']);
@@ -58,7 +56,9 @@ Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
 Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
 Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
 Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);
-Route::get('/staff/studentTable/date', [StaffController::class, 'studentTableContent']);
-Route::get('/staff/staffTable/date', [StaffController::class, 'staffTableContent']);
-Route::get('/staff/staffTable/A-Z', [StaffController::class, 'alphaStaffFilter']);
-Route::get('/staff/studentTable/A-Z', [StaffController::class, 'alphaStudentFilter']);
+Route::get('/staff/studentTable/date', [StudentMngtController::class, 'studentTableContent']);
+Route::get('/staff/staffTable/date', [StaffMngtController::class, 'staffTableContent']);
+Route::get('/staff/staffTable/A-Z', [StaffMngtController::class, 'alphaStaffFilter']);
+Route::get('/staff/studentTable/A-Z', [StudentMngtController::class, 'alphaStudentFilter']);
+Route::post('/staff/updateStudent', [StudentMngtController::class, 'update']);
+Route::post('/staff/deleteStudent', [StudentMngtController::class, 'deleteStudent']);

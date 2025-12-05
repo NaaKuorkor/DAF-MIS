@@ -79,10 +79,10 @@ class StudentController extends Controller
                 $studentid = null;
 
                 if ($studentCount === 0) {
-                    $studentid = 'S0000000001';
+                    $studentid = 'STU0000000001';
                 } else {
                     $newNum = $studentCount + 1;
-                    $studentid = 'S' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
+                    $studentid = 'STU' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
                 }
 
                 $transCount =  DB::table('tblcourse_registration')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
