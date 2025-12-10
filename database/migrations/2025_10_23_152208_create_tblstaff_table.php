@@ -21,6 +21,7 @@ return new class extends Migration
             $table->enum('gender', ['M', 'F']);
             $table->tinyInteger('age');
             $table->string('position', 50);
+            $table->string('department', 50);
             $table->string('residence');
             $table->string('createuser')->nullable()->default(null);
             $table->timestamp('createdate')->useCurrent();

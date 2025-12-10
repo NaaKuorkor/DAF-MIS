@@ -55,7 +55,9 @@ document.addEventListener('DOMContentLoaded', () => {
             //Get correct js based on route
             if (route === '/staff/student-info'){
                 loadStudents();
-            }//Will add the rest along the way
+            }else if (route === '/staff/staff-info'){
+                loadStaff();
+            }
 
         }catch(err){
             console.log(err);
@@ -96,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('submit', (e) => {
         if (e.target.id === 'registerStudent'){
             handleStudentSubmit(e);
+            loadStudents();
         }
     } );
 

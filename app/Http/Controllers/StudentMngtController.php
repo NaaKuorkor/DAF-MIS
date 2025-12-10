@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TblCourseRegistration;
 use App\Models\TblStudent;
 use App\Models\TblUser;
+use App\Models\TblUserModulePriviledges;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -90,8 +92,21 @@ class StudentMngtController extends Controller
         return response()->json($students);
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
 
-    public function update(Request $request)
+        $students = TblStudent::whereRaw(
+            "CONCAT_WS(' ',fname, mname, lname) LIKE ?",
+            ["%{$query}%"])
+            ->orderBy('lname')
+            ->get();
+
+        return response()->json($students);
+    }
+
+
+    public function updateStudent(Request $request)
     {
         try {
             $updates = $request->validate([
@@ -190,7 +205,8 @@ class StudentMngtController extends Controller
         }
     }
 
-    public function importStudents(Request $request){
+    public function importStudents(Request $request)
+    {
         //Check the kind of file first
         $request->validate([
             'file' => 'required|mimes:csv,xls,xlsx'
@@ -203,9 +219,9 @@ class StudentMngtController extends Controller
 
         //Loop through each row creating user and student records
 
-        $rows->each(function (array $row) use(&$createdusers) {
+        $rows->each(function (array $row) use (&$createdusers) {
             //Wrap in transaction and pass row and createdusers by reference
-            DB::transaction(function () use ($row, &$createdusers){
+            DB::transaction(function () use ($row, &$createdusers) {
                 //Create user id
                 $lastUser = DB::table('tbluser')
                     ->selectRaw("MAX(CAST(SUBSTRING(userid, 2) AS UNSIGNED)) as maxid")
@@ -221,7 +237,7 @@ class StudentMngtController extends Controller
                     ->lockForUpdate()
                     ->value('maxid');
 
-                $newNum = ($lastStudent?? 0) + 1;
+                $newNum = ($lastStudent ?? 0) + 1;
                 $studentid = "STU" . str_pad($newNum, 10, "0", STR_PAD_LEFT);
 
                 //Insert into tables and create other info
@@ -250,7 +266,7 @@ class StudentMngtController extends Controller
                     'residence' => $row['Residence'],
                     'referral' => $row['Referral Source'],
                     'employment_status' => $row['Employment Status'],
-                    'certificate' => $row['certificate'],
+                    'certificate' => $row['Certificate'],
                 ]);
 
                 TblCourseRegistration::create([
@@ -309,38 +325,38 @@ class StudentMngtController extends Controller
                     'student' => $student,
                 ]);
             });
-
         });
 
-        foreach($createdusers as $entry){
-                $user = $entry['user'];
-                $student = $entry['student'];
+        foreach ($createdusers as $entry) {
+            $user = $entry['user'];
+            $student = $entry['student'];
 
-                //create verification link for user
-                $verificationLink = URL::temporarySignedRoute('verification.verify',
-                    now()->addMinutes(60),
-                    ['id' => $user->userid, 'hash' => sha1($user->email)]
-                );
+            //create verification link for user
+            $verificationLink = URL::temporarySignedRoute(
+                'verification.verify',
+                now()->addMinutes(60),
+                ['id' => $user->userid, 'hash' => sha1($user->email)]
+            );
 
-                //Send mail with link
-                Mail::to($user->email)->send(new Verify($student, $verificationLink));
+            //Send mail with link
+            Mail::to($user->email)->send(new Verify($student, $verificationLink));
 
-                //Change phone format to have countrycode
-                $phone = preg_replace('/^0/', '233', $user->phone);
+            //Change phone format to have countrycode
+            $phone = preg_replace('/^0/', '233', $user->phone);
 
-                //Interpolate name, email and password within message
-                $message = "Thank you {$student->fname} for registering to be a part of DAF.\n
+            //Interpolate name, email and password within message
+            $message = "Thank you {$student->fname} for registering to be a part of DAF.\n
                 Your login credentials are as follows.\n
                 Email : {$user->email}\n
                 Password : {$user->phone}\n You have the liberty to change your password once you login.\n
                 Enjoy your time with us! ";
 
-                $this->sendSMS($phone, $message);
+            $this->sendSMS($phone, $message);
         }
-
     }
 
-    public function exportStudents(){
+    public function exportStudents()
+    {
         //Get students with the user model instances
         $students = TblStudent::with('user')->get();
 
@@ -350,7 +366,7 @@ class StudentMngtController extends Controller
         //Add data rows
         foreach ($students as $student) {
             $writer->addRow([
-                'Name' => $student->lname . ' ' .$student->mname .' '. $student->fname,
+                'Name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
                 'Email' => $student->user->email,
                 'Phone' => $student->user->phone,
                 'Age'   => $student->age,
@@ -364,7 +380,4 @@ class StudentMngtController extends Controller
 
         return $writer->toBrowser();
     }
-
-
 }
-

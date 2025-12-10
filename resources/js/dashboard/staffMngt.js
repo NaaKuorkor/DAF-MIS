@@ -1,7 +1,7 @@
 export default function loadStaff() {
      console.log("staffmngt is loaded");
 
-    const rows = document.getElementById('tableRows');
+    const rows = document.getElementById('staffRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
 

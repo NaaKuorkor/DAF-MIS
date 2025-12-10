@@ -2,13 +2,14 @@
     <div class='flex flex-col gap-4'>
         <h1 class="font-bold text-4xl">Students</h1>
         <div class="flex justify-between">
-            <div class="flex">
-                <input class='border border-gray-400 rounded-lg w-70 p-2 m-4' type='text' placeholder="Search">
+            <div class="flex justify-start">
+                <input class='border border-gray-400 rounded-lg w-70 p-2 mr-4' type='text' placeholder="Search">
                 <x-filter-button />
             </div>
             <div class='flex justify-end space-x-4 ml-2'>
                 <x-add-student-modal />
-                <button class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export to excelsheet</button>
+                <a href="{{route ('exportStudents')}}" class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export</a>
+                <x-import-modal/>
             </div>
 
         </div>

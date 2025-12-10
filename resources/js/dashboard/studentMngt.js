@@ -71,7 +71,7 @@ export default function loadStudents() {
 
                 <form method="POST" action='/staff/updateStudent' @submit.prevent="submitForm($event)">
                         <input type='hidden' name='_token'value="${document.querySelector('meta[name="csrf-token"]').content}">
-                        <div class="flex mb-4 space-x-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="userid" class="text-gray-600">User Id</label>
                                 <input type="text" name="userid" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.userid">
@@ -80,9 +80,6 @@ export default function loadStudents() {
                                 <label for="studentid" class="text-gray-600">Student Id</label>
                                 <input type="text" name="studentid" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.studentid">
                             </div>
-
-                        </div>
-                        <div class="flex mb-4 space-x-4">
                             <div>
                                 <label for="fname" class="block text-gray-600">First Name</label>
                                 <input type="text" id="fname" name="fname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.fname">
@@ -96,9 +93,6 @@ export default function loadStudents() {
                                 <input type="text" id="lname" name="lname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.lname" >
                             </div>
 
-                        </div>
-
-                        <div class="flex mb-4 space-x-4">
                             <div>
                                 <label for='gender' class="block text-gray-600">Gender</label>
                                 <select id="gender" name="gender"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.gender">
@@ -114,9 +108,6 @@ export default function loadStudents() {
                                  <label for="age" class="block text-gray-600">Age</label>
                                 <input type="number" id="age" name="age"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.age">
                             </div>
-                        </div>
-
-                        <div class="flex mb-4 space-x-4">
                             <div>
                                 <label for="phone" class="block text-gray-600">Phone</label>
                                 <input type="number" id="phone" name="phone" required minlength="10"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.phone">
@@ -136,9 +127,6 @@ export default function loadStudents() {
                                     <option value="Other" >Other</option>
                                 </select>
                             </div>
-                        </div>
-
-                        <div class="flex mb-6 space-x-4">
                             <div>
                                 <label for="employment_status" class="block text-gray-600">Employment</label>
                                 <select id="employment_status" name="employment_status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.employment_status">
@@ -162,8 +150,8 @@ export default function loadStudents() {
                             </div>
                         </div>
 
-                        <div class="flex justify-end">
-                            <button type="submit" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Save Changes</button>
+                        <div class="flex mt-4 space-x-4">
+                            <button type="submit" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Save</button>
                             <button @click.prevent="modalOpen=false" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Cancel</button>
                         </div>
 

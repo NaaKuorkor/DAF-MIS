@@ -9,31 +9,33 @@
             </div>
             <div class='flex justify-end space-x-4 ml-2'>
                 <x-add-staff-modal />
-                <button class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export to excelsheet</button>
+                <button class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export</button>
             </div>
         </div>
     </div>
 
     <div class="flex flex-col ">
+
         <div class="overflow-x-auto">
             <div class="inline-block min-w-full">
                 <div class="overflow-hidden">
-                    <table class="table" width='100%' id="staff-table">
+                    <table class="min-w-full divide-y divide-neutral-200/70">
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                                <th>Department</th>
-                                <th>Action</th>
+                                <th class="px-5 py-3 text-xs font-medium uppercase">Name</th>
+                                <th class="px-5 py-3 text-xs font-medium uppercase">Position</th>
+                                <th class="px-5 py-3 text-xs font-medium uppercase">Department</th>
+                                <th class="px-5 py-3 text-xs font-medium uppercase">Action</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            {{-- Data is fetched here using ajax --}}
+                        <tbody class="divide-y divide-neutral-200/70" id="staffRows">
+
                         </tbody>
                     </table>
-            </div>
+                </div>
             </div>
         </div>
     </div>
+
 
 </div>
