@@ -92,17 +92,53 @@ class StudentMngtController extends Controller
         return response()->json($students);
     }
 
-    public function search(Request $request)
+    public function searchStudent(Request $request)
     {
         $query = $request->input('q');
 
-        $students = TblStudent::whereRaw(
-            "CONCAT_WS(' ',fname, mname, lname) LIKE ?",
-            ["%{$query}%"])
-            ->orderBy('lname')
-            ->get();
+        if(!empty($query)){
+            $searchTerm = '%' . addcslashes($query, '%_') . '%';
 
-        return response()->json($students);
+            //Eagerload relationships and identify only undeleted students
+            $students = TblStudent::with(
+                'course_registration.course',
+                'cohort_registration.cohort',
+                'user'
+            )->where( function ($querybuilder) use($searchTerm){
+                $querybuilder->where('fname', 'LIKE', $searchTerm )
+                    ->orWhere('lname', 'LIKE', $searchTerm)
+                    ->orWhere('mname', 'LIKE', $searchTerm);
+            }
+
+            )->orderBy('createdate', 'desc')->paginate(10);
+
+            $students->getCollection()->transform(function ($student){
+                return [
+                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
+                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
+                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
+                'registration_date' => $student->course_registration[0]->createdate,
+                'studentid' => $student->studentid,
+                'userid' => $student->user->userid,
+                'fname' => $student->fname,
+                'mname' => $student->mname,
+                'lname' => $student->lname,
+                'age' => $student->age,
+                'email' => $student->user->email,
+                'phone' => $student->user->phone,
+                'referral' => $student->referral,
+                'residence' => $student->residence,
+                'employment_status' => $student->employment_status,
+                'certificate' => $student->certificate,
+            ];
+
+            });
+
+            return response()->json($students);
+        }else{
+            return $this->studentTableContent();
+        }
+
     }
 
 

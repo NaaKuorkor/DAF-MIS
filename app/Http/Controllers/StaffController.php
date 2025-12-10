@@ -5,17 +5,33 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Models\TblStaff;
-use App\Models\TblStudent;
 use App\Models\TblUserModulePriviledges;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 
 class StaffController extends Controller
 {
+    public function sendSMS($phone, $message)
+    {
 
+        $ApiKey = env('ARKESEL_SMS_API_KEY');
+        $apiEndpoint = env('ARKESEL_SMS_URL');
+
+        $response = Http::withHeaders(
+            [
+                'api-key' => $ApiKey,
+            ]
+        )->post($apiEndpoint, [
+            'sender' => 'Diaspora African Forum',
+            'message' => $message,
+            'recipient' => $phone
+        ]);
+    }
 
     public function createStaff(Request $request)
     {

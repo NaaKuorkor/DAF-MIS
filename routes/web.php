@@ -62,5 +62,6 @@ Route::get('/staff/staffTable/A-Z', [StaffMngtController::class, 'alphaStaffFilt
 Route::get('/staff/studentTable/A-Z', [StudentMngtController::class, 'alphaStudentFilter']);
 Route::post('/staff/updateStudent', [StudentMngtController::class, 'update']);
 Route::post('/staff/deleteStudent', [StudentMngtController::class, 'deleteStudent']);
+Route::get('/staff/searchStudent', [StudentMngtController::class, 'searchStudent']);
 Route::get('/staff/exportStudents', [StudentMngtController::class, 'exportStudents'])->name('exportStudents');
 Route::post('/staff/importStudents', [StudentMngtController::class, 'importStudents'])->name('importStudents');

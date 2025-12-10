@@ -3,6 +3,7 @@ export default function loadStudents() {
     const rows = document.getElementById('tableRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
+    const searchStudent = document.getElementById('searchStudent');
 
     async function studentsDateFilter(){
         try{
@@ -232,9 +233,21 @@ export default function loadStudents() {
     function renderTable(students){
         let html = ""
 
+        if(students.length === 0){
+            html = `
+             <tr>
+                <td colspan="6" class="px-5 py-4 text-center text-neutral-500">
+                    No students found.
+                </td>
+            </tr>
+            `;
+            rows.innerHTML = html;
+            return;
+        }
+
         students.forEach(student => {
             //Add a row
-            //And attach full student object to the button
+            //And attach full student object to the button\
             html += `
             <tr class="text-neutral-600 odd:bg-neutral-50 even:bg-white">
                 <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">${student.name}</td>
@@ -264,9 +277,21 @@ export default function loadStudents() {
         }
     }
 
+    async function search(){
+        const query = this.value;
+        try{
+            const response = await axios.get('/staff/searchStudent?q=' + query);
+            const students = response.data.data;
+
+                renderTable(students);
+        }catch(err){
+            console.log('Search failed: ', err);
+        }
+    }
 
 
 
+    searchStudent.addEventListener('input', search);
     az.addEventListener('click', studentsAlphabetFilter);
     date.addEventListener('click', studentsDateFilter);
 

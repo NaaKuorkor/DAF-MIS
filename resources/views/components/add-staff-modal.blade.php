@@ -1,7 +1,7 @@
 <div x-data="{ modalOpen: false }"
     @keydown.escape.window="modalOpen = false"
     class="relative z-50 w-auto h-auto">
-    <button @click="modalOpen=true" class="rounded-md bg-green-400 hover:bg-green-500 p-2">Add staff</button>
+    <button @click="modalOpen=true" class="rounded-md bg-green-400 hover:bg-green-500 p-2">Add</button>
     <template x-teleport="body">
         <div x-show="modalOpen" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-screen h-screen" x-cloak>
             <div x-show="modalOpen"
@@ -31,7 +31,7 @@
                     <form method='POST'  action="{{route('register.staff')}}">
                         @csrf
 
-                        <div class="flex mb-4 space-x-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="fname" class="block text-gray-600">First Name</label>
                                 <input type="text" id="fname" name="fname" placeholder="Enter first name" required value="{{ old('fname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
@@ -45,9 +45,6 @@
                                 <input type="text" id="lname" name="lname" placeholder="Enter surname" required value="{{ old('lname') }}" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                             </div>
 
-                        </div>
-
-                        <div class="flex mb-4 space-x-6">
                             <div>
                                 <label for='gender' class="block text-gray-600">Gender</label>
                                 <select id="gender" name="gender" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
@@ -63,9 +60,7 @@
                                  <label for="age" class="block text-gray-600">Age</label>
                                 <input type="number" id="age" name="age" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                             </div>
-                        </div>
 
-                        <div class="flex mb-4 space-x-6">
                             <div>
                                  <label for="password" class="block text-gray-600">Password</label>
                                  <input type="password" id="password" minlength=8 autocomplete="new-password" name="password" placeholder="At least 8 characters" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
@@ -79,9 +74,7 @@
                                 <label for="phone" class="block text-gray-600">Phone Number</label>
                                 <input type="number" id="phone" name="phone" placeholder="eg.0240000000" required minlength="10" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md">
                             </div>
-                        </div>
 
-                        <div class="flex mb-4 space-x-6">
                             <div>
                                  <label for="fname" class="block text-gray-600">Position</label>
                                 <input type="text" id="position" name="position" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
@@ -98,7 +91,7 @@
                             </div>
                         </div>
 
-                        <div class="flex justify-center">
+                        <div class="flex justify-center mt-6">
                             <button type="submit" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Register</button>
                         </div>
 

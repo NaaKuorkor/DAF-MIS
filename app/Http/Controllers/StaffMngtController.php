@@ -128,13 +128,15 @@ class StaffMngtController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            Log::error(
-                'Deletion failed',
-                [
-                    'message' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]
-            );
+            Log::error('Deletion failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Deletion failed'
+            ]);
         }
     }
 

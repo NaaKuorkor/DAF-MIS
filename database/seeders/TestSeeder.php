@@ -34,7 +34,8 @@ class TestSeeder extends Seeder
             'gender' => 'F',
             'age' => 30,
             'residence' => 'Dansoman',
-            'position' => 'Developer',
+            'position' => 'Trainer',
+            'department' => 'Training',
             'createuser' => 'system',
             'modifyuser' => 'system'
         ]);

@@ -3,7 +3,7 @@
         <h1 class="font-bold text-4xl">Students</h1>
         <div class="flex justify-between">
             <div class="flex justify-start">
-                <input class='border border-gray-400 rounded-lg w-70 p-2 mr-4' type='text' placeholder="Search">
+                <input id="searchStudent" class='border border-gray-400 rounded-lg w-70 p-2 mr-4' type='text' placeholder="Search">
                 <x-filter-button />
             </div>
             <div class='flex justify-end space-x-4 ml-2'>
