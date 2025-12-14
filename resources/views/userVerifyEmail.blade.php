@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <body>
-        <h2>Welcome, {{ $student->name }}!</h2>
+        <h2>Welcome, {{ $user->name }}!</h2>
 
         <p>Thank you for registering. Please verify your email to complete your registration:</p>
 

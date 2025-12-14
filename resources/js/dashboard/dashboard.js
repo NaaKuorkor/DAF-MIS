@@ -1,4 +1,4 @@
-import loadStudents, {handleStudentSubmit} from './studentMngt.js';
+import loadStudents from './studentMngt.js';
 import loadStaff from './staffMngt.js';
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -95,12 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
-    document.addEventListener('submit', (e) => {
-        if (e.target.id === 'registerStudent'){
-            handleStudentSubmit(e);
-            loadStudents();
-        }
-    } );
+
 
     getModules();
     displayOverview();

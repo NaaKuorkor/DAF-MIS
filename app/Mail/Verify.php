@@ -16,12 +16,12 @@ class Verify extends Mailable
     /**
      * Create a new message instance.
      */
-    public $student;
+    public $user;
     public $verificationLink;
 
-    public function __construct($student, $verificationLink)
+    public function __construct($user, $verificationLink)
     {
-        $this->student = $student;
+        $this->user = $user;
         $this->verificationLink = $verificationLink;
     }
 
@@ -41,9 +41,9 @@ class Verify extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'studentVerifyEmail',
+            view: 'userVerifyEmail',
             with: [
-                'student' => $this->student,
+                'user' => $this->user,
                 'verificationLink' => $this->verificationLink
             ]
         );

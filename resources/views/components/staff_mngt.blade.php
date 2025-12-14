@@ -4,12 +4,13 @@
 
         <div class='flex justify-between'>
             <div class='flex justify-start'>
-                <input class='border border-gray-400 rounded-lg w-70 p-2 mr-4' type='text' placeholder="Search">
+                <input id="searchStaff" class='border border-gray-400 rounded-lg w-70 p-2 mr-4' type='text' placeholder="Search">
                 <x-filter-button />
             </div>
             <div class='flex justify-end space-x-4 ml-2'>
                 <x-add-staff-modal />
-                <button class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export</button>
+                <a href="{{route ('exportStaff')}}" class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export</a>
+                <x-import-staff-modal />
             </div>
         </div>
     </div>
@@ -23,8 +24,8 @@
                         <thead>
                             <tr>
                                 <th class="px-5 py-3 text-xs font-medium uppercase">Name</th>
-                                <th class="px-5 py-3 text-xs font-medium uppercase">Position</th>
                                 <th class="px-5 py-3 text-xs font-medium uppercase">Department</th>
+                                <th class="px-5 py-3 text-xs font-medium uppercase">Position</th>
                                 <th class="px-5 py-3 text-xs font-medium uppercase">Action</th>
                             </tr>
                         </thead>

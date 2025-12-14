@@ -42,6 +42,78 @@ class StaffMngtController extends Controller
         return response()->json($staff);
     }
 
+    public function alphaStaffFilter()
+    {
+        $staff = TblStaff::with(
+            'user'
+        )->orderBy('lname', 'desc')
+            ->paginate(10);
+
+        $staff->getCollection()->transform(function ($s) {
+            return [
+                'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
+                'staffid' => $s->staffid,
+                'userid' => $s->user->userid,
+                'fname' => $s->fname,
+                'mname' => $s->mname,
+                'lname' => $s->lname,
+                'age' => $s->age,
+                'email' => $s->user->email,
+                'phone' => $s->user->phone,
+                'gender' => $s->gender,
+                'residence' => $s->residence,
+                'position' => $s->positon,
+                'department' => $s->department,
+            ];
+        });
+
+        return response()->json($staff);
+    }
+
+    public function searchStaff(Request $request)
+    {
+        $query = $request->input('q');
+
+        if (!empty($query)) {
+            $searchTerm = '%' . addcslashes($query, '%_') . '%';
+
+            //Eagerload relationships and identify only undeleted students
+            $staff = TblStaff::with(
+                'user'
+            )->where(
+                function ($querybuilder) use ($searchTerm) {
+                    $querybuilder->where('fname', 'LIKE', $searchTerm)
+                        ->orWhere('lname', 'LIKE', $searchTerm)
+                        ->orWhere('mname', 'LIKE', $searchTerm);
+                }
+
+            )->orderBy('createdate', 'desc')->paginate(10);
+
+            $staff->getCollection()->transform(function ($s) {
+                return [
+                    'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
+                    'staffid' => $s->staffid,
+                    'userid' => $s->user->userid,
+                    'fname' => $s->fname,
+                    'mname' => $s->mname,
+                    'lname' => $s->lname,
+                    'age' => $s->age,
+                    'email' => $s->user->email,
+                    'phone' => $s->user->phone,
+                    'gender' => $s->gender,
+                    'residence' => $s->residence,
+                    'position' => $s->positon,
+                    'department' => $s->department,
+                ];
+            });
+
+            return response()->json($staff);
+        } else {
+            return $this->staffTableContent();
+        }
+    }
+
+
     public function updateStaff(Request $request)
     {
         try {
@@ -140,30 +212,6 @@ class StaffMngtController extends Controller
         }
     }
 
-    public function alphaStaffFilter()
-    {
-        $staff = TblStaff::with(
-            'user'
-        )->orderBy('lname', 'desc')
-            ->paginate(10);
-
-        $staff->getCollection()->transform(function ($s) {
-            return [
-                'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
-                'department' => $s->department,
-                'position' => $s->position,
-                'fname' => $s->fname,
-                'mname' => $s->mname,
-                'lname' => $s->lname,
-                'gender' => $s->gender,
-                'age' => $s->age,
-                'staffid' => $s->staffid,
-                'userid' => $s->user->userid,
-            ];
-        });
-
-        return response()->json($staff);
-    }
 
     public function importStaff(Request $request)
     {
@@ -181,7 +229,7 @@ class StaffMngtController extends Controller
 
         $rows->each(function (array $row) use (&$createdusers) {
             //Wrap in transaction and pass row and createdusers by reference
-            DB::transaction(function () use ($row, &$createdusers) {
+            DB::transaction(function () use ($row, &$createdusers, &staff) {
                 //Create user id
                 $lastUser = DB::table('tbluser')
                     ->selectRaw("MAX(CAST(SUBSTRING(userid, 2) AS UNSIGNED)) as maxid")
@@ -202,10 +250,10 @@ class StaffMngtController extends Controller
 
                 $user = TblUser::create([
                     'userid' => $userid,
-                    'email' => $row['email'],
+                    'email' => $row['Email'],
                     'password' => Hash::make($row['phone']),
-                    'phone' => $row['phone'],
-                    'usertype' => $row['user_type'],
+                    'phone' => $row['Phone'],
+                    'usertype' => 'STA',
                     'createdate' => now(),
                     'createuser' =>  'system',
                     'modifydate' => now(),
@@ -216,13 +264,13 @@ class StaffMngtController extends Controller
                 $staff = TblStaff::create([
                     'userid' => $user->userid,
                     'staffid' => $staffid,
-                    'fname' => $row['fname'],
-                    'mname' => $row['mname'] ?? null,
-                    'lname' => $row['lname'],
-                    'gender' => $row['gender'],
-                    'age' => $row['age'],
-                    'position' => $row['position'],
-                    'departent' => $row['department']
+                    'fname' => $row['First Name'],
+                    'mname' => $row['Middle Name'] ?? null,
+                    'lname' => $row['Surname'],
+                    'gender' => $row['Gender'],
+                    'age' => $row['Age'],
+                    'position' => $row['Position'],
+                    'department' => $row['Department']
 
                 ]);
 
@@ -276,6 +324,10 @@ class StaffMngtController extends Controller
                         'mod_read' => $priviledges['mod_read'],
                         'mod_update' => $priviledges['mod_update'],
                         'mod_delete' => $priviledges['mod_delete'],
+                        'createuser' => 'system',
+                        'modifyuser' => 'system',
+                        'createdate' => now(),
+                        'modifydate' => now()
                     ]);
                 }
 

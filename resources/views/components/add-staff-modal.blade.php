@@ -1,4 +1,17 @@
-<div x-data="{ modalOpen: false }"
+<div x-data="{ modalOpen: false,
+    submitForm(event){
+    const formData = new FormData(event.target);
+    axios.post('/staff/register', formData).
+        then(response => {
+            if(response.data.success){
+            this.modalOpen=false;
+            alert(response.data.message);
+            }
+        }).catch(error  => {
+                alert(error.response?.data?.message || 'Registration Failed');
+            })
+        }
+    }"
     @keydown.escape.window="modalOpen = false"
     class="relative z-50 w-auto h-auto">
     <button @click="modalOpen=true" class="rounded-md bg-green-400 hover:bg-green-500 p-2">Add</button>
@@ -28,7 +41,7 @@
                     </button>
                 </div>
                 <div class="relative w-auto">
-                    <form method='POST'  action="{{route('register.staff')}}">
+                    <form method='POST'  action="{{route('register.staff')}}" @submit.prevent = 'submitForm($event)'>
                         @csrf
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">

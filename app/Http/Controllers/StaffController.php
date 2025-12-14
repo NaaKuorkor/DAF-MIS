@@ -45,11 +45,11 @@ class StaffController extends Controller
                 'lname' => 'string|required|max:50',
                 'email' => 'email|required',
                 'gender' => 'string|required|max:1',
-                'age' => 'number|required',
+                'age' => 'integer|required',
                 'position' => 'string|required|max:100',
                 'phone' => 'string|required|max:15',
                 'password' => 'required|string|min:6',
-                'user_type' => 'required|string',
+                'residence' => 'required|string',
                 'department' => 'required|string'
             ]);
 
@@ -87,7 +87,7 @@ class StaffController extends Controller
                     'email' => $staffData['email'],
                     'password' => Hash::make($staffData['password']),
                     'phone' => $staffData['phone'],
-                    'usertype' => $staffData['user_type'],
+                    'usertype' => 'STA',
                     'createdate' => now(),
                     'createuser' => auth()->user()->email ?? 'system',
                     'modifydate' => now(),
@@ -103,8 +103,9 @@ class StaffController extends Controller
                     'lname' => $staffData['lname'],
                     'gender' => $staffData['gender'],
                     'age' => $staffData['age'],
+                    'residence' => $staffData['age'],
                     'position' => $staffData['position'],
-                    'departent' => $staffData['department']
+                    'department' => $staffData['department']
 
                 ]);
 

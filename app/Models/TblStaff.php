@@ -14,6 +14,8 @@ class TblStaff extends Model
 
     public $timestamps = false;
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'userid',
         'staffid',
@@ -24,6 +26,7 @@ class TblStaff extends Model
         'age',
         'residence',
         'position',
+        'department'
     ];
 
     protected function casts(): array

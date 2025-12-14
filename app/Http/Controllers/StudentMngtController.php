@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Verify;
 use App\Models\TblCourseRegistration;
 use App\Models\TblStudent;
 use App\Models\TblUser;
@@ -9,6 +10,7 @@ use App\Models\TblUserModulePriviledges;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -17,6 +19,19 @@ use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class StudentMngtController extends Controller
 {
+    public function sendSMS($phone, $message)
+    {
+        $response = Http::withHeaders([
+            'api-key' => env('ARKESEL_SMS_API_KEY')
+        ])->post(env('ARKESEL_SMS_URL'), [
+            'sender' => 'Diaspora African Forum',
+            'message' => $message,
+            'recipient' => $phone
+        ]);
+
+        return $response->json();
+    }
+
     public function studentTableContent()
     {
 
@@ -96,7 +111,7 @@ class StudentMngtController extends Controller
     {
         $query = $request->input('q');
 
-        if(!empty($query)){
+        if (!empty($query)) {
             $searchTerm = '%' . addcslashes($query, '%_') . '%';
 
             //Eagerload relationships and identify only undeleted students
@@ -104,41 +119,40 @@ class StudentMngtController extends Controller
                 'course_registration.course',
                 'cohort_registration.cohort',
                 'user'
-            )->where( function ($querybuilder) use($searchTerm){
-                $querybuilder->where('fname', 'LIKE', $searchTerm )
-                    ->orWhere('lname', 'LIKE', $searchTerm)
-                    ->orWhere('mname', 'LIKE', $searchTerm);
-            }
+            )->where(
+                function ($querybuilder) use ($searchTerm) {
+                    $querybuilder->where('fname', 'LIKE', $searchTerm)
+                        ->orWhere('lname', 'LIKE', $searchTerm)
+                        ->orWhere('mname', 'LIKE', $searchTerm);
+                }
 
             )->orderBy('createdate', 'desc')->paginate(10);
 
-            $students->getCollection()->transform(function ($student){
+            $students->getCollection()->transform(function ($student) {
                 return [
-                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
-                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
-                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                'registration_date' => $student->course_registration[0]->createdate,
-                'studentid' => $student->studentid,
-                'userid' => $student->user->userid,
-                'fname' => $student->fname,
-                'mname' => $student->mname,
-                'lname' => $student->lname,
-                'age' => $student->age,
-                'email' => $student->user->email,
-                'phone' => $student->user->phone,
-                'referral' => $student->referral,
-                'residence' => $student->residence,
-                'employment_status' => $student->employment_status,
-                'certificate' => $student->certificate,
-            ];
-
+                    'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
+                    'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
+                    'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
+                    'registration_date' => $student->course_registration[0]->createdate,
+                    'studentid' => $student->studentid,
+                    'userid' => $student->user->userid,
+                    'fname' => $student->fname,
+                    'mname' => $student->mname,
+                    'lname' => $student->lname,
+                    'age' => $student->age,
+                    'email' => $student->user->email,
+                    'phone' => $student->user->phone,
+                    'referral' => $student->referral,
+                    'residence' => $student->residence,
+                    'employment_status' => $student->employment_status,
+                    'certificate' => $student->certificate,
+                ];
             });
 
             return response()->json($students);
-        }else{
+        } else {
             return $this->studentTableContent();
         }
-
     }
 
 
@@ -238,6 +252,11 @@ class StudentMngtController extends Controller
                     'trace' => $e->getTraceAsString()
                 ]
             );
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Deletion failed'
+            ]);
         }
     }
 
@@ -353,6 +372,8 @@ class StudentMngtController extends Controller
                         'mod_delete' => $p['mod_delete'],
                         'createuser' => 'system',
                         'modifyuser' => 'system',
+                        'createdate' => now(),
+                        'modifydate' => now()
                     ]);
                 }
 

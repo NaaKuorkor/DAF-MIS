@@ -9,7 +9,7 @@
             <div class='flex justify-end space-x-4 ml-2'>
                 <x-add-student-modal />
                 <a href="{{route ('exportStudents')}}" class="rounded-md bg-blue-400 hover:bg-blue-500 p-2">Export</a>
-                <x-import-modal/>
+                <x-import-students-modal/>
             </div>
 
         </div>

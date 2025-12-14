@@ -235,7 +235,7 @@ export default function loadStudents() {
 
         if(students.length === 0){
             html = `
-             <tr>
+            <tr>
                 <td colspan="6" class="px-5 py-4 text-center text-neutral-500">
                     No students found.
                 </td>
@@ -247,7 +247,7 @@ export default function loadStudents() {
 
         students.forEach(student => {
             //Add a row
-            //And attach full student object to the button\
+            //And attach full student object to the button
             html += `
             <tr class="text-neutral-600 odd:bg-neutral-50 even:bg-white">
                 <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">${student.name}</td>
@@ -298,26 +298,6 @@ export default function loadStudents() {
     studentsDateFilter();
 }
 
-export function handleStudentSubmit(e){
-        e.preventDefault();
 
-        const registerStudent = e.target;
-        const formData = new FormData(registerStudent);
-
-        axios.post(registerStudent.action, formData)
-        .then(
-            response => {
-                if(response.data.success) {
-                document.querySelector('[x-data]').__x.$data.modalOpen = false;
-                }
-            }
-        ).catch(error => {
-            if(error.response && error.response.data.message){
-                alert(error.response.data.message);
-            } else {
-                console.error(error);
-                }
-        });
-    }
 
 
