@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\TblUser;
+use App\Services\SmsService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 
@@ -86,9 +88,7 @@ class AuthController extends Controller
         return redirect()->route('login.form')->with('success', 'Successfully logged out');
     }
 
-    public function resetPassword(Request $request) {}
-
-    public function forgotPassword(Request $request)
+    public function forgotPassword(Request $request, SmsService $sms)
     {
 
         //Get user email
@@ -101,7 +101,14 @@ class AuthController extends Controller
             if (!$email) {
                 return back()->withErrors(['email' => 'User not found'])->withInput();
             }
-            //If yes, send an email
+
+            $otp = rand(100000, 999999);
+            $message = `Below is your code for verification\n
+            {$otp}`;
+
+            $phone = preg_replace('/^0/', '233', $request->user->phone);
+
+            $sms->send($phone, $message);
 
             return redirect()->route('/');
         } catch (\Exception $e) {
@@ -110,5 +117,61 @@ class AuthController extends Controller
                 'trace' => $e->getTraceAsString()
             ]);
         }
+    }
+
+    public function verifyOTP(Request $request)
+    {
+        $otp = $request->input('otp');
+
+        $request->merge(['otp' => $otp]);
+
+        $fields = $request->validate([
+
+            'otp' => 'numeric|required|digits:6',
+
+            'system' => 'required|string'
+
+        ]);
+
+        // dd($request);
+
+        $userOtp = $fields['otp'];
+
+        $email = $fields['email'];
+
+        $storedOtp = Cache::get('otp:' . $email)['otp'] ?? null;
+
+
+
+        if ($storedOtp && $storedOtp == $userOtp) {
+
+            Cache::forget("otp:" . $email);
+            $user = TblUser::where('email', $email)->first();
+
+            if ($fields['system'] == 'login') {
+
+                Auth::login($user);
+
+                $request->session()->regenerate();
+
+                return redirect();
+            }
+        } else {
+            return redirect();
+        }
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $fields = $request->validate([
+            'current_password' => 'required|string',
+            'password' => 'required|string|confirmed'
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($fields['password'])
+        ]);
+
+        return response()->json(['Password updated successfully']);
     }
 }

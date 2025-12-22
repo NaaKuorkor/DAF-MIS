@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Verify;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Models\TblStaff;
 use App\Models\TblUserModulePriviledges;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -16,24 +18,7 @@ use Illuminate\Support\Facades\URL;
 
 class StaffController extends Controller
 {
-    public function sendSMS($phone, $message)
-    {
-
-        $ApiKey = env('ARKESEL_SMS_API_KEY');
-        $apiEndpoint = env('ARKESEL_SMS_URL');
-
-        $response = Http::withHeaders(
-            [
-                'api-key' => $ApiKey,
-            ]
-        )->post($apiEndpoint, [
-            'sender' => 'Diaspora African Forum',
-            'message' => $message,
-            'recipient' => $phone
-        ]);
-    }
-
-    public function createStaff(Request $request)
+    public function createStaff(Request $request, SmsService $sms)
     {
 
         try {
@@ -184,7 +169,7 @@ class StaffController extends Controller
                 Enjoy your time with us!
                 ";
 
-            $response = $this->sendSMS($phone, $message);
+            $sms->send($phone, $message);
 
 
             if ($request->ajax()) {
@@ -204,6 +189,71 @@ class StaffController extends Controller
             DB::statement('UNLOCK TABLES');
 
             return back()->withErrors('Registration failed');
+        }
+    }
+
+    public function staffProfile()
+    {
+
+        $user = Auth::user()->load('staff');
+
+        return view('components.my-staff-account', compact('user'));
+    }
+
+    public function updateProfile(Request $request)
+    {
+        try {
+
+            $user = Auth::user();
+
+            $fields = $request->validate([
+                'fname' => 'string|required|max:50',
+                'mname' => 'nullable|string|max:50',
+                'lname' => 'string|required|max:50',
+                'email' => 'email|required',
+                'gender' => 'string|required|max:1',
+                'age' => 'integer|required',
+                'position' => 'string|required|max:100',
+                'phone' => 'string|required|max:15',
+                'residence' => 'required|string',
+                'department' => 'required|string'
+            ]);
+
+
+            DB::transaction(function () use ($user, $fields) {
+                //Insert in usertable
+                $user->update([
+                    'email' => $fields['email'],
+                    'phone' => $fields['phone'],
+                ]);
+
+                //Insert in staff table
+                $user->staff->update([
+                    'fname' => $fields['fname'],
+                    'mname' => $fields['mname'],
+                    'lname' => $fields['lname'],
+                    'gender' => $fields['gender'],
+                    'age' => $fields['age'],
+                    'position' => $fields['position'],
+                    'residence' => $fields['residence'],
+                    'department' => $fields['department'],
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Updated successfully'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Update failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Updates failed'
+            ]);
         }
     }
 }

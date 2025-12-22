@@ -1,5 +1,5 @@
 <div x-data="{ modalOpen: false,
-    import(){
+    import(event){
     return{
         isValid : false,
         validate(event){
@@ -45,7 +45,7 @@
                     </button>
                 </div>
                 <div class="relative w-auto">
-                    <form action="{{ route('importStaff')}}" method='POST' enctype="multipart/formdata">
+                    <form action="{{ route('importStaff')}}" method='POST' enctype="multipart/formdata" @submit.prevent="import($event)">
                         <p class="mb-4">Select a file</p>
                         <input type="file" class="block w-full text-sm text-gray-700
            file:mr-4 file:py-2 file:px-4
@@ -54,9 +54,9 @@
            file:bg-blue-50 file:text-blue-700
            hover:file:bg-blue-100
            cursor-pointer" accept=".csv,.xlsx,.xls" @change='validate'>
-                        <div>
-                            <button type="button" @click="modalOpen=false" class="rounded-md bg-red-400 hover:bg-red-500 ">Cancel</button>
-                            <button type="submit" :class="isValid ? 'bg-blue-400 : 'bg-grey-300" >Import</button>
+                        <div class="mt-4 flex space-x-2 items-center">
+                            <button type="button" @click="modalOpen=false" class="rounded-md bg-red-400 hover:bg-red-500 p-3 ">Cancel</button>
+                            <button type="submit" :class="isValid ? 'bg-blue-400 : 'bg-grey-600 p-4 rounded-md " >Import</button>
                         </div>
                     </form>
                 </div>

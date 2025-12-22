@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'ArkeselSms' => [
+        'key' => env('ARKESEL_SMS_API_KEY'),
+        'url' => env('ARKESEL_SMS_URL'),
+    ],
+
 ];

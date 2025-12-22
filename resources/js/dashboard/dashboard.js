@@ -1,5 +1,6 @@
 import loadStudents from './studentMngt.js';
 import loadStaff from './staffMngt.js';
+import loadProfileDetails from './myaccount.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const sidebar = document.getElementById('sidebar');
@@ -57,6 +58,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadStudents();
             }else if (route === '/staff/staff-info'){
                 loadStaff();
+            }else if (route === '/staff/myAccount'){
+               loadProfileDetails();
             }
 
         }catch(err){

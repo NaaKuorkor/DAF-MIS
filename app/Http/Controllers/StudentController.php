@@ -14,25 +14,12 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use App\Mail\Verify;
+use App\Services\SmsService;
 use Illuminate\Support\Facades\Http;
 
 class StudentController extends Controller
 {
-    public function sendSMS($phone, $message)
-    {
-        //Add headers for arkesel
-        $response = Http::withHeaders([
-            'api-key' => env('ARKESEL_SMS_API_KEY'),
-        ])->post(env('ARKESEL_SMS_URL'), [
-            'sender' => env('ARKESEL_SMS_SENDER_ID'),
-            'message' => $message,
-            'recipients' => $phone
-        ]);
-
-        return $response->json();
-    }
-
-    public function register(Request $request)
+    public function register(Request $request, SmsService $sms)
     {
         try {
 
@@ -84,19 +71,6 @@ class StudentController extends Controller
                     $newNum = $studentCount + 1;
                     $studentid = 'STU' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
                 }
-
-                $transCount =  DB::table('tblcourse_registration')->selectRaw('COUNT(*) as count')->lockForUpdate()->value('count');
-
-                $transid = null;
-
-                if ($transCount === 0) {
-                    $transid = 'TS0000000001';
-                } else {
-                    $newNum = $transCount + 1;
-                    $transid = 'TS' . str_pad($newNum, 10, '0', STR_PAD_LEFT);
-                }
-
-
 
 
                 $user = TblUser::create([
@@ -200,7 +174,7 @@ class StudentController extends Controller
                 Enjoy your time with us!
                 ";
 
-                $response = $this->sendSMS($phone, $message);
+                $sms->send($phone, $message);
             }
 
             if ($request->ajax()) {
@@ -244,5 +218,63 @@ class StudentController extends Controller
         $user->save();
 
         return redirect('/login')->with('success', 'Email verified!');
+    }
+
+    public function updateInfo(Request $request)
+    {
+        try {
+
+            $user = Auth::user();
+
+            $fields = $request->validate([
+                'fname' => 'string|required|max:50',
+                'mname' => 'nullable|string|max:50',
+                'lname' => 'string|required|max:50',
+                'email' => 'email|required',
+                'gender' => 'string|required|max:1',
+                'age' => 'integer|required',
+                'phone' => 'string|required|max:15',
+                'residence' => 'required|string',
+                'referral' => 'required|string',
+                'employment_status' => 'required|string',
+
+            ]);
+
+
+            DB::transaction(function () use ($user, $fields) {
+                //Insert in usertable
+                $user->update([
+                    'email' => $fields['email'],
+                    'phone' => $fields['phone'],
+                ]);
+
+                //Insert in staff table
+                $user->student->update([
+                    'fname' => $fields['fname'],
+                    'mname' => $fields['mname'],
+                    'lname' => $fields['lname'],
+                    'gender' => $fields['gender'],
+                    'age' => $fields['age'],
+                    'residence' => $fields['residence'],
+                    'referral' => $fields['referral'],
+                    'employment_status' => $fields['employment_status']
+                ]);
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Updated successfully'
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Update failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Updates failed'
+            ]);
+        }
     }
 }

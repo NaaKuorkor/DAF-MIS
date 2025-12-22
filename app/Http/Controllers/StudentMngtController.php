@@ -7,6 +7,7 @@ use App\Models\TblCourseRegistration;
 use App\Models\TblStudent;
 use App\Models\TblUser;
 use App\Models\TblUserModulePriviledges;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -19,19 +20,6 @@ use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class StudentMngtController extends Controller
 {
-    public function sendSMS($phone, $message)
-    {
-        $response = Http::withHeaders([
-            'api-key' => env('ARKESEL_SMS_API_KEY')
-        ])->post(env('ARKESEL_SMS_URL'), [
-            'sender' => 'Diaspora African Forum',
-            'message' => $message,
-            'recipient' => $phone
-        ]);
-
-        return $response->json();
-    }
-
     public function studentTableContent()
     {
 
@@ -260,7 +248,7 @@ class StudentMngtController extends Controller
         }
     }
 
-    public function importStudents(Request $request)
+    public function importStudents(Request $request, SmsService $sms)
     {
         //Check the kind of file first
         $request->validate([
@@ -408,7 +396,7 @@ class StudentMngtController extends Controller
                 Password : {$user->phone}\n You have the liberty to change your password once you login.\n
                 Enjoy your time with us! ";
 
-            $this->sendSMS($phone, $message);
+            $sms->send($phone, $message);
         }
     }
 

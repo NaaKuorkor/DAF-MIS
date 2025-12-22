@@ -45,23 +45,38 @@ Route::post('/student/logout', [AuthController::class, 'studentLogout'])->name('
 Route::get('email/verify', [RoutingController::class, 'showVerifyEmail'])->name('verification.notice');
 
 Route::get('/email/verify/{id}/{hash}', [StudentController::class, 'showVerifySuccess'])->middleware(['signed'])->name('verification.verify');
+Route::get('/modules', [DashboardController::class, 'fetchModules'])->middleware('auth');
+Route::get('/overview', [DashboardController::class, 'overviewContent']);
+Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
+Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
+
 
 
 //Staff dashboard routes
-Route::get('/modules', [DashboardController::class, 'fetchModules'])->middleware('auth');
-Route::get('/overview', [DashboardController::class, 'overviewContent']);
-Route::get('/staff/staff-info', [RoutingController::class, 'showStaffMngt']);
-Route::get('/staff/student-info', [RoutingController::class, 'showStudentMngt']);
-Route::get('/staff/tasks', [RoutingController::class, 'showTaskMngt']);
-Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
-Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
-Route::get('/staff/cohorts', [RoutingController::class, 'showCohortMngt']);
-Route::get('/staff/studentTable/date', [StudentMngtController::class, 'studentTableContent']);
-Route::get('/staff/staffTable/date', [StaffMngtController::class, 'staffTableContent']);
-Route::get('/staff/staffTable/A-Z', [StaffMngtController::class, 'alphaStaffFilter']);
-Route::get('/staff/studentTable/A-Z', [StudentMngtController::class, 'alphaStudentFilter']);
-Route::post('/staff/updateStudent', [StudentMngtController::class, 'update']);
-Route::post('/staff/deleteStudent', [StudentMngtController::class, 'deleteStudent']);
-Route::get('/staff/searchStudent', [StudentMngtController::class, 'searchStudent']);
-Route::get('/staff/exportStudents', [StudentMngtController::class, 'exportStudents'])->name('exportStudents');
-Route::post('/staff/importStudents', [StudentMngtController::class, 'importStudents'])->name('importStudents');
+
+Route::prefix('staff')->group(function () {
+    Route::post('/logout', [AuthController::class, 'staffLogout'])->name('staff.logout');
+    Route::get('/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
+    Route::post('/login', [AuthController::class, 'login'])->name('staff.login');
+    Route::get('/staff-info', [RoutingController::class, 'showStaffMngt']);
+    Route::get('/student-info', [RoutingController::class, 'showStudent']);
+    Route::get('/tasks', [RoutingController::class, 'showTaskMngt']);
+    Route::get('/cohorts', [RoutingController::class, 'showCohortMngt']);
+    Route::get('/studentTable/date', [StudentMngtController::class, 'studentTableContent']);
+    Route::get('/staffTable/date', [StaffMngtController::class, 'staffTableContent']);
+    Route::get('/staffTable/A-Z', [StaffMngtController::class, 'alphaStaffFilter']);
+    Route::get('/studentTable/A-Z', [StudentMngtController::class, 'alphaStudentFilter']);
+    Route::post('/updateStudent', [StudentMngtController::class, 'update']);
+    Route::post('/deleteStudent', [StudentMngtController::class, 'deleteStudent']);
+    Route::get('/searchStudent', [StudentMngtController::class, 'searchStudents']);
+    Route::get('/exportStudents', [StudentMngtController::class, 'exportStudents']);
+    Route::post('/importStudents', [StudentMngtController::class, 'importStudents']);
+    Route::get('/exportStaff', [StaffMngtController::class, 'exportStaff'])->name('exportStaff');
+    Route::post('/importStaff', [StaffMngtController::class, 'importStaff'])->name('importStaff');
+    Route::post('/searchStaff', [StaffMngtController::class, 'searchStaff']);
+    Route::post('/updateStaff', [StaffMngtController::class, 'updateStaff']);
+    Route::post('/deleteStaff', [StaffMngtController::class, 'deleteStaff']);
+    Route::post('/updateProfile', [StaffController::class, 'updateProfile']);
+    Route::get('/staffProfile', [RoutingController::class, 'showStaffProfile']);
+    Route::post('/updatePassword', [AuthController::class, 'updatePassword']);
+});

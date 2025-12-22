@@ -120,17 +120,17 @@ export default function loadStaff() {
 
                                     <div>
                                         <label for="residence" class="block text-gray-600">Residence</label>
-                                        <input type="text" id="residence" name="residence" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="staff.residence">
+                                        <input type="text" id="residence" name="residence" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 focus:invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="staff.residence">
                                     </div>
 
                                     <div>
                                         <label for="position" class="block text-gray-600">Position</label>
-                                        <input type="text" id="position" name="position"  class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="staff.position">
+                                        <input type="text" id="position" name="position"  class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="staff.position">
                                     </div>
 
                                     <div>
                                         <label for="department" class="block text-gray-600">Department</label>
-                                        <input type="text" id="department" name="department" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="staff.department">
+                                        <input type="text" id="department" name="department" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="staff.department">
                                     </div>
 
 
@@ -158,7 +158,7 @@ export default function loadStaff() {
 
          return `<div x-data='{ modalOpen: false,
                 staff: ${JSON.stringify(staff)},
-                delete() {
+                delete(event) {
                 axios.post("/staff/deleteStaff", {
                     userid : this.staff.userid
                     })
@@ -205,12 +205,16 @@ export default function loadStaff() {
                         <div class="items-center pb-8">
                             <p>Are you sure you would like to delete this staff's details?</p>
                         </div>
+                        <form action='/staff/deleteStaff' method='POST' @submit.prevent="delete($event)">
+                             <input type='hidden' name='_token'value="${document.querySelector('meta[name="csrf-token"]').content}">
 
-                        <div class="flex space-x-4 mt-8">
-                            <button @click='modalOpen=false' type="button" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Cancel</button>
-                            <button @click="delete()" type="button" class="mb-4 bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Delete</button>
+                            <div class="flex space-x-4 mt-8">
+                                <button @click='modalOpen=false' type="button" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Cancel</button>
+                                <button type="submit" class="mb-4 bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Delete</button>
+                            </div>
+                        </form>
                         </div>
-                        </div>
+
                     </div>
                 </div>
             </template>
@@ -240,8 +244,8 @@ export default function loadStaff() {
                 <td class="px-5 py-4 text-sm whitespace-nowrap">${s.department}</td>
                 <td class="px-5 py-4 text-sm whitespace-nowrap">${s.position}</td>
                 <td class="px-5 py-4 whitespace-nowrap flex space-x-2 items-center">
-                    ${getEdit(staff)}
-                    ${getDelete(staff)}
+                    ${getEdit(s)}
+                    ${getDelete(s)}
                 </td>
             </tr>`
         });

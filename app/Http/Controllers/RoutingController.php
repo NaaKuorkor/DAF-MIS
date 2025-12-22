@@ -65,9 +65,14 @@ class RoutingController extends Controller
         return view('components.task_mngt');
     }
 
-    public function showMyAccount()
+    public function showStaffProfile()
     {
-        return view('components.my-account');
+        return view('components.my-staff-account');
+    }
+
+    public function showStudentProfile()
+    {
+        return view('components.my-student-account');
     }
 
     public function showCohortMngt()

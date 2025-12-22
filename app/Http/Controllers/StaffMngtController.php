@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Verify;
 use App\Models\TblStaff;
 use App\Models\TblUser;
 use App\Models\TblUserModulePriviledges;
+use App\Services\SmsService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
@@ -16,6 +19,8 @@ use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class StaffMngtController extends Controller
 {
+
+
     public function staffTableContent()
     {
         $staff = TblStaff::with(
@@ -27,15 +32,18 @@ class StaffMngtController extends Controller
         $staff->getCollection()->transform(function ($s) {
             return [
                 'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
-                'department' => $s->department,
-                'position' => $s->position,
+                'staffid' => $s->staffid,
+                'userid' => $s->user->userid,
                 'fname' => $s->fname,
                 'mname' => $s->mname,
                 'lname' => $s->lname,
-                'gender' => $s->gender,
                 'age' => $s->age,
-                'staffid' => $s->staffid,
-                'userid' => $s->user->userid,
+                'email' => $s->user->email,
+                'phone' => $s->user->phone,
+                'gender' => $s->gender,
+                'residence' => $s->residence,
+                'position' => $s->position,
+                'department' => $s->department
             ];
         });
 
@@ -62,7 +70,7 @@ class StaffMngtController extends Controller
                 'phone' => $s->user->phone,
                 'gender' => $s->gender,
                 'residence' => $s->residence,
-                'position' => $s->positon,
+                'position' => $s->position,
                 'department' => $s->department,
             ];
         });
@@ -213,7 +221,7 @@ class StaffMngtController extends Controller
     }
 
 
-    public function importStaff(Request $request)
+    public function importStaff(Request $request, SmsService $sms)
     {
         //Check the kind of file first
         $request->validate([
@@ -229,7 +237,7 @@ class StaffMngtController extends Controller
 
         $rows->each(function (array $row) use (&$createdusers) {
             //Wrap in transaction and pass row and createdusers by reference
-            DB::transaction(function () use ($row, &$createdusers, &staff) {
+            DB::transaction(function () use ($row, &$createdusers, &$staff) {
                 //Create user id
                 $lastUser = DB::table('tbluser')
                     ->selectRaw("MAX(CAST(SUBSTRING(userid, 2) AS UNSIGNED)) as maxid")
@@ -361,9 +369,9 @@ class StaffMngtController extends Controller
                 Your login credentials are as follows.\n
                 Email : {$user->email}\n
                 Password : {$user->phone}\n You have the liberty to change your password once you login.\n
-                Enjoy your time with us! ";
+                ";
 
-            $this->sendSMS($phone, $message);
+            $sms->send($phone, $message);
         }
     }
 

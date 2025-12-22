@@ -40,7 +40,7 @@
             </form>
 
             <div class="flex justify-between">
-                <a href="#">Forgot Password?</a>
+                <a href="{{ route('forgotPassword')}}">Forgot Password?</a>
 
                <p>Click <a href='{{ route( 'register.form' )}}' class="text-blue-500 underline">here</a> to register</p>
             </div>

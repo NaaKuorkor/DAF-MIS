@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 
-class my_account extends Component
+class myStaffAccount extends Component
 {
     /**
      * Create a new component instance.
@@ -21,6 +21,6 @@ class my_account extends Component
      */
     public function render(): View|Closure|string
     {
-        return view('components.my_account');
+        return view('components.my-staff-account');
     }
 }
