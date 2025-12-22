@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadStudents();
             }else if (route === '/staff/staff-info'){
                 loadStaff();
-            }else if (route === '/staff/myAccount'){
+            }else if (route === '/staff/myAccount' || route ==='/myAccount'){
                loadProfileDetails();
             }
 

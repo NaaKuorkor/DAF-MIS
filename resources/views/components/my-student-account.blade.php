@@ -1,7 +1,7 @@
 <div>
     <p>Personal Information</p>
 
-    <form action="/" method="POST">
+    <form action="/" method="POST" id='profileForm'>
         @csrf
         <div class="space-x-2">
             <button
@@ -9,7 +9,7 @@
                 Edit
             </button>
 
-            <div class="space-x-2" id="saveDiv" hidden>
+            <div class="space-x-2" id="actionBtns" hidden>
                 <button
                     type="submit" id='saveBtn'
                     class="bg-green-600 text-white px-4 py-1 rounded-md"
@@ -89,19 +89,30 @@
 <div>
     <div>
         <p>Security</p>
-        <form action="/" method="POST">
+        <form action="/" method="POST" id="passwordForm">
             @csrf
             <div>
                 <label for="current_password" class="block text-gray-600">Current Password</label>
-                <input type="password" id="current_password" name="current-password" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="password" id="current_password" name="current-password" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 pr-10 w-full rounded-md">
+                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600" data-toggle="current_password">
+                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                </button>
             </div>
             <div>
                 <label for="password" class="block text-gray-600">New Password</label>
                 <input type="password" id="password" name="password" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
+                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600" data-toggle="password">
+                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                </button>
+
             </div>
             <div>
             <label for="password_confirmation" class="block text-gray-600">Confirm new password</label>
-            <input type="password" id="password_confirmation" name="password_confirmation" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
+                <input type="password" id="password_confirmation" name="password_confirmation" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md">
+                <button type="button" class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-600" data-toggle="password_confirmation">
+                <i class="fa fa-eye-slash" aria-hidden="true"></i>
+                </button>
+
             </div>
             <button type="submit" class="mb-4 bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Change</button>
         </form>

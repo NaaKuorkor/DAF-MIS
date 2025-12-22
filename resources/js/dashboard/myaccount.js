@@ -8,6 +8,7 @@ export async function loadProfileDetails(){
     const profileForm = document.getElementById('profileForm');
     const passwordForm = document.getElementById('passwordForm');
     const changeBtn = document.getElementById('changeBtn');
+    const toggleButtons = document.querySelectorAll('[data-toggle]');
 
     let originalInput = {};
 
@@ -79,6 +80,26 @@ export async function loadProfileDetails(){
         }
     }
 
+    function passwordToggle(){
+        toggleButtons.forEach(btn => {
+            const inputId = btn.dataset.toggle;
+            const input = document.getElementById(inputId);
+            const icon = btn.querySelector('i');
+
+            btn.addEventListener('click', () => {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                }
+            });
+        });
+    }
+
     async function handlePasswordSubmit(e){
         e.preventDefault();
         changeBtn.innerHTML = 'Making changes...';
@@ -110,4 +131,6 @@ export async function loadProfileDetails(){
     editBtn.addEventListener('click', showActionBtns);
     cancelBtn.addEventListener('click', () => hideActionBtns(true));
     profileForm.addEventListener('submit', handleProfileSubmit);
+    passwordForm.addEventListener('submit', handlePasswordSubmit);
+    passwordToggle();
 }
