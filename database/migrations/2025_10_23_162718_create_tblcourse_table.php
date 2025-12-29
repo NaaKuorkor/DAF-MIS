@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('course_id')->unique()->primary();
             $table->string('course_name');
             $table->string('description');
+            $table->string('eligibility')->nullable()->default(null);
             $table->string('duration', 20);
             $table->char('deleted', 1)->default('0');
             $table->string('createuser')->nullable()->default(null);

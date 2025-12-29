@@ -15,12 +15,19 @@ class TblCourse extends Model
 
     public $incrementing = false;
 
+    protected $keytype = 'string';
+
     public $timestamps = false;
 
     protected $fillable = [
         'course_id',
         'course_name',
+        'description',
+        'eligibility',
         'duration',
+        'deleted',
+        'createuser',
+        'modifyuser'
     ];
 
     protected function casts(): array

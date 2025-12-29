@@ -85,7 +85,7 @@ class StaffMngtController extends Controller
         if (!empty($query)) {
             $searchTerm = '%' . addcslashes($query, '%_') . '%';
 
-            //Eagerload relationships and identify only undeleted students
+            //Eagerload relationships and identify only undeleted staff
             $staff = TblStaff::with(
                 'user'
             )->where(
@@ -110,7 +110,7 @@ class StaffMngtController extends Controller
                     'phone' => $s->user->phone,
                     'gender' => $s->gender,
                     'residence' => $s->residence,
-                    'position' => $s->positon,
+                    'position' => $s->position,
                     'department' => $s->department,
                 ];
             });
