@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('course_id')->references('course_id')->on('tblcourse');
 
 
-            $table->primary(['cohort_id', 'course_id']);
+            $table->primary('cohort_id');
 
             $table->string('description');
             $table->date('start_date');

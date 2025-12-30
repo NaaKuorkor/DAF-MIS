@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('course_id')->references('course_id')->on('tblcourse');
             $table->foreign('studentid')->references('studentid')->on('tblstudent');
 
-            $table->primary('studentid', 'course_id');
+            $table->primary(['studentid', 'course_id']);
 
             $table->char('is_completed')->default(0);
             $table->string('createuser')->nullable()->default(null);

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Models\TblCourse;
+use App\Models\TblStudent;
 
 class TblCourseRegistration extends Model
 {
@@ -24,5 +25,10 @@ class TblCourseRegistration extends Model
     public function course()
     {
         return $this->belongsTo(TblCourse::class, 'course_id', 'course_id');
+    }
+
+    public function student()
+    {
+        return $this->belongsTo(TblStudent::class, 'studentid', 'studentid');
     }
 }

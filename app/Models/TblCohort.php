@@ -11,7 +11,7 @@ class TblCohort extends Model
 {
     protected $table = "tblcohort";
 
-    protected $primaryKey = 'transid';
+    protected $primaryKey = 'cohort_id';
 
     public $incrementing = false;
 
@@ -22,6 +22,11 @@ class TblCohort extends Model
         'course_id',
         'start_date',
         'end_date',
+        'student_limit',
+        'is_completed',
+        'deleted',
+        'createuser',
+        'modifyuser',
     ];
 
     protected function cast(): array
