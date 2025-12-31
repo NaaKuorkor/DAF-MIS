@@ -220,7 +220,7 @@ class StudentController extends Controller
         return redirect('/login')->with('success', 'Email verified!');
     }
 
-    public function updateInfo(Request $request)
+    public function updateProfile(Request $request)
     {
         try {
 

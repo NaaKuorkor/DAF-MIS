@@ -58,7 +58,8 @@ class CohortController extends Controller
         }
     }
 
-    public function assignToCohort(Request $request){
+    public function assignToCohort(Request $request)
+    {
 
         $fields = $request->validate([
             'cohort_id' => 'required|string',
@@ -67,7 +68,7 @@ class CohortController extends Controller
 
         //Check for cohort in table
         $cohort = TblCohort::where('cohort_id', $fields['cohort_id'])
-        ->where('deleted', '0')
+            ->where('deleted', '0')
             ->firstOrFail();
 
         $registered = TblCourseRegistration::where('studentid', $fields['studentid'])
@@ -105,7 +106,8 @@ class CohortController extends Controller
         ]);
     }
 
-    public function viewCohortsForCourse($course_id){
+    public function viewCohortsForCourse($course_id)
+    {
         //Check if course exists
         $course = TblCourse::where('course_id', $course_id)
             ->where('deleted', '0')
@@ -154,15 +156,16 @@ class CohortController extends Controller
         ]);
     }
 
-    public function viewStudentsForCohort(){
+    public function viewStudentsForCohort()
+    {
         $cohort = TblCohort::where('cohort_id', $cohort_id)
-        ->where('deleted', '0')
-        ->firstOrFail();
+            ->where('deleted', '0')
+            ->firstOrFail();
 
         $students = TblCohortRegistration::where(
-                'tblcohort_registration.cohort_id',
-                $cohort_id
-            )
+            'tblcohort_registration.cohort_id',
+            $cohort_id
+        )
             ->join('tblstudent', 'tblstudent.studentid', '=', 'tblcohort_registration.studentid')
             ->join('tblcourse', 'tblcourse.course_id', '=', 'tblcohort.course_id')
             ->select([
@@ -186,5 +189,3 @@ class CohortController extends Controller
         ]);
     }
 }
-
-

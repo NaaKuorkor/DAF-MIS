@@ -42,6 +42,16 @@
                 <input type="text" class="profileInput" id="lname" name="lname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" value="{{$user->staff->lname}}" readonly>
             </div>
             <div>
+                 <label for="email" class="block text-gray-600">Email</label>
+                <input type="email" id="email" name="email" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" value="{{$user->email}}" readonly>
+
+            </div>
+            <div>
+                <label for="phone" class="block text-gray-600">Phone Number</label>
+                <input type="text" id="phone" name="phone" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" value="{{$user->phone}}" readonly>
+            </div>
+
+            <div>
                 <label for='gender' class="block text-gray-600">Gender</label>
                 <select id="gender" class="profileSelect" name="gender"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" disabled>
                         <option value="M" @selected( $user->staff->gender== 'M')>Male</option>

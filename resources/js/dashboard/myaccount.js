@@ -14,6 +14,7 @@ export async function loadProfileDetails(){
 
     function showActionBtns(){
         actionBtns.hidden = false;
+        editBtn.disabled = true;
 
         originalInput = {}
 
@@ -111,6 +112,7 @@ export async function loadProfileDetails(){
              const response = await axios.post(passwordForm.action, formData);
 
             alert(response.data.message);
+            passwordForm.reset();
 
         }catch(error){
              if (error.response?.data?.errors) {

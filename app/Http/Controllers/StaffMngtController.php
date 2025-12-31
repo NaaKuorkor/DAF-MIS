@@ -194,7 +194,7 @@ class StaffMngtController extends Controller
             $userid = $request->userid;
 
             //Update deleted to 1
-            $deleted = TblUser::where('userid', $userid)->update(['deleted' => 1]);
+            $deleted = TblUser::where('userid', $userid)->update(['deleted' => '1']);
 
             if ($deleted) {
                 return response()->json([
