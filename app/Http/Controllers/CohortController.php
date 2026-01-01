@@ -156,7 +156,7 @@ class CohortController extends Controller
         ]);
     }
 
-    public function viewStudentsForCohort()
+    public function viewStudentsForCohort($cohort_id)
     {
         $cohort = TblCohort::where('cohort_id', $cohort_id)
             ->where('deleted', '0')

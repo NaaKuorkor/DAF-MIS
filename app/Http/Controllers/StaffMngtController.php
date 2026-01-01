@@ -377,10 +377,10 @@ class StaffMngtController extends Controller
 
     public function exportStaff()
     {
-        //Get students with the user model instances
+        //Get staff with the user model instances
         $staff = TblStaff::with('user')->get();
 
-        //Create anin-excel file to be streamed to browser
+        //Create an in-excel file to be streamed to browser
         $writer = SimpleExcelWriter::streamDownload('Staff.xlsx');
 
         //Add data rows

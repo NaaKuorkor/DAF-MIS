@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\TblTask;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use Spatie\SimpleExcel\SimpleExcelWriter;
 
 class TaskController extends Controller
 {
@@ -20,7 +22,7 @@ class TaskController extends Controller
                 'priority' => 'required|string',
             ]);
 
-            $task_id = 'TSK-' . rand(100, 900);
+            $task_id = 'TSK-' . strtoupper(Str::random(6));
 
             TblTask::create([
                 'task_id' => $task_id,
@@ -86,10 +88,75 @@ class TaskController extends Controller
         }
     }
 
+    public function showTask($task_id)
+    {
+        try {
+            $task = TblTask::where('task_id', $task_id)
+                ->where('userid', auth()->user()->userid)
+                ->where('deleted', '0')
+                ->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => $task
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to load', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Task not found'
+            ]);
+        }
+    }
+
+    public function indexTasks(Request $request)
+    {
+        try {
+            $query = TblTask::where('userid', auth()->user()->userid)
+                ->where('deleted', '0');
+
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+
+            if ($request->filled('priority')) {
+                $query->where('priority', $request->priority);
+            }
+
+            if ($request->filled('search')) {
+                $query->where('title', 'like', '%' . $request->search . '%');
+            }
+
+            $tasks = $query->orderBy('due_date')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $tasks
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to load', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Tasks failed to load'
+            ]);
+        }
+    }
+
     public function updateTask(Request $request)
     {
         try {
-            $task = TblTask::findOrFail($request->task_id);
+            $task = TblTask::where('userid', auth()->user()->userid)
+                ->where('task_id', $request->task_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
 
             $fields = $request->validate([
                 'title' => 'required|string',
@@ -116,5 +183,72 @@ class TaskController extends Controller
                 'message' => 'Task update failed'
             ]);
         }
+    }
+
+    public function markCompleted(Request $request)
+    {
+        try {
+
+            $task = TblTask::where('userid', auth()->user()->userid)
+                ->where('task_id', $request->task_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
+
+            if ($task->status === 'completed') {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Task already completed'
+                ]);
+            }
+
+            $task->update([
+                'completed_at' => now(),
+                'status' => 'completed',
+                'modifyuser' => auth()->user()->email,
+                'modifydate' => now()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Marked as complete'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to complete task', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to complete task'
+            ]);
+        }
+    }
+
+    public function exportTasks()
+    {
+        $task = TblTask::where('userid', auth()->user()->userid)
+            ->where('deleted', '0')
+            ->orderBy('createdate')
+            ->get();
+
+
+        $name = auth()->user()->fname;
+        $writer = SimpleExcelWriter::streamDownload('Tasks_' . $name . '.xlsx');
+
+        //Add data rows
+        foreach ($task as $t) {
+            $writer->addRow([
+                'Task Id' => $t->task_id,
+                'title' => $t->title,
+                'Description' => $t->description,
+                'Due Date' => $t->due_date,
+                'Priority' => $t->priority,
+                'Status' => $t->status,
+                'Time Completed' => $t->completed_at
+            ]);
+        }
+
+        return $writer->toBrowser();
     }
 }
