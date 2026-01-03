@@ -19,9 +19,9 @@ class ModuleSeeder extends Seeder
             [
                 'modid' => 'MOD001',
                 'mod_position' => '1',
-                'mod_name' => 'Overview',
+                'mod_name' => 'Staff Dashboard',
                 'mod_label' => 'Overview',
-                'mod_url' => '/overview',
+                'mod_url' => '/staff/overview',
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,
@@ -33,6 +33,59 @@ class ModuleSeeder extends Seeder
                 'modifyuser' => 'system',
                 'modifydate' => Carbon::now(),
             ],
+
+            [
+                'modid' => 'MOD012',
+                'mod_position' => '1',
+                'mod_name' => 'Courses and Cohorts',
+                'mod_label' => 'Courses and Cohorts',
+                'mod_url' => '/courses',
+                'is_child' => 0,
+                'pmod_id' => null,
+                'has_child' => 0,
+                'icon_class' => 'fa-solid fa-book-open',
+                'mod_status' => '1',
+                'mod_icon' => null,
+                'createuser' => 'system',
+                'createdate' => Carbon::now(),
+                'modifyuser' => 'system',
+                'modifydate' => Carbon::now(),
+            ],
+            [
+                'modid' => 'MOD013',
+                'mod_position' => '2',
+                'mod_name' => 'Announcements',
+                'mod_label' => 'Announcements',
+                'mod_url' => '/announcements',
+                'is_child' => 0,
+                'pmod_id' => null,
+                'has_child' => 0,
+                'icon_class' => 'fa-solid fa-bullhorn ',
+                'mod_status' => '1',
+                'mod_icon' => null,
+                'createuser' => 'system',
+                'createdate' => Carbon::now(),
+                'modifyuser' => 'system',
+                'modifydate' => Carbon::now(),
+            ],
+            [
+                'modid' => 'MOD014',
+                'mod_position' => '3',
+                'mod_name' => 'Profile Management',
+                'mod_label' => 'Profile',
+                'mod_url' => '/myAccount',
+                'is_child' => 0,
+                'pmod_id' => null,
+                'has_child' => 0,
+                'icon_class' => 'fa-solid fa-file',
+                'mod_status' => '1',
+                'mod_icon' => null,
+                'createuser' => 'system',
+                'createdate' => Carbon::now(),
+                'modifyuser' => 'system',
+                'modifydate' => Carbon::now(),
+            ],
+
             [
                 'modid' => 'MOD002',
                 'mod_position' => '2',
@@ -129,7 +182,7 @@ class ModuleSeeder extends Seeder
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,
-                'icon_class' => 'fa-solid file',
+                'icon_class' => 'fa-solid fa-file',
                 'mod_status' => '1',
                 'mod_icon' => null,
                 'createuser' => 'system',
@@ -138,24 +191,23 @@ class ModuleSeeder extends Seeder
                 'modifydate' => Carbon::now(),
 
             ],
-            [
-                'modid' => 'MOD008',
-                'mod_position' => '8',
-                'mod_name' => 'Profile Management',
-                'mod_label' => 'Profile',
-                'mod_url' => '/myAccount',
-                'is_child' => 0,
-                'pmod_id' => null,
-                'has_child' => 0,
-                'icon_class' => 'fa-solid file',
-                'mod_status' => '1',
-                'mod_icon' => null,
-                'createuser' => 'system',
-                'createdate' => Carbon::now(),
-                'modifyuser' => 'system',
-                'modifydate' => Carbon::now(),
-
-            ]
+            //[
+            //'modid' => 'MOD008',
+            //'mod_position' => '8',
+            //'mod_name' => 'Announcements',
+            //'mod_label' => 'Announcements',
+            //'mod_url' => '/staff/announcements',
+            //'is_child' => 0,
+            //'pmod_id' => null,
+            //'has_child' => 0,
+            //'icon_class' => 'fa-solid fa-bullhorn',
+            //'mod_status' => '1',
+            //'mod_icon' => null,
+            //'createuser' => 'system',
+            //'createdate' => Carbon::now(),
+            //'modifyuser' => 'system',
+            //'modifydate' => Carbon::now(),
+            //],
 
 
         ];
@@ -250,10 +302,35 @@ class ModuleSeeder extends Seeder
                 'modifydate' => Carbon::now(),
                 'modifyuser' => 'system'
             ],
+            //[
+            //'userid' => 'U0000000001',
+            //'modid' => 'MOD008',
+            //'mod_create' => 1,
+            //'mod_read' => 1,
+            //'mod_update' => 1,
+            //'mod_delete' => 1,
+            //'createdate' => Carbon::now(),
+            //'createuser' => 'system',
+            //'modifydate' => Carbon::now(),
+            //'modifyuser' => 'system'
+            //],
 
+            //[
+            //'userid' => 'U0000000002',
+            //'modid' => 'MOD011',
+            //'mod_create' => 0,
+            //'mod_read' => 1,
+            //'mod_update' => 0,
+            //'mod_delete' => 0,
+            //'createdate' => Carbon::now(),
+            //'createuser' => 'system',
+            //'modifydate' => Carbon::now(),
+            //'modifyuser' => 'system'
+
+            //],
             [
                 'userid' => 'U0000000002',
-                'modid' => 'MOD001',
+                'modid' => 'MOD012',
                 'mod_create' => 0,
                 'mod_read' => 1,
                 'mod_update' => 0,
@@ -262,23 +339,10 @@ class ModuleSeeder extends Seeder
                 'createuser' => 'system',
                 'modifydate' => Carbon::now(),
                 'modifyuser' => 'system'
-
             ],
             [
                 'userid' => 'U0000000002',
-                'modid' => 'MOD004',
-                'mod_create' => 0,
-                'mod_read' => 1,
-                'mod_update' => 0,
-                'mod_delete' => 0,
-                'createdate' => Carbon::now(),
-                'createuser' => 'system',
-                'modifydate' => Carbon::now(),
-                'modifyuser' => 'system'
-            ],
-            [
-                'userid' => 'U0000000002',
-                'modid' => 'MOD007',
+                'modid' => 'MOD013',
                 'mod_create' => 0,
                 'mod_read' => 1,
                 'mod_update' => 1,
@@ -288,7 +352,22 @@ class ModuleSeeder extends Seeder
                 'modifydate' => Carbon::now(),
                 'modifyuser' => 'system'
 
-            ]
+            ],
+            [
+                'userid' => 'U0000000002',
+                'modid' => 'MOD014',
+                'mod_create' => 0,
+                'mod_read' => 1,
+                'mod_update' => 1,
+                'mod_delete' => 0,
+                'createdate' => Carbon::now(),
+                'createuser' => 'system',
+                'modifydate' => Carbon::now(),
+                'modifyuser' => 'system'
+
+            ],
+
+
         ];
 
         TblUserModulePriviledges::insert($modulePriviledges);

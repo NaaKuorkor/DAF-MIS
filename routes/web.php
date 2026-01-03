@@ -24,7 +24,7 @@ Route::get('/login', [RoutingController::class, 'showLoginForm'])->middleware('g
 Route::get('/dashboard', [RoutingController::class, 'showDashboard'])->middleware('auth', 'student')->name('dashboard');
 
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-
+Route::post('/forgotPassword', [AuthController::class, 'forgotPassword'])->name('forgotPassword');
 
 //Admin routesi
 

@@ -110,7 +110,7 @@ class AuthController extends Controller
 
             $sms->send($phone, $message);
 
-            return redirect()->route('/');
+            return redirect('/verifyOTP');
         } catch (\Exception $e) {
             Log::error('Failed', [
                 'message' => $e->getMessage(),

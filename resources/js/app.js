@@ -1,4 +1,7 @@
 import './bootstrap';
-import './dashboard/studentMngt.js';
-import './dashboard/dashboard.js';
-import './dashboard/staffMngt.js';
+import './staffDashboard/studentMngt.js';
+import './staffDashboard/dashboard.js';
+import './staffDashboard/staffMngt.js';
+import './staffDashboard/myaccount.js';
+import './staffDashboard/cohortMngt.js';
+import './staffDashboard/courseMngt.js';

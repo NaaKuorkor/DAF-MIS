@@ -1,4 +1,4 @@
-export async function loadProfileDetails(){
+export default async function loadProfileDetails(){
     const editBtn = document.getElementById('editBtn');
     const actionBtns = document.getElementById('actionBtns');
     const saveBtn = document.getElementById('saveBtn');

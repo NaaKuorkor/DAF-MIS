@@ -1,7 +1,5 @@
 export default function loadStaff() {
      console.log("staffmngt is loaded");
-    axios.defaults.headers.common['X-CSRF-TOKEN'] =
-       document.querySelector('meta[name="csrf-token"]').content;
 
     const rows = document.getElementById('staffRows');
     const az = document.getElementById('A-Z');
@@ -270,7 +268,7 @@ export default function loadStaff() {
         const query = this.value;
         try{
             const response = await axios.get('/staff/searchStaff?q=' + query);
-            const students = response.data.data;
+            const staff = response.data.data;
 
                 renderTable(staff);
         }catch(err){
