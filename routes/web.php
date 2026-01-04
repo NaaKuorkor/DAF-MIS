@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseRegistrationController;
 use App\Http\Controllers\StaffController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoutingController;
@@ -59,7 +61,7 @@ Route::prefix('staff')->group(function () {
     Route::get('/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
     Route::post('/login', [AuthController::class, 'login'])->name('staff.login');
     Route::get('/staff-info', [RoutingController::class, 'showStaffMngt']);
-    Route::get('/student-info', [RoutingController::class, 'showStudent']);
+    Route::get('/student-info', [RoutingController::class, 'showStudentMngt']);
     Route::get('/tasks', [RoutingController::class, 'showTaskMngt']);
     Route::get('/cohorts', [RoutingController::class, 'showCohortMngt']);
     Route::get('/studentTable/date', [StudentMngtController::class, 'studentTableContent']);
@@ -69,8 +71,8 @@ Route::prefix('staff')->group(function () {
     Route::post('/updateStudent', [StudentMngtController::class, 'update']);
     Route::post('/deleteStudent', [StudentMngtController::class, 'deleteStudent']);
     Route::get('/searchStudent', [StudentMngtController::class, 'searchStudents']);
-    Route::get('/exportStudents', [StudentMngtController::class, 'exportStudents']);
-    Route::post('/importStudents', [StudentMngtController::class, 'importStudents']);
+    Route::get('/exportStudents', [StudentMngtController::class, 'exportStudents'])->name('exportStudents');
+    Route::post('/importStudents', [StudentMngtController::class, 'importStudents'])->name('importStudents');
     Route::get('/exportStaff', [StaffMngtController::class, 'exportStaff'])->name('exportStaff');
     Route::post('/importStaff', [StaffMngtController::class, 'importStaff'])->name('importStaff');
     Route::post('/searchStaff', [StaffMngtController::class, 'searchStaff']);
@@ -79,4 +81,28 @@ Route::prefix('staff')->group(function () {
     Route::post('/updateProfile', [StaffController::class, 'updateProfile']);
     Route::get('/staffProfile', [RoutingController::class, 'showStaffProfile']);
     Route::post('/updatePassword', [AuthController::class, 'updatePassword']);
+    // View all courses
+    Route::get('/courses', [CourseController::class, 'viewCourses'])->name('courses.index');
+
+    // Create course
+    Route::post('/createcourse', [CourseController::class, 'createCourse'])->name('courses.create');
+
+    // Get single course
+    Route::get('/{course_id}', [CourseController::class, 'getCourse'])->name('courses.show');
+
+    // Search courses
+    Route::get('/search', [CourseController::class, 'searchCourse'])->name('courses.search');
+
+    // Filter courses
+    Route::post('/filter', [CourseController::class, 'filterCourses'])->name('courses.filter');
+
+    // Update course
+    Route::put('/{course_id}', [CourseController::class, 'updateCourse'])->name('courses.update');
+    Route::post('/{course_id}/update', [CourseController::class, 'updateCourse'])->name('courses.update.post'); // For form submissions
+
+    // Delete course
+    Route::delete('/{course_id}', [CourseController::class, 'deleteCourse'])->name('courses.delete');
+
+    // View registrations by course
+    Route::get('/{course_id}/registrations', [CourseRegistrationController::class, 'viewRegistrationsByCourse'])->name('courses.registrations');
 });

@@ -126,7 +126,7 @@ class ModuleSeeder extends Seeder
                 'mod_position' => '4',
                 'mod_name' => 'Course Management',
                 'mod_label' => 'Courses',
-                'mod_url' => '/courses',
+                'mod_url' => '/staff/courses',
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,

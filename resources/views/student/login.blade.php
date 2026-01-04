@@ -6,7 +6,7 @@
 <div class="w-full max-w-sm bg-white border border-purple-200 shadow-md rounded-xl p-8 transition-all duration-300">
     <div class="mb-8 text-center">
         <div class="w-10 h-10 bg-purple-600 text-white rounded-lg mx-auto flex items-center justify-center mb-4">
-            <i class="fa-solid fa-graduation-cap text-xl" style="color:white"></i>
+            <i class="fa-solid fa-graduation-cap text-xl"></i>
         </div>
         <h1 class="text-3xl font-bold text-purple-600 mb-2">Login</h1>
         <p class="text-sm text-gray-500">Enter your credentials to access your portal</p>

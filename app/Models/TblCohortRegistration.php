@@ -31,8 +31,4 @@ class TblCohortRegistration extends Model
     {
         return $this->belongsTo(TblStudent::class, 'studentid', 'studentid');
     }
-
-
-
-        
-    
+}

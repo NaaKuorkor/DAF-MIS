@@ -6,6 +6,7 @@
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>@yield('title', 'DAF web app')</title>
         @vite(['resources/css/app.css'])
+        <script src="https://kit.fontawesome.com/856b94abea.js" crossorigin="anonymous"></script>
     </head>
     <body class='min-h-screen flex items-center justify-center bg-purple-200'>
 

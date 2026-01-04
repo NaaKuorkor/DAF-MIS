@@ -1,303 +1,220 @@
 export default function loadStudents() {
-
     const rows = document.getElementById('tableRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
     const searchStudent = document.getElementById('searchStudent');
+    const showingCount = document.getElementById('showing-count');
 
-    async function studentsDateFilter(){
-        try{
-            //Get info from route
-            const response = await axios.get('/staff/studentTable/date');
-            //Just to check the pagination response
-            console.log(response.data.data);
-            //Get only the array with the data needed to be injected
-            const info = response.data.data;
+    function renderTable(students) {
+        let html = "";
 
-            //Display within table
-            renderTable(info);
-        }catch(err){
-            console.log('Failed to load student info');
-            console.log(err);
-            rows.innerHTML = `<p class="text-red-500">Failed to load</p>`;
-        }
-
-    }
-
-    function getEdit(student){
-        return `<div x-data='{ modalOpen: false, student: ${JSON.stringify(student)},
-        submitForm(event) {
-        const formData = new FormData(event.target);
-        axios.post("/staff/updateStudent", formData)
-            .then(response => {
-                if(response.data.success) {
-                    this.modalOpen = false;
-                    alert(response.data.message);
-                }
-            })
-            .catch(error => {
-                alert(error.response?.data?.message || "Update failed");
-            });
-    }
-}'
-    @keydown.escape.window="modalOpen = false"
-    class="relative z-50 w-auto h-auto">
-    <button @click="modalOpen=true"  class="bg-blue-400 p-2 rounded-md items-center"><i class="fa-solid fa-pen-to-square" style="color:white"></i></button>
-    <template x-teleport="body">
-        <div x-show="modalOpen" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-screen h-screen" x-cloak>
-            <div x-show="modalOpen"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-300"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                @click="modalOpen=false" class="absolute inset-0 w-full h-full bg-black/40"></div>
-            <div x-show="modalOpen"
-                x-trap.inert.noscroll="modalOpen"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative px-7 py-6 w-full bg-white sm:max-w-lg sm:rounded-lg">
-                <div class="flex justify-between items-center pb-2">
-                    <h3 class="text-lg font-semibold">Edit Student Information</h3>
-                    <button @click="modalOpen=false" class="flex absolute top-0 right-0 justify-center items-center mt-5 mr-5 w-8 h-8 text-gray-600 rounded-full hover:text-gray-800  bg-green-400 hover:bg-green-500 p-2">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
-                <div class="relative w-auto">
-
-                <form method="POST" action='/staff/updateStudent' @submit.prevent="submitForm($event)">
-                        <input type='hidden' name='_token'value="${document.querySelector('meta[name="csrf-token"]').content}">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label for="userid" class="text-gray-600">User Id</label>
-                                <input type="text" name="userid" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.userid">
-                            </div>
-                            <div>
-                                <label for="studentid" class="text-gray-600">Student Id</label>
-                                <input type="text" name="studentid" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.studentid">
-                            </div>
-                            <div>
-                                <label for="fname" class="block text-gray-600">First Name</label>
-                                <input type="text" id="fname" name="fname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.fname">
-                            </div>
-                            <div>
-                                <label for="mname" class="block text-gray-600">Middle Name</label>
-                                <input type="text" id="mname" name="mname" class="focus:outline-none focus:ring-2 focus:ring-purple-300  border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.mname">
-                            </div>
-                            <div>
-                               <label for="lname" class="block text-gray-600">Surname</label>
-                                <input type="text" id="lname" name="lname" required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.lname" >
-                            </div>
-
-                            <div>
-                                <label for='gender' class="block text-gray-600">Gender</label>
-                                <select id="gender" name="gender"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.gender">
-                                    <option value="M" >Male</option>
-                                    <option value="F" >Female</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="email" class="block text-gray-600">Email</label>
-                                <input type="email" id="email" name="email"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.email">
-                            </div>
-                            <div>
-                                 <label for="age" class="block text-gray-600">Age</label>
-                                <input type="number" id="age" name="age"  required class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.age">
-                            </div>
-                            <div>
-                                <label for="phone" class="block text-gray-600">Phone</label>
-                                <input type="number" id="phone" name="phone" required minlength="10"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.phone">
-                            </div>
-
-                            <div>
-                                <label for="residence" class="block text-gray-600">Residence</label>
-                                <input type="text" id="residence" name="residence"  class="focus:outline-none focus:ring-2 focus:ring-purple-300  focus:invalid:ring-red-500 border border-gray-400 invalid:border-red-500 h-8 p-2 w-full rounded-md" x-model="student.residence">
-                            </div>
-                            <div>
-                                <label for="referral" class="block text-gray-600">Referral</label>
-                                <select id='referral' name="referral"  class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.referral">
-                                    <option value="Social Media" >Social Media</option>
-                                    <option value="Alumni"  >DAF Alumni</option>
-                                    <option value="Website"  >Website</option>
-                                    <option value="Institution" >Institution</option>
-                                    <option value="Other" >Other</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="employment_status" class="block text-gray-600">Employment</label>
-                                <select id="employment_status" name="employment_status" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.employment_status">
-                                    <option value="unemployed">Unemployed</option>
-                                    <option value="employed">Employed</option>
-                                </select>
-                            </div>
-
-                            <div>
-                            <label for="course" class="block text-gray-600">Course</label>
-                                <select id="course" name="course" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.course">
-                                    <option value="LS101" >Life Skills</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label for="certificate" class="block text-gray-600">Certification</label>
-                                <select id="certificate" name="certificate" class="focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-8 p-2 w-full rounded-md" x-model="student.certificate">
-                                    <option value="Y" >Yes</option>
-                                    <option value="N" >No</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="flex mt-4 space-x-4">
-                            <button type="submit" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Save</button>
-                            <button @click.prevent="modalOpen=false" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Cancel</button>
-                        </div>
-
-                    </form>
-
-
-                </div>
-            </div>
-        </div>
-    </template>
-</div>`
-    }
-
- function getDelete(student){
-        return `<div x-data='{ modalOpen: false,
-        student: ${JSON.stringify(student)},
-        delete() {
-        axios.post("/staff/deleteStudent", {
-            userid : this.student.userid
-            })
-            .then(response => {
-                if(response.data.success) {
-                    this.modalOpen = false;
-                    alert(response.data.message);
-                }
-            })
-            .catch(error => {
-                alert(error.response?.data?.message || "Deletion failed");
-            });
-    }
-}'
-    @keydown.escape.window="modalOpen = false"
-    class="relative z-50 w-auto h-auto">
-    <button @click="modalOpen=true" class="bg-red-600 p-2 rounded-md items-center"><i class="fa-regular fa-trash-can" style="color:white"></i></button>
-    <template x-teleport="body">
-        <div x-show="modalOpen" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-screen h-screen" x-cloak>
-            <div x-show="modalOpen"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0"
-                x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-300"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                @click="modalOpen=false" class="absolute inset-0 w-full h-full bg-black/40"></div>
-            <div x-show="modalOpen"
-                x-trap.inert.noscroll="modalOpen"
-                x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative px-7 py-6 w-full bg-white sm:max-w-lg sm:rounded-lg">
-                <div class="flex justify-between items-center pb-2">
-                    <h3 class="text-lg font-semibold">Delete Student Information</h3>
-                    <button @click="modalOpen=false" class="flex absolute top-0 right-0 justify-center items-center mt-5 mr-5 w-8 h-8 text-gray-600 rounded-full hover:text-gray-800  bg-green-400 hover:bg-green-500 p-2">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-                    </button>
-                </div>
-                <div class="relative w-auto">
-                <div class="items-center pb-8">
-                    <p>Are you sure you would like to delete this student's details?</p>
-                </div>
-
-                <div class="flex space-x-4 mt-8">
-                    <button @click='modalOpen=false' type="button" class="mb-4 bg-purple-600 hover:bg-purple-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Cancel</button>
-                    <button @click="delete()" type="button" class="mb-4 bg-red-600 hover:bg-red-700 rounded-lg text-white font-bold w-50 text-center h-10 shadow">Delete</button>
-                </div>
-                </div>
-            </div>
-        </div>
-    </template>
-</div>`
-    }
-
-
-
-    function renderTable(students){
-        let html = ""
-
-        if(students.length === 0){
+        if (students.length === 0) {
             html = `
             <tr>
-                <td colspan="6" class="px-5 py-4 text-center text-neutral-500">
-                    No students found.
+                <td colspan="6" class="p-8 text-center">
+                    <div class="flex flex-col items-center justify-center">
+                        <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
+                        <p class="text-gray-500 font-medium">No students found</p>
+                        <p class="text-sm text-gray-400 mt-1">Try adjusting your search or filters</p>
+                    </div>
                 </td>
             </tr>
             `;
             rows.innerHTML = html;
+            if (showingCount) showingCount.textContent = '0';
             return;
         }
 
         students.forEach(student => {
-            //Add a row
-            //And attach full student object to the button
+            const initials = `${student.fname?.charAt(0) || ''}${student.lname?.charAt(0) || ''}`;
+            const colors = ['bg-purple-100 text-purple-700', 'bg-blue-100 text-blue-700', 'bg-green-100 text-green-700', 'bg-orange-100 text-orange-700'];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
             html += `
-            <tr class="text-neutral-600 odd:bg-neutral-50 even:bg-white">
-                <td class="px-5 py-4 text-sm font-medium whitespace-nowrap">${student.name}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap text-center">${student.course}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap text-center">${student.cohort}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap text-center">${student.registration_date}</td>
-                <td class="px-5 py-4 text-sm whitespace-nowrap text-center">${student.referral}</td>
-                <td class="px-5 py-4 whitespace-nowrap flex space-x-2 items-center">
-                    ${getEdit(student)}
-                    ${getDelete(student)}
+            <tr class="group hover:bg-purple-50/50 transition-colors">
+                <td class="p-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-full ${randomColor} flex items-center justify-center font-semibold text-sm flex-shrink-0">
+                            ${initials}
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-900">${student.name}</p>
+                            <p class="text-xs text-gray-500">ID: #${student.studentid || 'N/A'}</p>
+                        </div>
+                    </div>
                 </td>
-            </tr>`
+                <td class="p-4">
+                    <div class="text-sm text-gray-700">${student.course || 'N/A'}</div>
+                </td>
+                <td class="p-4">
+                    <span class="inline-flex items-center px-2 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-medium">
+                        ${student.cohort || 'N/A'}
+                    </span>
+                </td>
+                <td class="p-4">
+                    <div class="text-sm text-gray-600">${student.registration_date || 'N/A'}</div>
+                </td>
+                <td class="p-4">
+                    <div class="text-sm text-gray-600">${student.referral || 'N/A'}</div>
+                </td>
+                <td class="p-4 text-right">
+                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        ${getEditButton(student)}
+                        ${getDeleteButton(student)}
+                    </div>
+                </td>
+            </tr>`;
         });
 
         rows.innerHTML = html;
+        if (showingCount) showingCount.textContent = students.length;
     }
 
-    async function studentsAlphabetFilter(){
-        try{
-            const response = await axios.get('/staff/studentTable/A-Z');
-
-            renderTable(response.data.data);
-        }catch(err){
-            console.log('Failed to load student info');
-            console.log(err);
-            rows.innerHTML= `<p class="text-red-500">Failed to load</p>`;
-        }
+    function getEditButton(student) {
+        return `
+        <div x-data='{
+            modalOpen: false,
+            student: ${JSON.stringify(student).replace(/'/g, "\\'")}
+        }'>
+            <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Edit Student">
+                <i class="fas fa-pencil text-lg"></i>
+            </button>
+            ${getEditModal()}
+        </div>`;
     }
 
-    async function search(){
-        const query = this.value;
-        try{
-            const response = await axios.get('/staff/searchStudent?q=' + query);
-            const students = response.data.data;
-
-                renderTable(students);
-        }catch(err){
-            console.log('Search failed: ', err);
-        }
-    }
-
-
-
-    searchStudent.addEventListener('input', search);
-    az.addEventListener('click', studentsAlphabetFilter);
-    date.addEventListener('click', studentsDateFilter);
-
-    studentsDateFilter();
+    function getEditModal() {
+        return `
+        <template x-teleport="body">
+            <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+<div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+<div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-white">
+<h3 class="text-xl font-semibold text-gray-900">Edit Student</h3>
+<button @click="modalOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-purple-100 rounded-lg transition-colors">
+<i class="fas fa-times text-lg"></i>
+</button>
+</div>
+<form method="POST" action="/staff/updateStudent" @submit.prevent="
+axios.post('/staff/updateStudent', new FormData($event.target))
+.then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }})
+.catch(e => alert(e.response?.data?.message || 'Update failed'))
+" class="p-6 max-h-[70vh] overflow-y-auto">
+<input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+<input type="hidden" name="userid" x-model="student.userid">
+<input type="hidden" name="studentid" x-model="student.studentid">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">First Name</label>
+                            <input type="text" name="fname" x-model="student.fname" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Middle Name</label>
+                            <input type="text" name="mname" x-model="student.mname" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Surname</label>
+                            <input type="text" name="lname" x-model="student.lname" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Gender</label>
+                            <select name="gender" x-model="student.gender" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" x-model="student.email" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Age</label>
+                            <input type="number" name="age" x-model="student.age" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Phone</label>
+                            <input type="tel" name="phone" x-model="student.phone" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Residence</label>
+                            <input type="text" name="residence" x-model="student.residence" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
+                        <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                        <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </template>`;
 }
 
+function getDeleteButton(student) {
+    return `
+    <div x-data='{
+        modalOpen: false,
+        student: ${JSON.stringify(student).replace(/'/g, "\\'")}
+    }'>
+        <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Student">
+            <i class="fas fa-trash text-lg"></i>
+        </button>
+        <template x-teleport="body">
+            <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+                <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div class="p-6">
+                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Student?</h3>
+                        <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this student? This action cannot be undone.</p>
+                        <div class="flex items-center gap-3">
+                            <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button @click="axios.post('/staff/deleteStudent', {userid: student.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>`;
+}
 
+async function studentsDateFilter() {
+    try {
+        const response = await axios.get('/staff/studentTable/date');
+        renderTable(response.data.data);
+    } catch (err) {
+        console.error('Failed to load student info:', err);
+        rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+    }
+}
 
+async function studentsAlphabetFilter() {
+    try {
+        const response = await axios.get('/staff/studentTable/A-Z');
+        renderTable(response.data.data);
+    } catch (err) {
+        console.error('Failed to load student info:', err);
+        rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+    }
+}
 
+async function search() {
+    const query = this.value;
+    try {
+        const response = await axios.get('/staff/searchStudent?q=' + encodeURIComponent(query));
+        renderTable(response.data.data);
+    } catch (err) {
+        console.error('Search failed:', err);
+    }
+}
+
+// Event listeners
+if (searchStudent) searchStudent.addEventListener('input', search);
+if (az) az.addEventListener('click', studentsAlphabetFilter);
+if (date) date.addEventListener('click', studentsDateFilter);
+
+// Initial load
+studentsDateFilter();
+}

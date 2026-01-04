@@ -1,65 +1,88 @@
-<div x-data="{ modalOpen: false,
-    import(){
-    return{
-        isValid : false,
-        validate(event){
-            const file = event.target.file[0];
-            if(!file){
-                this.isValid = false;
-                return;
-            }
-
-            const types = ['csv', 'xlsx', 'xls'];
-    const ext = file.name.split('.').pop().toLowerCase();
-            this.isValid = types.includes(ext);
+{{-- resources/views/components/import-students-modal.blade.php --}}
+<div x-data="{
+    modalOpen: false,
+    isValid: false,
+    fileName: '',
+    validate(event) {
+        const file = event.target.files[0];
+        if(!file) {
+            this.isValid = false;
+            this.fileName = '';
+            return;
         }
+        const types = ['csv', 'xlsx', 'xls'];
+        const ext = file.name.split('.').pop().toLowerCase();
+        this.isValid = types.includes(ext);
+        this.fileName = file.name;
     }
-    }
-    }"
-    @keydown.escape.window="modalOpen = false"
-    class="relative z-50 w-auto h-auto">
-    <button @click="modalOpen=true" class="rounded-md bg-yellow-400 hover:bg-yellow-500 p-2" >Import</button>
+}"
+@keydown.escape.window="modalOpen = false"
+class="relative">
+    <button @click="modalOpen = true" class="px-3 py-2 bg-white border border-purple-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 hover:border-purple-300 transition-all shadow-sm flex items-center gap-2 group">
+        <i class="fas fa-upload text-gray-500 group-hover:text-gray-700"></i>
+        Import
+    </button>
+
     <template x-teleport="body">
-        <div x-show="modalOpen" class="fixed top-0 left-0 z-[99] flex items-center justify-center w-screen h-screen" x-cloak>
+        <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+            <!-- Backdrop -->
             <div x-show="modalOpen"
                 x-transition:enter="ease-out duration-300"
                 x-transition:enter-start="opacity-0"
                 x-transition:enter-end="opacity-100"
-                x-transition:leave="ease-in duration-300"
-                x-transition:leave-start="opacity-100"
-                x-transition:leave-end="opacity-0"
-                @click="modalOpen=false" class="absolute inset-0 w-full h-full bg-black/40"></div>
+                @click="modalOpen = false"
+                class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+            <!-- Modal -->
             <div x-show="modalOpen"
                 x-trap.inert.noscroll="modalOpen"
                 x-transition:enter="ease-out duration-300"
-                x-transition:enter-start="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                x-transition:enter-end="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave="ease-in duration-200"
-                x-transition:leave-start="opacity-100 translate-y-0 sm:scale-100"
-                x-transition:leave-end="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                class="relative px-7 py-6 w-full bg-white sm:max-w-lg sm:rounded-lg">
-                <div class="flex justify-between items-center pb-2">
-                    <h3 class="text-lg font-semibold">Import Student Information</h3>
-                    <button @click="modalOpen=false" class="flex absolute top-0 right-0 justify-center items-center mt-5 mr-5 w-8 h-8 text-gray-600 rounded-full hover:text-gray-800  bg-green-400 hover:bg-green-500 p-2">
-                        <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between p-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-white">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">Import Students</h3>
+                        <p class="text-sm text-gray-500 mt-1">Upload a CSV or Excel file</p>
+                    </div>
+                    <button @click="modalOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-purple-100 rounded-lg transition-colors">
+                        <i class="fas fa-times text-lg"></i>
                     </button>
                 </div>
-                <div class="relative w-auto">
-                    <form action="{{ route('importStudents')}}" method='POST' enctype="multipart/formdata">
-                        <p class="mb-4">Select a file</p>
-                        <input type="file" class="block w-full text-sm text-gray-700
-           file:mr-4 file:py-2 file:px-4
-           file:rounded file:border-0
-           file:text-sm file:font-semibold
-           file:bg-blue-50 file:text-blue-700
-           hover:file:bg-blue-100
-           cursor-pointer" accept=".csv,.xlsx,.xls" @change='validate'>
-                        <div>
-                            <button type="button" @click="modalOpen=false" class="rounded-md bg-red-400 hover:bg-red-500 ">Cancel</button>
-                            <button type="submit" :class="isValid ? 'bg-blue-400 : 'bg-grey-300" >Import</button>
+
+                <!-- Form -->
+                <form action="{{ route('importStudents') }}" method="POST" enctype="multipart/form-data" class="p-6">
+                    @csrf
+                    <div class="space-y-4">
+                        <div class="border-2 border-dashed border-purple-200 rounded-lg p-6 text-center hover:border-purple-400 transition-colors">
+                            <i class="fas fa-cloud-upload-alt text-4xl text-purple-400 mb-3"></i>
+                            <label for="file-upload" class="cursor-pointer">
+                                <span class="text-sm font-medium text-purple-600 hover:text-purple-700">Choose a file</span>
+                                <span class="text-sm text-gray-500"> or drag and drop</span>
+                                <input id="file-upload" type="file" name="file" class="hidden" accept=".csv,.xlsx,.xls" @change="validate" required>
+                            </label>
+                            <p class="text-xs text-gray-400 mt-2">CSV, XLS, or XLSX (Max 10MB)</p>
                         </div>
-                    </form>
-                </div>
+
+                        <div x-show="fileName" class="flex items-center gap-3 p-3 bg-purple-50 rounded-lg border border-purple-200">
+                            <i class="fas fa-file-excel text-purple-600"></i>
+                            <span class="text-sm text-gray-700 flex-1" x-text="fileName"></span>
+                            <i class="fas fa-check-circle text-green-600" x-show="isValid"></i>
+                        </div>
+                    </div>
+
+                    <!-- Footer -->
+                    <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
+                        <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            Cancel
+                        </button>
+                        <button type="submit" :disabled="!isValid" :class="isValid ? 'bg-purple-600 hover:bg-purple-700' : 'bg-gray-300 cursor-not-allowed'" class="px-4 py-2 text-sm font-medium text-white rounded-lg transition-colors shadow-sm">
+                            Import
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </template>
