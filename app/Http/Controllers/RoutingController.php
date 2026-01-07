@@ -40,9 +40,9 @@ class RoutingController extends Controller
         return view('verifyEmail');
     }
 
-    public function showOverview()
+    public function showStaffOverview()
     {
-        return view('components.overview');
+        return view('components.staffOverview');
     }
 
     public function showStudentMngt()
@@ -78,5 +78,10 @@ class RoutingController extends Controller
     public function showCohortMngt()
     {
         return view('components.cohort_mngt');
+    }
+
+    public function course_cohort()
+    {
+        return view('components.student-courses');
     }
 }

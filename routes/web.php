@@ -9,6 +9,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\RoutingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\StaffMngtController;
+use App\Http\Controllers\Student\CourseCohortController;
 use App\Http\Controllers\StudentMngtController;
 
 //Base route
@@ -51,7 +52,8 @@ Route::get('/modules', [DashboardController::class, 'fetchModules'])->middleware
 Route::get('/overview', [DashboardController::class, 'overviewContent']);
 Route::get('/myAccount', [RoutingController::class, 'showMyAccount']);
 Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
-
+Route::get('/indexcourse-cohort', [CourseCohortController::class, 'index']);
+Route::get('/course-cohort', [RoutingController::class, 'course_cohort']);
 
 
 //Staff dashboard routes
@@ -81,11 +83,12 @@ Route::prefix('staff')->group(function () {
     Route::post('/updateProfile', [StaffController::class, 'updateProfile']);
     Route::get('/staffProfile', [RoutingController::class, 'showStaffProfile']);
     Route::post('/updatePassword', [AuthController::class, 'updatePassword']);
+    Route::get('/overview', [RoutingController::class, 'showStaffOverview']);
     // View all courses
-    Route::get('/courses', [CourseController::class, 'viewCourses'])->name('courses.index');
-
+    Route::get('/viewCourses', [CourseController::class, 'viewCourses'])->name('courses.index');
+    Route::get('/courses', [RoutingController::class, 'showCourseMngt']);
     // Create course
-    Route::post('/createcourse', [CourseController::class, 'createCourse'])->name('courses.create');
+    Route::post('/createCourse', [CourseController::class, 'createCourse'])->name('courses.create');
 
     // Get single course
     Route::get('/{course_id}', [CourseController::class, 'getCourse'])->name('courses.show');

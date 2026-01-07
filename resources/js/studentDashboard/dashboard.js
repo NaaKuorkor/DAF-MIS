@@ -1,21 +1,14 @@
-import loadStudents from './studentMngt.js';
-import loadStaff from './staffMngt.js';
-import loadProfileDetails from './myaccount.js';
-import loadCourses from './courseMngt.js';
+import loadCourses from './course-cohort.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    const navigationMenu = document.getElementById('navigation-menu');
-    const dashboardContent = document.getElementById('dashboardContent');
+    const navigationMenu = document.getElementById('studentNavigation-menu');
+    const dashboardContent = document.getElementById('studentDashboardContent');
 
     // Icon mapping for modules
     const iconMap = {
-        'Overview': 'fa-home',
-        'Students': 'fa-users',
-        'Staff': 'fa-user-tie',
-        'Courses': 'fa-book-open',
-        'Cohorts': 'fa-book-open',
-        'My Account': 'fa-user',
-        'Tasks': 'fa-tasks'
+        'Courses and Cohorts': 'fa-book-open',
+        'Annoucements': 'fa-bullhorn',
+        'Profile': 'fa-user',
     };
 
     async function getModules() {
@@ -51,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navigationMenu.appendChild(button);
 
             // Add section divider before personal items
-            if (module.mod_label === 'Announcements' || index === modules.length - 3) {
+            if (module.mod_label === 'Profile' ) {
                 const divider = document.createElement('div');
                 divider.className = "pt-4 pb-2";
                 divider.innerHTML = '<p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider nav-text">Personal</p>';
@@ -78,16 +71,10 @@ document.addEventListener('DOMContentLoaded', () => {
             dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
 
             // Load corresponding JS
-            if (route === '/staff/student-info') {
-                loadStudents();
-            } else if (route === '/staff/staff-info') {
-                loadStaff();
-            } else if (route === '/staff/myAccount') {
-                loadProfileDetails();
-            }else if (route === '/staff/courses'){
+            if (route === '/course-cohort') {
                 loadCourses();
-            } else if (route === '/staff/overview'){
-                displayOverview();
+            } else if (route === '/announcements') {
+                loadAnnouncements();
             }
         } catch (err) {
             console.log(err);
@@ -121,17 +108,17 @@ document.addEventListener('DOMContentLoaded', () => {
         activeBtn.appendChild(indicator);
     }
 
-    async function displayOverview() {
+    async function displayCourses() {
         try {
-            const response = await axios.get('/overview');
+            const response = await axios.get('/course-cohort');
             dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
         } catch (err) {
             console.error(err);
-            dashboardContent.innerHTML = `<p class="text-red-500">Failed to load overview.</p>`;
+            dashboardContent.innerHTML = `<p class="text-red-500">Failed to load courses.</p>`;
         }
     }
 
     // Initialize
     getModules();
-    displayOverview();
+    loadCourses();
 });

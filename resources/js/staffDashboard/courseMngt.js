@@ -12,7 +12,7 @@ export default function loadCourses() {
     // Load all courses
     async function loadAllCourses() {
         try {
-            const response = await axios.get('/staff/courses');
+            const response = await axios.get('/staff/viewCourses');
             renderCourseGrid(response.data.data);
         } catch (err) {
             console.error('Failed to load courses:', err);

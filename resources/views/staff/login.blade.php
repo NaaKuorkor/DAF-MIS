@@ -1,56 +1,83 @@
 @extends('layouts.app')
-
 @section('title', 'Staff Login')
-
 @section('content')
 
-        <div class="bg-white rounded-lg shadow-md p-8 w-full max-w-md">
-
-            <h2 class="text-3xl text-purple-600 text-center font-bold mb-6">Admin Login</h2>
-
-            {{--Checks for a success message from the session and displays it--}}
-            @if (session('success'))
-            <div class="">
-                {{session('success')}}
-            </div>
-            @endif
-
-
-            <form method="POST" action="{{ route('staff.login') }}" >
-                @csrf
-                <div class="mb-4">
-                     <label for='email' class="block text-gray-600 ">Email</label>
-                    <input type="email" id="email" name="email" required class="w-full focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-6 p-4 rounded-md">
-                    @error('email')
-                        <p class="text-red-500 text-sm">{{ $message }}</p>
-                    @enderror
-
-                </div>
-
-                <div class="mb-4">
-                    <label for="password" class="block text-gray-600">Password</label>
-                    <input type="password" id="password" name="password" minlength=6 class="w-full focus:outline-none focus:ring-2 focus:ring-purple-300 border border-gray-400 h-6 p-4 rounded-md" required>
-                        @error('password')
-                        <p class="text-red-500 text-sm">{{ $message }}</p>
-                    @enderror
-
-                </div>
-
-                <div class="mb-4">
-                    <input type="checkbox" id="remember" name="remember" class="rounded border-gray-200">
-                    <label for="remember">Remember me</label>
-                </div>
-
-                <div class='mb-4'>
-                    <button type="submit" class='bg-purple-600 hover:bg-purple-700 text-gray-300 w-full text-center h-8 shadow rounded-md'>Login</button>
-                </div>
-
-                <div class='flex justify-center'>
-                    <a href="">Forgot password?</a>
-                </div>
-
-            </form>
-
+<div class="w-full max-w-sm bg-white border border-purple-200 shadow-md rounded-xl p-8 transition-all duration-300">
+    <div class="mb-8 text-center">
+        <div class="w-10 h-10 bg-purple-600 text-white rounded-lg mx-auto flex items-center justify-center mb-4">
+            <i class="fa-solid fa-user-tie text-xl"></i>
         </div>
+        <h1 class="text-3xl font-bold text-purple-600 mb-2">Admin Login</h1>
+        <p class="text-sm text-gray-500">Enter your credentials to access the admin portal</p>
+    </div>
+
+    {{-- Success message --}}
+    @if (session('success'))
+    <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+        {{ session('success') }}
+    </div>
+    @endif
+
+    <form action="{{ route('staff.login') }}" method="POST" class="space-y-4">
+        @csrf
+
+        <div class="space-y-1.5">
+            <label for="email" class="text-xs font-medium text-gray-700">Email</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="admin@daf.org"
+                required
+                value="{{ old('email') }}"
+                class="w-full px-3 py-2 bg-white border border-gray-400 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all"
+            >
+            @error('email')
+                <span class="text-red-500 text-sm block mt-1">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="space-y-1.5">
+            <div class="flex justify-between items-center">
+                <label for="password" class="text-xs font-medium text-gray-700">Password</label>
+                <a href="{{ route('forgotPassword') }}" class="text-xs text-gray-500 hover:text-purple-600 transition-colors">Forgot password?</a>
+            </div>
+            <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="••••••••"
+                minlength="6"
+                required
+                autocomplete="current-password"
+                class="w-full px-3 py-2 bg-white border border-gray-400 rounded-lg text-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all"
+            >
+            @error('password')
+                <span class="text-red-500 text-sm block mt-1">{{ $message }}</span>
+            @enderror
+        </div>
+
+        <div class="flex items-center gap-2 custom-checkbox cursor-pointer">
+            <label class="flex items-center gap-2 cursor-pointer select-none group">
+                <input type="checkbox" id="remember" name="remember" class="hidden peer">
+                <div class="w-4 h-4 border border-gray-300 rounded flex items-center justify-center transition-colors group-hover:border-gray-400 bg-white peer-checked:bg-purple-600 peer-checked:border-purple-600">
+                    <i class="fas fa-check text-white text-xs hidden peer-checked:block"></i>
+                </div>
+                <span class="text-xs text-gray-600">Remember me</span>
+            </label>
+        </div>
+
+        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2.5 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2">
+            Login
+            <i class="fas fa-arrow-right"></i>
+        </button>
+    </form>
+</div>
+
+<style>
+    /* Custom Checkbox */
+    .custom-checkbox input:checked + div { background-color: #9333ea; border-color: #9333ea; }
+    .custom-checkbox input:checked + div i { display: block; }
+</style>
 
 @endsection

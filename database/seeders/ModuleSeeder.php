@@ -39,7 +39,7 @@ class ModuleSeeder extends Seeder
                 'mod_position' => '1',
                 'mod_name' => 'Courses and Cohorts',
                 'mod_label' => 'Courses and Cohorts',
-                'mod_url' => '/courses',
+                'mod_url' => '/course-cohort',
                 'is_child' => 0,
                 'pmod_id' => null,
                 'has_child' => 0,

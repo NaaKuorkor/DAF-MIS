@@ -70,7 +70,7 @@ class DashboardController extends Controller
             ],
         ];
 
-        $html = view('components.overview', compact('cards'));
+        $html = view('components.staffOverview', compact('cards'));
 
         return response($html);
     }

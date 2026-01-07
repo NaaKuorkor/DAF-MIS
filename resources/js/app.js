@@ -5,3 +5,5 @@ import './staffDashboard/staffMngt.js';
 import './staffDashboard/myaccount.js';
 import './staffDashboard/cohortMngt.js';
 import './staffDashboard/courseMngt.js';
+import './studentDashboard/dashboard.js';
+import './studentDashboard/course-cohort.js';
