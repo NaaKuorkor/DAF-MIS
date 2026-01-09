@@ -24,7 +24,7 @@
         </div>
 
         <!-- Reset Password Form -->
-        <form action="{{ route('') }}" method="POST" class="space-y-4">
+        <form action="{{ route('password.update') }}" method="POST" class="space-y-4">
             @csrf
 
             <!-- Old Password Input -->

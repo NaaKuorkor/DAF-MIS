@@ -5,41 +5,64 @@ namespace App\Http\Controllers;
 use App\Models\TblCourse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class CourseController extends Controller
 {
+    public function viewCourses()
+    {
+        try {
+            $courses = TblCourse::where('deleted', '0')
+                ->orderBy('createdate', 'desc')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $courses
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to load courses', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load courses'
+            ], 500);
+        }
+    }
 
     public function createCourse(Request $request)
     {
         try {
-
             $fields = $request->validate([
-                'course_name' => 'required|string',
-                'description' => 'required|string',
+                'course_id' => 'required|string|unique:tblcourse,course_id',
+                'course_name' => 'required|string|max:255',
+                'description' => 'nullable|string',
                 'eligibility' => 'nullable|string',
-                'duration' => 'required|string',
+                'duration' => 'nullable|string',
             ]);
 
-            //Generate course id
-            $course_id = 'CRS-' . random_int(100, 999);
-
             TblCourse::create([
-                'course_id' => $course_id,
+                'course_id' => $fields['course_id'],
                 'course_name' => $fields['course_name'],
-                'description' => $fields['description'],
-                'eligibility' => $fields['eligibility'],
-                'duration' => $fields['duration'],
+                'description' => $fields['description'] ?? null,
+                'eligibility' => $fields['eligibility'] ?? null,
+                'duration' => $fields['duration'] ?? null,
                 'deleted' => '0',
                 'createuser' => auth()->user()->email,
+                'createdate' => now(),
                 'modifyuser' => auth()->user()->email,
+                'modifydate' => now(),
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Course created successfully!'
+                'message' => 'Course created successfully'
             ]);
         } catch (\Exception $e) {
-            Log::error('Creation unsuccessful', [
+            Log::error('Course creation failed', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -47,101 +70,121 @@ class CourseController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Course creation failed'
-            ]);
+            ], 500);
         }
     }
 
-    public function viewCourses()
+    public function searchCourse(Request $request)
     {
+        try {
+            $query = $request->get('q', '');
+            
+            $courses = TblCourse::where('deleted', '0')
+                ->where(function($q) use ($query) {
+                    $q->where('course_name', 'like', '%' . $query . '%')
+                      ->orWhere('course_id', 'like', '%' . $query . '%')
+                      ->orWhere('description', 'like', '%' . $query . '%');
+                })
+                ->orderBy('createdate', 'desc')
+                ->get();
 
-        $courses = TblCourse::where('deleted', '0')
-            ->orderBy('createdate', 'desc')
-            ->paginate(12);
+            return response()->json([
+                'success' => true,
+                'data' => $courses
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Course search failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
 
-        //Transform them later
-
-        return response()->json($courses);
-    }
-
-    public function getCourse($course_id){
-
-        $course = TblCourse::where('course_id', $course_id)
-            ->where('deleted', '0')
-            ->firstOrFail();
-
-        return response()->json($course);
-
-    }
-
-    public function searchCourse(Request $request){
-        $searchQuery = $request->input('q');
-
-        $query = TblCourse::where('deleted', '0');
-
-        if (!empty($searchQuery)) {
-            $query->where(function ($builder) use ($searchQuery) {
-                $builder->where('course_name', 'like', '%' . $searchQuery . '%')
-                   ->orWhere('description', 'like', '%' . $searchQuery . '%');
-            });
+            return response()->json([
+                'success' => false,
+                'message' => 'Course search failed'
+            ], 500);
         }
-
-        $courses = $query
-            ->orderBy('createdate', 'desc')
-            ->paginate(12);
-
-        return response()->json($courses);
     }
 
     public function filterCourses(Request $request)
     {
-        $request->validate([
-            'duration' => 'nullable|string|max:20',
-            'eligibility' => 'nullable|string|max:255',
-        ]);
+        try {
+            $query = TblCourse::where('deleted', '0');
 
-        $query = TblCourse::where('deleted', '0');
+            // Add any filter logic here based on request parameters
+            if ($request->filled('filter')) {
+                // Implement filtering logic as needed
+            }
 
-        if ($request->filled('duration')) {
-            $query->where('duration', $request->duration);
+            $courses = $query->orderBy('createdate', 'desc')->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => $courses
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Course filter failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Course filter failed'
+            ], 500);
         }
+    }
 
-        if ($request->filled('eligibility')) {
-            $query->where('eligibility', $request->eligibility);
+    public function getCourse($course_id)
+    {
+        try {
+            $course = TblCourse::where('course_id', $course_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => $course
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to load course', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Course not found'
+            ], 404);
         }
-
-        $courses = $query->orderBy('createdate', 'desc')
-            ->paginate(12);
-
-        return response()->json($courses);
     }
 
     public function updateCourse(Request $request, $course_id)
     {
-
         try {
-            $fields = $request->validate([
-                'course_name' => 'required|string',
-                'description' => 'required|string',
-                'eligibility' => 'nullable|string',
-                'duration' => 'required|string'
+            $course = TblCourse::where('course_id', $course_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
 
+            $fields = $request->validate([
+                'course_name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+                'eligibility' => 'nullable|string',
+                'duration' => 'nullable|string',
             ]);
 
-
-            TblCourse::where('course_id', $course_id)->update([
+            $course->update([
                 'course_name' => $fields['course_name'],
-                'description' => $fields['description'],
-                'eligibility' => $fields['eligibility'] ,
-                'duration' => $fields['duration'],
+                'description' => $fields['description'] ?? null,
+                'eligibility' => $fields['eligibility'] ?? null,
+                'duration' => $fields['duration'] ?? null,
                 'modifyuser' => auth()->user()->email,
+                'modifydate' => now(),
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Course updated successful',
+                'message' => 'Course updated successfully'
             ]);
-
-
         } catch (\Exception $e) {
             Log::error('Course update failed', [
                 'message' => $e->getMessage(),
@@ -151,17 +194,21 @@ class CourseController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Course update failed'
-            ]);
+            ], 500);
         }
     }
 
     public function deleteCourse($course_id)
     {
         try {
+            $course = TblCourse::where('course_id', $course_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
 
-            TblCourse::where('course_id', $course_id)->update([
+            $course->update([
                 'deleted' => '1',
                 'modifyuser' => auth()->user()->email,
+                'modifydate' => now(),
             ]);
 
             return response()->json([
@@ -169,7 +216,7 @@ class CourseController extends Controller
                 'message' => 'Course deleted successfully'
             ]);
         } catch (\Exception $e) {
-            Log::error('Deletion Unsuccessful', [
+            Log::error('Course deletion failed', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -177,7 +224,7 @@ class CourseController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Course deletion failed'
-            ]);
+            ], 500);
         }
     }
 }

@@ -5,7 +5,7 @@
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <title>@yield('title', 'Student Dashboard')</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/student.js'])
         <script src="https://kit.fontawesome.com/856b94abea.js" crossorigin="anonymous"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="//unpkg.com/alpinejs" defer></script>
@@ -25,6 +25,7 @@
     </head>
     <body class="bg-gray-50 text-gray-900 h-screen overflow-hidden flex">
         @php
+    
             $user = Auth::user();
 
             // Get user display name

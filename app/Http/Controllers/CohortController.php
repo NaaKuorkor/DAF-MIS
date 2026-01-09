@@ -6,7 +6,9 @@ use App\Models\TblCohort;
 use App\Models\TblCohortRegistration;
 use App\Models\TblCourse;
 use App\Models\TblCourseRegistration;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 
@@ -113,24 +115,23 @@ class CohortController extends Controller
             ->where('deleted', '0')
             ->firstOrFail();
 
-
         $cohorts = TblCohort::where('course_id', $course_id)
             ->where('deleted', '0')
             ->orderBy('start_date', 'desc')
             ->get()
             ->map(function ($cohort) {
-
                 $studentCount = TblCohortRegistration::where(
                     'cohort_id',
                     $cohort->cohort_id
                 )->count();
 
-
                 $now = Carbon::now();
+                $startDate = Carbon::parse($cohort->start_date);
+                $endDate = Carbon::parse($cohort->end_date);
 
-                if ($now->lt($cohort->start_date)) {
+                if ($now->lt($startDate)) {
                     $status = 'open';
-                } elseif ($now->between($cohort->start_date, $cohort->end_date)) {
+                } elseif ($now->between($startDate, $endDate)) {
                     $status = 'ongoing';
                 } else {
                     $status = 'completed';
@@ -138,11 +139,11 @@ class CohortController extends Controller
 
                 return [
                     'cohort_id'     => $cohort->cohort_id,
-                    'description'   => $cohort->description,
+                    'description'   => $cohort->description ?? '',  // Handle null description
                     'start_date'    => $cohort->start_date,
                     'end_date'      => $cohort->end_date,
                     'status'        => $status,
-                    'student_count' => $studentCount,
+                    'student_count' => $studentCount,  // Changed from student_count to match JS
                 ];
             });
 
@@ -167,15 +168,15 @@ class CohortController extends Controller
             $cohort_id
         )
             ->join('tblstudent', 'tblstudent.studentid', '=', 'tblcohort_registration.studentid')
+            ->join('tblcohort', 'tblcohort.cohort_id', '=', 'tblcohort_registration.cohort_id')
             ->join('tblcourse', 'tblcourse.course_id', '=', 'tblcohort.course_id')
             ->select([
                 'tblstudent.studentid',
-                DB::raw("CONCAT(tblstudent.lname, ' ', tblstudent.mname, ' ', tblstudent.fname) AS student_name"),
+                DB::raw("CONCAT(tblstudent.fname, ' ', COALESCE(tblstudent.mname, ''), ' ', tblstudent.lname) AS student_name"),
                 'tblstudent.referral',
                 'tblcourse.course_name',
                 'tblcohort_registration.createdate as registered_on',
             ])
-            ->join('tblcohort', 'tblcohort.cohort_id', '=', 'tblcohort_registration.cohort_id')
             ->orderBy('tblcohort_registration.createdate', 'desc')
             ->paginate(15);
 
@@ -187,5 +188,35 @@ class CohortController extends Controller
             ],
             'students' => $students
         ]);
+    }
+
+    public function deleteCohort($cohort_id)
+    {
+        try {
+            $cohort = TblCohort::where('cohort_id', $cohort_id)
+                ->where('deleted', '0')
+                ->firstOrFail();
+
+            // Soft delete - set deleted flag instead of actually deleting
+            $cohort->update([
+                'deleted' => '1',
+                'modifyuser' => auth()->user()->email,
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cohort deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Cohort deletion failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete cohort'
+            ], 500);
+        }
     }
 }

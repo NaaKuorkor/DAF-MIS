@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('description');
             $table->date('start_date');
             $table->date('end_date');
-            $table->integer('student_limit');
+            $table->integer('student_limit')->nullable()->default(null);
             $table->char('is_completed')->default(0);
             $table->char('deleted', 1)->default('0');
             $table->string('createuser')->nullable()->default(null);

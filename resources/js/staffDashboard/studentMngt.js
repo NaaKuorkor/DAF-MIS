@@ -1,9 +1,18 @@
+// resources/js/staffDashboard/studentMngt.js
+
 export default function loadStudents() {
     const rows = document.getElementById('tableRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
     const searchStudent = document.getElementById('searchStudent');
     const showingCount = document.getElementById('showing-count');
+
+    if (!rows) {
+        console.warn('Student management elements not found');
+        return () => {}; // Return empty cleanup
+    }
+
+    const eventListeners = [];
 
     function renderTable(students) {
         let html = "";
@@ -148,73 +157,90 @@ axios.post('/staff/updateStudent', new FormData($event.target))
             </div>
         </div>
     </template>`;
-}
+    }
 
-function getDeleteButton(student) {
-    return `
-    <div x-data='{
-        modalOpen: false,
-        student: ${JSON.stringify(student).replace(/'/g, "\\'")}
-    }'>
-        <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Student">
-            <i class="fas fa-trash text-lg"></i>
-        </button>
-        <template x-teleport="body">
-            <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
-                <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-                <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-                    <div class="p-6">
-                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
-                        </div>
-                        <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Student?</h3>
-                        <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this student? This action cannot be undone.</p>
-                        <div class="flex items-center gap-3">
-                            <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                            <button @click="axios.post('/staff/deleteStudent', {userid: student.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+    function getDeleteButton(student) {
+        return `
+        <div x-data='{
+            modalOpen: false,
+            student: ${JSON.stringify(student).replace(/'/g, "\\'")}
+        }'>
+            <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Student">
+                <i class="fas fa-trash text-lg"></i>
+            </button>
+            <template x-teleport="body">
+                <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+                    <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                    <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Student?</h3>
+                            <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this student? This action cannot be undone.</p>
+                            <div class="flex items-center gap-3">
+                                <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button @click="axios.post('/staff/deleteStudent', {userid: student.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </template>
-    </div>`;
-}
-
-async function studentsDateFilter() {
-    try {
-        const response = await axios.get('/staff/studentTable/date');
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Failed to load student info:', err);
-        rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+            </template>
+        </div>`;
     }
-}
 
-async function studentsAlphabetFilter() {
-    try {
-        const response = await axios.get('/staff/studentTable/A-Z');
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Failed to load student info:', err);
-        rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+    async function studentsDateFilter() {
+        try {
+            const response = await axios.get('/staff/studentTable/date');
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Failed to load student info:', err);
+            rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+        }
     }
-}
 
-async function search() {
-    const query = this.value;
-    try {
-        const response = await axios.get('/staff/searchStudent?q=' + encodeURIComponent(query));
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Search failed:', err);
+    async function studentsAlphabetFilter() {
+        try {
+            const response = await axios.get('/staff/studentTable/A-Z');
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Failed to load student info:', err);
+            rows.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-red-500">Failed to load students</td></tr>`;
+        }
     }
-}
 
-// Event listeners
-if (searchStudent) searchStudent.addEventListener('input', search);
-if (az) az.addEventListener('click', studentsAlphabetFilter);
-if (date) date.addEventListener('click', studentsDateFilter);
+    async function search() {
+        const query = this.value;
+        try {
+            const response = await axios.get('/staff/searchStudent?q=' + encodeURIComponent(query));
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Search failed:', err);
+        }
+    }
 
-// Initial load
-studentsDateFilter();
+    // Attach event listeners
+    if (searchStudent) {
+        searchStudent.addEventListener('input', search);
+        eventListeners.push({ element: searchStudent, event: 'input', handler: search });
+    }
+    if (az) {
+        az.addEventListener('click', studentsAlphabetFilter);
+        eventListeners.push({ element: az, event: 'click', handler: studentsAlphabetFilter });
+    }
+    if (date) {
+        date.addEventListener('click', studentsDateFilter);
+        eventListeners.push({ element: date, event: 'click', handler: studentsDateFilter });
+    }
+
+    // Initial load
+    studentsDateFilter();
+
+    // Return cleanup function
+    return function cleanup() {
+        eventListeners.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+        });
+        console.log('Student management module cleaned up');
+    };
 }

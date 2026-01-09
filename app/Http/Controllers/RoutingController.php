@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TblCourse;
+use App\Models\TblStaff;
+use App\Models\TblStudent;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -42,7 +45,26 @@ class RoutingController extends Controller
 
     public function showStaffOverview()
     {
-        return view('components.staffOverview');
+        $students = TblStudent::count();
+        $staff = TblStaff::count();
+        $courses = TblCourse::count();
+
+        $cards = [
+            [
+                'title' => 'Total Students',
+                'value' => $students,
+            ],
+            [
+                'title' => 'Total Staff',
+                'value' => $staff,
+            ],
+            [
+                'title' => 'Total Courses',
+                'value' => $courses,
+            ],
+        ];
+
+        return view('components.staffOverview', compact('cards'));
     }
 
     public function showStudentMngt()
@@ -83,5 +105,10 @@ class RoutingController extends Controller
     public function course_cohort()
     {
         return view('components.student-courses');
+    }
+
+    public function showAnnouncements()
+    {
+        return view('components.announcements');
     }
 }

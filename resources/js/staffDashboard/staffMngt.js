@@ -1,3 +1,5 @@
+// resources/js/staffDashboard/staffMngt.js
+
 export default function loadStaff() {
     console.log("staffMngt is loaded");
 
@@ -7,7 +9,21 @@ export default function loadStaff() {
     const searchStaff = document.getElementById('searchStaff');
     const showingCount = document.getElementById('showing-count');
 
+    // Early return if essential elements not found
+    if (!rows) {
+        console.warn('Staff management elements not found');
+        return () => {}; // Return empty cleanup function
+    }
+
+    // Track event listeners for cleanup
+    const eventListeners = [];
+
     function renderTable(staff) {
+        if (!rows) {
+            console.warn('Staff rows element not found');
+            return;
+        }
+
         let html = "";
 
         if (staff.length === 0) {
@@ -88,6 +104,8 @@ export default function loadStaff() {
     }
 
     function getEditModal() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        
         return `
         <template x-teleport="body">
             <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
@@ -104,7 +122,7 @@ export default function loadStaff() {
                             .then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }})
                             .catch(e => alert(e.response?.data?.message || 'Update failed'))
                     " class="p-6 max-h-[70vh] overflow-y-auto">
-                        <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
+                        <input type="hidden" name="_token" value="${csrfToken}">
                         <input type="hidden" name="userid" x-model="staff.userid">
                         <input type="hidden" name="staffid" x-model="staff.staffid">
 
@@ -142,92 +160,138 @@ export default function loadStaff() {
                             </div>
                             <div class="space-y-1.5">
                                 <label class="text-xs font-medium text-gray-700">Position</label>
-<input type="text" name="position" x-model="staff.position" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
-</div>
-<div class="space-y-1.5">
-<label class="text-xs font-medium text-gray-700">Department</label>
-<input type="text" name="department" x-model="staff.department" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
-</div>
-<div class="space-y-1.5">
-<label class="text-xs font-medium text-gray-700">Residence</label>
-<input type="text" name="residence" x-model="staff.residence" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
-</div>
-</div>
-<div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
-<button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-<button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm">Save Changes</button>
-</div>
-</form>
-</div>
-</div>
-</template>`;
-}
-
-function getDeleteButton(staff) {
-    return `
-    <div x-data='{
-        modalOpen: false,
-        staff: ${JSON.stringify(staff).replace(/'/g, "\\'")}
-    }'>
-        <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Staff">
-            <i class="fas fa-trash text-lg"></i>
-        </button>
-        <template x-teleport="body">
-            <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
-                <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
-                <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-                    <div class="p-6">
-                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                            <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                                <input type="text" name="position" x-model="staff.position" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-700">Department</label>
+                                <input type="text" name="department" x-model="staff.department" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-700">Residence</label>
+                                <input type="text" name="residence" x-model="staff.residence" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                            </div>
                         </div>
-                        <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Staff Member?</h3>
-                        <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this staff member? This action cannot be undone.</p>
-                        <div class="flex items-center gap-3">
-                            <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                            <button @click="axios.post('/staff/deleteStaff', {userid: staff.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                        <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
+                            <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </template>`;
+    }
+
+    function getDeleteButton(staff) {
+        return `
+        <div x-data='{
+            modalOpen: false,
+            staff: ${JSON.stringify(staff).replace(/'/g, "\\'")}
+        }'>
+            <button @click="modalOpen = true" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Staff">
+                <i class="fas fa-trash text-lg"></i>
+            </button>
+            <template x-teleport="body">
+                <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+                    <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                    <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Staff Member?</h3>
+                            <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this staff member? This action cannot be undone.</p>
+                            <div class="flex items-center gap-3">
+                                <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button @click="axios.post('/staff/deleteStaff', {userid: staff.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </template>
-    </div>`;
-}
-
-async function staffDateFilter() {
-    try {
-        const response = await axios.get('/staff/staffTable/date');
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Failed to load staff info:', err);
-        rows.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load staff</td></tr>`;
+            </template>
+        </div>`;
     }
-}
 
-async function staffAlphabeticFilter() {
-    try {
-        const response = await axios.get('/staff/staffTable/A-Z');
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Failed to load staff info:', err);
-        rows.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load staff</td></tr>`;
+    async function staffDateFilter() {
+        if (!rows) {
+            console.warn('Staff rows element not found');
+            return;
+        }
+
+        try {
+            const response = await axios.get('/staff/staffTable/date');
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Failed to load staff info:', err);
+            rows.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load staff</td></tr>`;
+        }
     }
-}
 
-async function search() {
-    const query = this.value;
-    try {
-        const response = await axios.get('/staff/searchStaff?q=' + encodeURIComponent(query));
-        renderTable(response.data.data);
-    } catch (err) {
-        console.error('Search failed:', err);
+    async function staffAlphabeticFilter() {
+        if (!rows) {
+            console.warn('Staff rows element not found');
+            return;
+        }
+
+        try {
+            const response = await axios.get('/staff/staffTable/A-Z');
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Failed to load staff info:', err);
+            rows.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Failed to load staff</td></tr>`;
+        }
     }
-}
 
-// Event listeners
-if (searchStaff) searchStaff.addEventListener('input', search);
-if (az) az.addEventListener('click', staffAlphabeticFilter);
-if (date) date.addEventListener('click', staffDateFilter);
+    async function search() {
+        if (!rows) {
+            console.warn('Staff rows element not found');
+            return;
+        }
 
-// Initial load
-staffDateFilter();
+        const query = this.value;
+        try {
+            const response = await axios.get('/staff/searchStaff?q=' + encodeURIComponent(query));
+            renderTable(response.data.data);
+        } catch (err) {
+            console.error('Search failed:', err);
+            rows.innerHTML = `<tr><td colspan="4" class="p-8 text-center text-red-500">Search failed</td></tr>`;
+        }
+    }
+
+    // Attach event listeners
+    if (searchStaff) {
+        searchStaff.addEventListener('input', search);
+        eventListeners.push({ element: searchStaff, event: 'input', handler: search });
+    }
+
+    if (az) {
+        az.addEventListener('click', staffAlphabeticFilter);
+        eventListeners.push({ element: az, event: 'click', handler: staffAlphabeticFilter });
+    }
+
+    if (date) {
+        date.addEventListener('click', staffDateFilter);
+        eventListeners.push({ element: date, event: 'click', handler: staffDateFilter });
+    }
+
+    // Initial load
+    staffDateFilter();
+
+    // Return cleanup function
+    return function cleanup() {
+        // Remove all event listeners
+        eventListeners.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+        });
+
+        // Clear table content
+        if (rows) {
+            rows.innerHTML = '';
+        }
+
+        if (showingCount) {
+            showingCount.textContent = '0';
+        }
+
+        console.log('Staff management module cleaned up');
+    };
 }

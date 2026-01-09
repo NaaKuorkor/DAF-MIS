@@ -1,11 +1,32 @@
+// resources/js/staffDashboard/dashboard.js
+import moduleLoader from '../core/moduleLoader.js';
 import loadStudents from './studentMngt.js';
 import loadStaff from './staffMngt.js';
 import loadProfileDetails from './myaccount.js';
 import loadCourses from './courseMngt.js';
+import loadAnnouncements from './announcements.js';
+import loadCohorts from './cohortMngt.js';
+import loadTasks from './taskMngt.js';
+
+// Module registry - maps routes to their loaders
+const moduleRegistry = {
+    '/staff/student-info': loadStudents,
+    '/staff/staff-info': loadStaff,
+    '/staff/staffProfile': loadProfileDetails,
+    '/staff/courses': loadCourses,
+    '/staff/announcements': loadAnnouncements,
+    '/staff/cohorts': loadCohorts,
+    '/staff/tasks': loadTasks,
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const navigationMenu = document.getElementById('navigation-menu');
     const dashboardContent = document.getElementById('dashboardContent');
+
+    if (!navigationMenu || !dashboardContent) {
+        console.warn('Dashboard elements not found');
+        return;
+    }
 
     // Icon mapping for modules
     const iconMap = {
@@ -15,17 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
         'Courses': 'fa-book-open',
         'Cohorts': 'fa-book-open',
         'My Account': 'fa-user',
-        'Tasks': 'fa-tasks'
+        'Tasks': 'fa-tasks',
+        'Announcements': 'fa-bullhorn'
     };
 
     async function getModules() {
         try {
             const response = await axios.get('/modules');
-            console.log('Modules:', response.data);
             const modules = response.data;
             displayModules(modules);
         } catch (err) {
-            console.error(err);
+            console.error('Failed to load modules:', err);
             navigationMenu.innerHTML = `<p class="text-red-500 text-sm p-4">Failed to load modules.</p>`;
         }
     }
@@ -51,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navigationMenu.appendChild(button);
 
             // Add section divider before personal items
-            if (module.mod_label === 'Announcements' || index === modules.length - 3) {
+            if (module.mod_label === 'Profile') {
                 const divider = document.createElement('div');
                 divider.className = "pt-4 pb-2";
                 divider.innerHTML = '<p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider nav-text">Personal</p>';
@@ -73,24 +94,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const response = await axios.get(route);
-
-            // Add fade-in animation
             dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
 
-            // Load corresponding JS
-            if (route === '/staff/student-info') {
-                loadStudents();
-            } else if (route === '/staff/staff-info') {
-                loadStaff();
-            } else if (route === '/staff/myAccount') {
-                loadProfileDetails();
-            }else if (route === '/staff/courses'){
-                loadCourses();
-            } else if (route === '/staff/overview'){
-                displayOverview();
+            // Load corresponding module using module loader
+            if (moduleRegistry[route]) {
+                await moduleLoader.loadModule(route, async () => {
+                    return moduleRegistry[route]();
+                });
+            } else if (route === '/staff/overview') {
+                await displayOverview();
             }
         } catch (err) {
-            console.log(err);
+            console.error('Failed to load content:', err);
             dashboardContent.innerHTML = `
                 <div class="flex items-center justify-center h-full">
                     <div class="text-center">
@@ -107,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         buttons.forEach((btn) => {
             btn.classList.remove('bg-purple-50', 'text-purple-600');
             btn.classList.add('text-gray-500');
-            // Remove active indicator
             const indicator = btn.querySelector('.absolute');
             if (indicator) indicator.remove();
         });
@@ -115,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         activeBtn.classList.remove('text-gray-500');
         activeBtn.classList.add('bg-purple-50', 'text-purple-600');
 
-        // Add active indicator
         const indicator = document.createElement('div');
         indicator.className = "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-600 rounded-l-full";
         activeBtn.appendChild(indicator);
@@ -126,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await axios.get('/overview');
             dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
         } catch (err) {
-            console.error(err);
+            console.error('Failed to load overview:', err);
             dashboardContent.innerHTML = `<p class="text-red-500">Failed to load overview.</p>`;
         }
     }

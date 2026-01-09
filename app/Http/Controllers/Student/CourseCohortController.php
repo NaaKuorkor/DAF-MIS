@@ -17,20 +17,34 @@ class CourseCohortController extends Controller
         try {
             $student = auth()->user()->student;
 
+            if (!$student) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Student record not found'
+                ], 404);
+            }
+
             $registration = TblCourseRegistration::where('studentid', $student->studentid)
+                ->where('deleted', '0')
                 ->firstOrFail();
 
             $id = $registration->course_id;
 
             $course = TblCourse::where('course_id', $id)
+                ->where('deleted', '0')
                 ->firstOrFail();
 
-            $cohortRegistration = TblCohortRegistration::where('studentid', $student->studentid)->first();
+            // Check cohort registration - this is the key relationship
+            $cohortRegistration = TblCohortRegistration::where('studentid', $student->studentid)
+                ->where('deleted', '0')
+                ->first();
 
             $cohort = null;
 
             if ($cohortRegistration) {
-                $cohort = TblCohort::where('cohort_id', $cohortRegistration->cohort_id)->first();
+                $cohort = TblCohort::where('cohort_id', $cohortRegistration->cohort_id)
+                    ->where('deleted', '0')
+                    ->first();
             }
 
             return response()->json([
@@ -49,7 +63,7 @@ class CourseCohortController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Course failed to load'
-            ]);
+            ], 500);
         }
     }
 }

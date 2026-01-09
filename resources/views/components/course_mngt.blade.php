@@ -48,4 +48,4 @@
         overflow: hidden;
     }
 </style>
-@vite(['resources/js/staffDashboard/courseMngt.js'])
+

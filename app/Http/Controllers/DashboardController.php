@@ -27,27 +27,54 @@ class DashboardController extends Controller
         return response()->json($modules);
     }
 
-    public function getContent($route)
-    {
-        $user = Auth::user();
-        $fname = $user->fname;
-        $lname = $user->lname;
-        $fullname = $fname . ' ' . $lname;
-        $email = $user->email;
-        $type = $user->usertype;
-        $logout = null;
+    // app/Http/Controllers/DashboardController.php
 
-        //Check usertype to assign the right logout
-        if ($type === 'STU') {
-            $logout = 'student.logout';
-        } else {
-            $logout = 'staff.logout';
-        }
+    // app/Http/Controllers/DashboardController.php
 
-        $view = view('module.$route', compact('fullname', 'email', 'logout'))->render();
+public function getContent($route)
+{
+    // Handle overview specially - needs $cards data
+    if ($route === '/staff/overview') {
+        $students = TblStudent::count();
+        $staff = TblStaff::count();
+        $courses = TblCourse::count();
 
-        return response($view);
+        $cards = [
+            [
+                'title' => 'Total Students',
+                'value' => $students,
+            ],
+            [
+                'title' => 'Total Staff',
+                'value' => $staff,
+            ],
+            [
+                'title' => 'Total Courses',
+                'value' => $courses,
+            ],
+        ];
+
+        return response(view('components.staffOverview', compact('cards'))->render());
     }
+
+    // Map routes to their corresponding component views
+    $routeViewMap = [
+        '/staff/student-info' => 'components.student_mngt',
+        '/staff/staff-info' => 'components.staff_mngt',
+        '/staff/courses' => 'components.course_mngt',
+        '/staff/tasks' => 'components.task_mngt',
+        '/staff/cohorts' => 'components.cohort_mngt',
+        '/staff/myAccount' => 'components.my-staff-account',
+        '/staff/announcements' => 'components.announcements',
+        '/course-cohort' => 'components.student-courses',
+        '/myProfile' => 'components.my-student-account',
+    ];
+
+    // Get the view name from the map, default to overview
+    $viewName = $routeViewMap[$route] ?? 'components.staffOverview';
+    
+    return response(view($viewName)->render());
+}
 
     public function overviewContent()
     {

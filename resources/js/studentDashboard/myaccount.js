@@ -1,6 +1,6 @@
-// resources/js/staffDashboard/myaccount.js
+// resources/js/studentDashboard/myaccount.js
 
-export default async function loadProfileDetails(){
+export default async function loadStudentProfileDetails(){
     const editBtn = document.getElementById('editBtn');
     const actionBtns = document.getElementById('actionBtns');
     const saveBtn = document.getElementById('saveBtn');
@@ -191,6 +191,6 @@ export default async function loadProfileDetails(){
         // Ensure forms are in read-only state
         hideActionBtns(false);
 
-        console.log('Profile module cleaned up');
+        console.log('Student profile module cleaned up');
     };
 }

@@ -5,7 +5,7 @@
         <meta name='viewport' content='width=device-width, initial-scale=1.0'>
         <title>@yield('title', 'Staff Dashboard')</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @vite(['resources/css/app.css', 'resources/js/staff.js'])
         <script src="https://kit.fontawesome.com/856b94abea.js" crossorigin="anonymous"></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="//unpkg.com/alpinejs" defer></script>

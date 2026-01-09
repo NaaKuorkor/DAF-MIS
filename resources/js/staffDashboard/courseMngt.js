@@ -1,3 +1,5 @@
+// resources/js/staffDashboard/courseMngt.js
+
 export default function loadCourses() {
     console.log("courseMngt is loaded");
 
@@ -6,6 +8,23 @@ export default function loadCourses() {
     const createCourseBtn = document.getElementById('createCourseBtn');
     const courseView = document.getElementById('course-view');
     const registrationView = document.getElementById('registration-view');
+
+    // Early return if elements not found
+    if (!courseGrid) {
+        console.warn('Course management elements not found');
+        return () => {}; // Return empty cleanup function
+    }
+
+    // Track event listeners for cleanup
+    const eventListeners = [];
+    
+    // Store references to global functions for cleanup
+    const globalFunctions = {
+        viewCourseRegistrations: null,
+        backToCourses: null,
+        deleteCourse: null,
+        editCourse: null
+    };
 
     let currentCourse = null;
 
@@ -16,14 +35,16 @@ export default function loadCourses() {
             renderCourseGrid(response.data.data);
         } catch (err) {
             console.error('Failed to load courses:', err);
-            courseGrid.innerHTML = `
-                <div class="col-span-full flex items-center justify-center py-12">
-                    <div class="text-center">
-                        <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
-                        <p class="text-red-500">Failed to load courses</p>
+            if (courseGrid) {
+                courseGrid.innerHTML = `
+                    <div class="col-span-full flex items-center justify-center py-12">
+                        <div class="text-center">
+                            <i class="fas fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+                            <p class="text-red-500">Failed to load courses</p>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            }
         }
     }
 
@@ -100,7 +121,7 @@ export default function loadCourses() {
     async function searchCourses() {
         const query = this.value;
         try {
-            const response = await axios.get('/courses/search?q=' + encodeURIComponent(query));
+            const response = await axios.get('/staff/search?q=' + encodeURIComponent(query));
             renderCourseGrid(response.data.data);
         } catch (err) {
             console.error('Search failed:', err);
@@ -108,21 +129,24 @@ export default function loadCourses() {
     }
 
     // View course registrations
-    window.viewCourseRegistrations = async function(courseId) {
+    globalFunctions.viewCourseRegistrations = async function(courseId) {
         currentCourse = courseId;
         try {
-            const response = await axios.get(`/courses/${courseId}/registrations`);
+            const response = await axios.get(`/staff/${courseId}/registrations`);
             renderRegistrationView(response.data.data, courseId);
-            courseView.classList.add('hidden');
-            registrationView.classList.remove('hidden');
+            if (courseView) courseView.classList.add('hidden');
+            if (registrationView) registrationView.classList.remove('hidden');
         } catch (err) {
             console.error('Failed to load registrations:', err);
             alert('Failed to load registrations');
         }
     };
+    window.viewCourseRegistrations = globalFunctions.viewCourseRegistrations;
 
     // Render registration view
     function renderRegistrationView(registrations, courseId) {
+        if (!registrationView) return;
+
         let html = `
             <div class="content-fade">
                 <div class="flex items-center gap-4 mb-6">
@@ -227,11 +251,12 @@ export default function loadCourses() {
     }
 
     // Back to courses
-    window.backToCourses = function() {
-        registrationView.classList.add('hidden');
-        courseView.classList.remove('hidden');
+    globalFunctions.backToCourses = function() {
+        if (registrationView) registrationView.classList.add('hidden');
+        if (courseView) courseView.classList.remove('hidden');
         currentCourse = null;
     };
+    window.backToCourses = globalFunctions.backToCourses;
 
     // Edit button
     function getEditButton(course) {
@@ -252,11 +277,11 @@ export default function loadCourses() {
     }
 
     // Delete course
-    window.deleteCourse = async function(courseId) {
+    globalFunctions.deleteCourse = async function(courseId) {
         if (!confirm('Are you sure you want to delete this course?')) return;
 
         try {
-            const response = await axios.delete(`/courses/${courseId}`);
+            const response = await axios.delete(`/staff/${courseId}`);
             if (response.data.success) {
                 alert(response.data.message);
                 loadAllCourses();
@@ -266,28 +291,55 @@ export default function loadCourses() {
             alert('Failed to delete course');
         }
     };
+    window.deleteCourse = globalFunctions.deleteCourse;
 
     // Edit course (implement modal similar to create)
-    window.editCourse = function(course) {
+    globalFunctions.editCourse = function(course) {
         // You can implement an edit modal similar to create modal
         console.log('Edit course:', course);
         alert('Edit functionality - to be implemented with modal');
     };
+    window.editCourse = globalFunctions.editCourse;
 
     // Create course modal trigger
     if (createCourseBtn) {
-        createCourseBtn.addEventListener('click', () => {
+        const createCourseHandler = () => {
             // Trigger Alpine.js modal
             const modal = document.querySelector('[x-data*="modalOpen"]');
-            if (modal) {
+            if (modal && window.Alpine) {
                 Alpine.$data(modal).modalOpen = true;
             }
-        });
+        };
+        createCourseBtn.addEventListener('click', createCourseHandler);
+        eventListeners.push({ element: createCourseBtn, event: 'click', handler: createCourseHandler });
     }
 
     // Event listeners
-    if (searchCourse) searchCourse.addEventListener('input', searchCourses);
+    if (searchCourse) {
+        searchCourse.addEventListener('input', searchCourses);
+        eventListeners.push({ element: searchCourse, event: 'input', handler: searchCourses });
+    }
 
     // Initial load
     loadAllCourses();
+
+    // Return cleanup function
+    return function cleanup() {
+        // Remove all event listeners
+        eventListeners.forEach(({ element, event, handler }) => {
+            element.removeEventListener(event, handler);
+        });
+
+        // Clean up global functions
+        Object.keys(globalFunctions).forEach(key => {
+            if (window[key] === globalFunctions[key]) {
+                delete window[key];
+            }
+        });
+
+        // Reset state
+        currentCourse = null;
+
+        console.log('Course management module cleaned up');
+    };
 }

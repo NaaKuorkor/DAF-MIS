@@ -55,13 +55,13 @@ class TaskController extends Controller
         }
     }
 
-    public function deleteTask(Request $request)
+    public function deleteTask($task_id)
     {
-        try {
-            $task_id = $request->task_id;
+        try{
 
             $deleted = TblTask::where('task_id', $task_id)
                 ->where('userid', auth()->user()->userid)
+                ->where('deleted', '0')
                 ->update(['deleted' => '1']);
 
             if ($deleted) {
@@ -128,7 +128,8 @@ class TaskController extends Controller
             }
 
             if ($request->filled('search')) {
-                $query->where('title', 'like', '%' . $request->search . '%');
+                $query->where('title', 'like', '%' . $request->search . '%')
+                ->orWhere('description', 'like', '%' . $request->search . '%');
             }
 
             $tasks = $query->orderBy('due_date')->get();
@@ -150,11 +151,11 @@ class TaskController extends Controller
         }
     }
 
-    public function updateTask(Request $request)
+    public function updateTask(Request $request, $task_id)
     {
         try {
             $task = TblTask::where('userid', auth()->user()->userid)
-                ->where('task_id', $request->task_id)
+                ->where('task_id', $task_id)
                 ->where('deleted', '0')
                 ->firstOrFail();
 

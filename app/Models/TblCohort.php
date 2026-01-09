@@ -20,6 +20,7 @@ class TblCohort extends Model
     protected $fillable = [
         'cohort_id',
         'course_id',
+        'description',
         'start_date',
         'end_date',
         'student_limit',
