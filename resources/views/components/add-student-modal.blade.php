@@ -2,18 +2,51 @@
 <div x-data="{
     modalOpen: false,
     submitForm(event) {
+        event.preventDefault();
         const formData = new FormData(event.target);
-        axios.post('/register', formData)
-            .then(response => {
-                if(response.data.success) {
-                    this.modalOpen = false;
-                    alert(response.data.message);
-                    location.reload();
+        const submitButton = event.target.querySelector('button[type=\'submit\']');
+        const originalText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class=\'fas fa-spinner fa-spin\'></i> Adding...';
+        axios.post('/register', formData, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if(response.data.success) {
+                this.modalOpen = false;
+                event.target.reset();
+                alert(response.data.message);
+                window.dispatchEvent(new CustomEvent('refreshStudentTable'));
+                setTimeout(() => {
+                    const tableRows = document.getElementById('tableRows');
+                    if (tableRows) {
+                        const dateFilter = document.getElementById('date');
+                        if (dateFilter) dateFilter.click();
+                    }
+                }, 100);
+            } else {
+                alert(response.data.message || 'Registration failed');
+            }
+        })
+        .catch(error => {
+            let errorMessage = 'Registration Failed';
+            if (error.response) {
+                if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                } else if (error.response.data && error.response.data.errors) {
+                    const errors = error.response.data.errors;
+                    errorMessage = Object.values(errors).flat().join(', ');
                 }
-            })
-            .catch(error => {
-                alert(error.response?.data?.message || 'Registration Failed');
-            });
+            }
+            alert(errorMessage);
+        })
+        .finally(() => {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalText;
+        });
     }
 }"
 @keydown.escape.window="modalOpen = false"

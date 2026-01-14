@@ -3,12 +3,14 @@
 import moduleLoader from '../core/moduleLoader.js';
 import loadCourses from './course-cohort.js';
 import loadStudentProfile from './myaccount.js';
+import loadStudentAnnouncements from './announcements.js';
+import initStudentAnnouncementNotifications from './announcementNotifications.js';
 
 // Module registry - maps routes to their loaders
 const moduleRegistry = {
     '/course-cohort': loadCourses,
     '/myProfile': loadStudentProfile,
-    '/announcements': null, // Will be handled separately if needed
+    '/announcements': loadStudentAnnouncements,
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -49,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <i class="fas ${icon} text-xl flex-shrink-0"></i>
                 <span class="ml-3 font-medium text-sm nav-text">${module.mod_label}</span>
             `;
-            button.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-500 hover:bg-purple-50 hover:text-purple-600 transition-colors group w-full text-left relative";
+            button.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-purple-200 hover:bg-purple-900 hover:text-white transition-colors group w-full text-left relative";
 
             button.addEventListener('click', () => {
                 setActiveButton(button);
@@ -62,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (module.mod_label === 'Profile') {
                 const divider = document.createElement('div');
                 divider.className = "pt-4 pb-2";
-                divider.innerHTML = '<p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider nav-text">Personal</p>';
+                divider.innerHTML = '<p class="px-3 text-xs font-medium text-purple-300 uppercase tracking-wider nav-text">Personal</p>';
                 navigationMenu.appendChild(divider);
             }
         });
@@ -88,9 +90,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 await moduleLoader.loadModule(route, async () => {
                     return moduleRegistry[route]();
                 });
-            } else if (route === '/announcements') {
-                // Handle announcements if needed
-                console.log('Announcements module not yet implemented for students');
             }
         } catch (err) {
             console.error('Failed to load content:', err);
@@ -108,27 +107,50 @@ document.addEventListener('DOMContentLoaded', () => {
     function setActiveButton(activeBtn) {
         const buttons = navigationMenu.querySelectorAll('button');
         buttons.forEach((btn) => {
-            btn.classList.remove('bg-purple-50', 'text-purple-600');
-            btn.classList.add('text-gray-500');
+            btn.classList.remove('bg-purple-900', 'text-white');
+            btn.classList.add('text-purple-200');
             const indicator = btn.querySelector('.absolute');
             if (indicator) indicator.remove();
         });
 
-        activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.add('bg-purple-50', 'text-purple-600');
+        activeBtn.classList.remove('text-purple-200');
+        activeBtn.classList.add('bg-purple-900', 'text-white');
 
         const indicator = document.createElement('div');
-        indicator.className = "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-600 rounded-l-full";
+        indicator.className = "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full";
         activeBtn.appendChild(indicator);
     }
 
     // Initialize - load first module
-    getModules();
-    // Load course-cohort by default
-    setTimeout(() => {
-        const firstButton = navigationMenu.querySelector('button');
-        if (firstButton) {
-            firstButton.click();
+    async function initializeDashboard() {
+        await getModules();
+        // Wait a bit for modules to render, then load first module
+        setTimeout(() => {
+            const firstButton = navigationMenu.querySelector('button');
+            if (firstButton) {
+                firstButton.click();
+            } else {
+                // Fallback: if no modules, try to load course-cohort directly
+                displayContent('/course-cohort');
+            }
+        }, 300);
+    }
+    
+    // Start initialization
+    initializeDashboard();
+    
+    // Initialize announcement notifications
+    let announcementNotificationsCleanup = null;
+    try {
+        announcementNotificationsCleanup = initStudentAnnouncementNotifications();
+    } catch (error) {
+        console.error('Failed to initialize announcement notifications:', error);
+    }
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (announcementNotificationsCleanup) {
+            announcementNotificationsCleanup();
         }
-    }, 500);
+    });
 });

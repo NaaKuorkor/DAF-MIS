@@ -1,4 +1,3 @@
-{{-- resources/views/components/add-task-modal.blade.php --}}
 <div x-data="{
     modalOpen: false,
     submitForm(event) {
@@ -12,17 +11,15 @@
                     if (window.loadTasks) {
                         window.loadTasks();
                     }
-                    alert(response.data.message || 'Task created successfully!');
                 } else {
-                    alert(response.data.message || 'Failed to create task');
+                    console.error('Task creation failed:', response.data.message);
                 }
             })
             .catch(error => {
+                console.error('Error creating task:', error);
                 if (error.response?.data?.errors) {
                     const errors = Object.values(error.response.data.errors).flat();
-                    alert(errors.join('\n'));
-                } else {
-                    alert(error.response?.data?.message || 'Task creation failed');
+                    console.error('Validation errors:', errors);
                 }
             });
     }

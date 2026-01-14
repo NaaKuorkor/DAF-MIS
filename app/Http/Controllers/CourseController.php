@@ -37,15 +37,16 @@ class CourseController extends Controller
     {
         try {
             $fields = $request->validate([
-                'course_id' => 'required|string|unique:tblcourse,course_id',
                 'course_name' => 'required|string|max:255',
                 'description' => 'nullable|string',
                 'eligibility' => 'nullable|string',
                 'duration' => 'nullable|string',
             ]);
 
+            $course_id = 'CRS-' . rand(100, 999);
+
             TblCourse::create([
-                'course_id' => $fields['course_id'],
+                'course_id' => $course_id,
                 'course_name' => $fields['course_name'],
                 'description' => $fields['description'] ?? null,
                 'eligibility' => $fields['eligibility'] ?? null,

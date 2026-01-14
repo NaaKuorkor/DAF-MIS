@@ -1,6 +1,20 @@
 // resources/js/staffDashboard/studentMngt.js
 
 export default function loadStudents() {
+    // Close any open modals when module loads
+    if (window.Alpine) {
+        document.querySelectorAll('[x-data]').forEach(element => {
+            try {
+                const data = Alpine.$data(element);
+                if (data && typeof data.modalOpen !== 'undefined' && data.modalOpen === true) {
+                    data.modalOpen = false;
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+        });
+    }
+
     const rows = document.getElementById('tableRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
@@ -148,6 +162,36 @@ axios.post('/staff/updateStudent', new FormData($event.target))
                             <label class="text-xs font-medium text-gray-700">Residence</label>
                             <input type="text" name="residence" x-model="student.residence" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
                         </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Referral Source</label>
+                            <select name="referral" x-model="student.referral" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                <option value="Social Media">Social Media</option>
+                                <option value="Alumni">DAF Alumni</option>
+                                <option value="Website">Website</option>
+                                <option value="Institution">Institution</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Employment Status</label>
+                            <select name="employment_status" x-model="student.employment_status" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                <option value="unemployed">Unemployed</option>
+                                <option value="employed">Employed</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Certificate Required</label>
+                            <select name="certificate" x-model="student.certificate" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                <option value="Y">Yes</option>
+                                <option value="N">No</option>
+                            </select>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs font-medium text-gray-700">Course</label>
+                            <select name="course" x-model="student.course_id" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                <option value="LS101">Life Skills</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
                         <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
@@ -235,6 +279,13 @@ axios.post('/staff/updateStudent', new FormData($event.target))
 
     // Initial load
     studentsDateFilter();
+
+    // Listen for refresh events
+    const refreshHandler = () => {
+        studentsDateFilter();
+    };
+    window.addEventListener('refreshStudentTable', refreshHandler);
+    eventListeners.push({ element: window, event: 'refreshStudentTable', handler: refreshHandler });
 
     // Return cleanup function
     return function cleanup() {

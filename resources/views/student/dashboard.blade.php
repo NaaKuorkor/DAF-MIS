@@ -28,8 +28,13 @@
     
             $user = Auth::user();
 
-            // Get user display name
-            $userName = ($user->student->fname . ' ' . $user->student->lname);
+            // Get user display name - check if student relationship exists
+            $userName = 'User';
+            if ($user->student) {
+                $userName = ($user->student->fname . ' ' . $user->student->lname);
+            } elseif ($user->email) {
+                $userName = $user->email;
+            }
             $userEmail = $user->email;
 
             // Portal title
@@ -42,14 +47,14 @@
                     @endphp
 
         <!-- Sidebar -->
-        <aside id="sidebar" class="bg-white border-r border-purple-200 h-full w-64 flex flex-col justify-between sidebar-transition z-20 relative flex-shrink-0">
+        <aside id="sidebar" class="bg-purple-800 border-r border-purple-900 h-full w-64 flex flex-col justify-between sidebar-transition z-20 relative flex-shrink-0">
             <div>
                 <!-- Logo -->
-                <div class="h-16 flex items-center px-6 border-b border-purple-100">
-                    <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                        <i class="fas fa-graduation-cap text-white text-lg"></i>
+                <div class="h-16 flex items-center px-6 border-b border-purple-900">
+                    <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i class="fas fa-graduation-cap text-purple-600 text-lg"></i>
                     </div>
-                    <span class="ml-3 font-semibold text-gray-800 tracking-tight logo-text">Student Portal</span>
+                    <span class="ml-3 font-semibold text-white tracking-tight logo-text">Student Portal</span>
                 </div>
 
                 <!-- Navigation (populated by JS) -->
@@ -57,19 +62,19 @@
             </div>
 
             <!-- Bottom Section -->
-            <div class="p-4 border-t border-purple-100">
-                <button onclick="toggleSidebar()" class="w-full flex items-center justify-center p-2 mb-4 rounded-lg text-gray-400 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+            <div class="p-4 border-t border-purple-900">
+                <button onclick="toggleSidebar()" class="w-full flex items-center justify-center p-2 mb-4 rounded-lg text-purple-200 hover:bg-purple-900 hover:text-white transition-colors">
                     <i id="collapseIcon" class="fas fa-angles-left text-xl transition-transform duration-300"></i>
                 </button>
 
                 <!-- Profile -->
-                <button class="flex items-center w-full p-2 rounded-xl hover:bg-purple-50 transition-colors group text-left">
-                    <img src="https://ui-avatars.com/api/?name={{ urlencode($userName) }}&background=9333ea&color=fff" alt="Profile" class="w-9 h-9 rounded-full border border-purple-200 flex-shrink-0">
+                <button class="flex items-center w-full p-2 rounded-xl hover:bg-purple-900 transition-colors group text-left">
+                    <img src="https://ui-avatars.com/api/?name={{ urlencode($userName) }}&background=ffffff&color=9333ea" alt="Profile" class="w-9 h-9 rounded-full border border-purple-500 flex-shrink-0">
                     <div class="ml-3 overflow-hidden profile-text">
-                        <p class="text-sm font-medium text-gray-700 group-hover:text-gray-900 truncate">{{$userName }}</p>
-                        <p class="text-xs text-gray-500 truncate">{{$userEmail}}</p>
+                        <p class="text-sm font-medium text-white group-hover:text-purple-100 truncate">{{$userName }}</p>
+                        <p class="text-xs text-purple-200 truncate">{{$userEmail}}</p>
                     </div>
-                    <i class="fas fa-ellipsis-v ml-auto text-gray-400 profile-text"></i>
+                    <i class="fas fa-ellipsis-v ml-auto text-purple-300 profile-text"></i>
                 </button>
             </div>
         </aside>
@@ -87,10 +92,33 @@
                 </div>
 
                 <div class="flex items-center gap-3">
-                    <button class="p-2 text-gray-500 hover:bg-purple-50 rounded-full transition-colors relative">
-                        <i class="fas fa-bell text-xl"></i>
-                        <span class="absolute top-2 right-2.5 w-2 h-2 bg-red-500 rounded-full border border-white"></span>
-                    </button>
+                    <!-- Announcements Bell Icon -->
+                    <div class="relative">
+                        <button id="studentAnnouncementBellIcon" class="p-2 text-gray-500 hover:bg-purple-50 rounded-full transition-colors relative">
+                            <i class="fas fa-bell text-xl"></i>
+                            <span id="studentAnnouncementUnreadBadge" class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-white" style="display: none;">0</span>
+                        </button>
+                        
+                        <!-- Announcements Dropdown -->
+                        <div id="studentAnnouncementDropdown" class="hidden absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[600px] overflow-hidden">
+                            <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-purple-100">
+                                <div>
+                                    <h3 class="text-sm font-semibold text-gray-900">Announcements</h3>
+                                    <p class="text-xs text-gray-600">Unread notifications</p>
+                                </div>
+                                <button id="viewAllStudentAnnouncementsLink" class="text-xs font-medium text-purple-600 hover:text-purple-700 transition-colors">
+                                    View All →
+                                </button>
+                            </div>
+                            <div id="studentAnnouncementDropdownContent" class="max-h-[400px] overflow-y-auto">
+                                <div class="p-6 text-center">
+                                    <i class="fas fa-spinner fa-spin text-2xl text-purple-600 mb-3"></i>
+                                    <p class="text-sm text-gray-500">Loading announcements...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <button class="p-2 text-gray-500 hover:bg-purple-50 rounded-full transition-colors">
                         <i class="fas fa-question-circle text-xl"></i>
                     </button>

@@ -3,7 +3,7 @@
     modalOpen: false,
     submitForm(event) {
         const formData = new FormData(event.target);
-        axios.post('/courses/create', formData)
+        axios.post('/staff/createCourse', formData)
             .then(response => {
                 if(response.data.success) {
                     this.modalOpen = false;

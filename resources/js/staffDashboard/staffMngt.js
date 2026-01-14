@@ -3,6 +3,20 @@
 export default function loadStaff() {
     console.log("staffMngt is loaded");
 
+    // Close any open modals when module loads
+    if (window.Alpine) {
+        document.querySelectorAll('[x-data]').forEach(element => {
+            try {
+                const data = Alpine.$data(element);
+                if (data && typeof data.modalOpen !== 'undefined' && data.modalOpen === true) {
+                    data.modalOpen = false;
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+        });
+    }
+
     const rows = document.getElementById('staffRows');
     const az = document.getElementById('A-Z');
     const date = document.getElementById('date');
@@ -119,7 +133,13 @@ export default function loadStaff() {
                     </div>
                     <form method="POST" action="/staff/updateStaff" @submit.prevent="
                         axios.post('/staff/updateStaff', new FormData($event.target))
-                            .then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }})
+                            .then(r => { 
+                                if(r.data.success) { 
+                                    modalOpen=false; 
+                                    alert(r.data.message); 
+                                    window.dispatchEvent(new CustomEvent('refreshStaffTable'));
+                                }
+                            })
                             .catch(e => alert(e.response?.data?.message || 'Update failed'))
                     " class="p-6 max-h-[70vh] overflow-y-auto">
                         <input type="hidden" name="_token" value="${csrfToken}">
@@ -275,6 +295,13 @@ export default function loadStaff() {
 
     // Initial load
     staffDateFilter();
+
+    // Listen for refresh events
+    const refreshHandler = () => {
+        staffDateFilter();
+    };
+    window.addEventListener('refreshStaffTable', refreshHandler);
+    eventListeners.push({ element: window, event: 'refreshStaffTable', handler: refreshHandler });
 
     // Return cleanup function
     return function cleanup() {

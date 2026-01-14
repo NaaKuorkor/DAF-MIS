@@ -33,7 +33,10 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [AuthController::class, 'login'])->name('login');
     
     Route::get('/register', [RoutingController::class, 'showRegisterForm'])->name('register.form');
-    Route::post('/register', [StudentController::class, 'register'])->name('register');
+});
+
+// Allow registration from both guests and authenticated users (for staff adding students)
+Route::post('/register', [StudentController::class, 'register'])->name('register');
     
     // Staff Authentication
     Route::get('/staff/login', [RoutingController::class, 'showStaffLogin'])->name('staff.login.form');
@@ -49,7 +52,7 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/resetPassword', [AuthController::class, 'showResetPassword'])->middleware('auth')->name('password.reset');
     Route::post('/resetPassword', [AuthController::class, 'resetPassword'])->middleware('auth')->name('password.update');
-});
+
 
 // ============================================================================
 // EMAIL VERIFICATION ROUTES
@@ -86,11 +89,20 @@ Route::middleware(['auth', 'student'])->group(function () {
     Route::get('/course-cohort', [RoutingController::class, 'course_cohort']);
     Route::get('/indexcourse-cohort', [CourseCohortController::class, 'index']);
     Route::get('/myProfile', [RoutingController::class, 'showStudentProfile']);
+    Route::get('/announcements', [RoutingController::class, 'showStudentAnnouncements']);
     
     // Student Profile API
     Route::get('/profile', [ProfileController::class, 'showProfile'])->name('student.profile');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('student.profile.update');
     Route::post('/updatePassword', [AuthController::class, 'updatePassword'])->name('student.password.update');
+    
+    // Student Announcements API
+    Route::prefix('announcements')->group(function () {
+        Route::get('/recipients/list', [AnnouncementsController::class, 'getRecipientsAnnouncements'])->name('student.announcements.recipients.list');
+        Route::get('/recipients/unread-count', [AnnouncementsController::class, 'getUnreadCount'])->name('student.announcements.recipients.unread-count');
+        Route::get('/recipients/{announcement_id}', [AnnouncementsController::class, 'viewRecipientAnnouncement'])->name('student.announcements.recipients.view');
+        Route::post('/recipients/{announcement_id}/mark-read', [AnnouncementsController::class, 'markAsRead'])->name('student.announcements.recipients.mark-read');
+    });
 });
 
 // ============================================================================
@@ -127,7 +139,6 @@ Route::prefix('staff')->middleware(['auth', 'staff'])->group(function () {
     Route::post('/deleteStaff', [StaffMngtController::class, 'deleteStaff']);
     Route::get('/exportStaff', [StaffMngtController::class, 'exportStaff'])->name('exportStaff');
     Route::post('/importStaff', [StaffMngtController::class, 'importStaff'])->name('importStaff');
-    
     // ========================================================================
     // Student Management API
     // ========================================================================
@@ -137,7 +148,7 @@ Route::prefix('staff')->middleware(['auth', 'staff'])->group(function () {
         Route::get('/A-Z', [StudentMngtController::class, 'alphaStudentFilter']);
     });
     
-    Route::post('/updateStudent', [StudentMngtController::class, 'update']);
+    Route::post('/updateStudent', [StudentMngtController::class, 'updateStudent']);
     Route::post('/deleteStudent', [StudentMngtController::class, 'deleteStudent']);
     Route::get('/searchStudent', [StudentMngtController::class, 'searchStudents']);
     Route::get('/exportStudents', [StudentMngtController::class, 'exportStudents'])->name('exportStudents');
@@ -159,6 +170,14 @@ Route::prefix('staff')->middleware(['auth', 'staff'])->group(function () {
         Route::get('/list', [AnnouncementsController::class, 'index'])->name('announcements.index');
         Route::post('/', [AnnouncementsController::class, 'store'])->name('announcements.store');
         Route::post('/draft', [AnnouncementsController::class, 'saveDraft'])->name('announcements.draft');
+        
+        // Recipient endpoints (must come before parameterized routes)
+        Route::get('/recipients/list', [AnnouncementsController::class, 'getRecipientsAnnouncements'])->name('announcements.recipients.list');
+        Route::get('/recipients/unread-count', [AnnouncementsController::class, 'getUnreadCount'])->name('announcements.recipients.unread-count');
+        Route::get('/recipients/{announcement_id}', [AnnouncementsController::class, 'viewRecipientAnnouncement'])->name('announcements.recipients.view');
+        Route::post('/recipients/{announcement_id}/mark-read', [AnnouncementsController::class, 'markAsRead'])->name('announcements.recipients.mark-read');
+        
+        // Parameterized routes (must come after specific routes)
         Route::get('/{announcement_id}', [AnnouncementsController::class, 'show'])->name('announcements.show');
         Route::put('/{announcement_id}', [AnnouncementsController::class, 'update'])->name('announcements.update');
         Route::delete('/{announcement_id}', [AnnouncementsController::class, 'destroy'])->name('announcements.delete');

@@ -7,6 +7,7 @@ import loadCourses from './courseMngt.js';
 import loadAnnouncements from './announcements.js';
 import loadCohorts from './cohortMngt.js';
 import loadTasks from './taskMngt.js';
+import initAnnouncementNotifications from './announcementNotifications.js';
 
 // Module registry - maps routes to their loaders
 const moduleRegistry = {
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <i class="fas ${icon} text-xl flex-shrink-0"></i>
                 <span class="ml-3 font-medium text-sm nav-text">${module.mod_label}</span>
             `;
-            button.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-gray-500 hover:bg-purple-50 hover:text-purple-600 transition-colors group w-full text-left relative";
+            button.className = "nav-item flex items-center px-3 py-2.5 rounded-lg text-purple-200 hover:bg-purple-900 hover:text-white transition-colors group w-full text-left relative";
 
             button.addEventListener('click', () => {
                 setActiveButton(button);
@@ -75,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (module.mod_label === 'Profile') {
                 const divider = document.createElement('div');
                 divider.className = "pt-4 pb-2";
-                divider.innerHTML = '<p class="px-3 text-xs font-medium text-gray-400 uppercase tracking-wider nav-text">Personal</p>';
+                divider.innerHTML = '<p class="px-3 text-xs font-medium text-purple-300 uppercase tracking-wider nav-text">Personal</p>';
                 navigationMenu.appendChild(divider);
             }
         });
@@ -95,6 +96,35 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await axios.get(route);
             dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
+
+            // Close any open modals when switching modules
+            if (window.Alpine) {
+                // Close all modals by finding elements with x-show="modalOpen"
+                document.querySelectorAll('[x-show*="modalOpen"]').forEach(modal => {
+                    try {
+                        const parent = modal.closest('[x-data]');
+                        if (parent) {
+                            const data = Alpine.$data(parent);
+                            if (data && typeof data.modalOpen !== 'undefined') {
+                                data.modalOpen = false;
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                });
+                // Also try direct approach
+                document.querySelectorAll('[x-data]').forEach(element => {
+                    try {
+                        const data = Alpine.$data(element);
+                        if (data && typeof data.modalOpen !== 'undefined' && data.modalOpen === true) {
+                            data.modalOpen = false;
+                        }
+                    } catch (e) {
+                        // Ignore errors
+                    }
+                });
+            }
 
             // Load corresponding module using module loader
             if (moduleRegistry[route]) {
@@ -120,17 +150,17 @@ document.addEventListener('DOMContentLoaded', () => {
     function setActiveButton(activeBtn) {
         const buttons = navigationMenu.querySelectorAll('button');
         buttons.forEach((btn) => {
-            btn.classList.remove('bg-purple-50', 'text-purple-600');
-            btn.classList.add('text-gray-500');
+            btn.classList.remove('bg-purple-900', 'text-white');
+            btn.classList.add('text-purple-200');
             const indicator = btn.querySelector('.absolute');
             if (indicator) indicator.remove();
         });
 
-        activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.add('bg-purple-50', 'text-purple-600');
+        activeBtn.classList.remove('text-purple-200');
+        activeBtn.classList.add('bg-purple-900', 'text-white');
 
         const indicator = document.createElement('div');
-        indicator.className = "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-purple-600 rounded-l-full";
+        indicator.className = "absolute right-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-l-full";
         activeBtn.appendChild(indicator);
     }
 
@@ -147,4 +177,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize
     getModules();
     displayOverview();
+    
+    // Initialize announcement notifications
+    let announcementNotificationsCleanup = null;
+    try {
+        announcementNotificationsCleanup = initAnnouncementNotifications();
+    } catch (error) {
+        console.error('Failed to initialize announcement notifications:', error);
+    }
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (announcementNotificationsCleanup) {
+            announcementNotificationsCleanup();
+        }
+    });
 });

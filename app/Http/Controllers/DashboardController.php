@@ -35,9 +35,13 @@ public function getContent($route)
 {
     // Handle overview specially - needs $cards data
     if ($route === '/staff/overview') {
-        $students = TblStudent::count();
-        $staff = TblStaff::count();
-        $courses = TblCourse::count();
+        $students = TblStudent::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $staff = TblStaff::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $courses = TblCourse::where('deleted', '0')->count();
 
         $cards = [
             [
@@ -68,6 +72,7 @@ public function getContent($route)
         '/staff/announcements' => 'components.announcements',
         '/course-cohort' => 'components.student-courses',
         '/myProfile' => 'components.my-student-account',
+        '/announcements' => 'components.student-announcements',
     ];
 
     // Get the view name from the map, default to overview
@@ -78,9 +83,13 @@ public function getContent($route)
 
     public function overviewContent()
     {
-        $students = TblStudent::count();
-        $staff = TblStaff::count();
-        $courses = TblCourse::count();
+        $students = TblStudent::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $staff = TblStaff::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $courses = TblCourse::where('deleted', '0')->count();
 
         $cards = [
             [

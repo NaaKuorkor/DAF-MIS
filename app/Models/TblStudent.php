@@ -47,7 +47,7 @@ class TblStudent extends Model
     public function user()
     {
         return $this->belongsTo(TblUser::class, 'userid', 'userid')
-            ->where('deleted', 0);
+            ->where('deleted', '0');
     }
 
 

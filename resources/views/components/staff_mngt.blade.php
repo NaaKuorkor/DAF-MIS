@@ -9,10 +9,10 @@
             </div>
             <div class="flex gap-3">
                 <x-import-staff-modal />
-                <button class="px-3 py-2 bg-white border border-purple-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 hover:border-purple-300 transition-all shadow-sm flex items-center gap-2 group">
+                <a href="/staff/exportStaff" class="px-3 py-2 bg-white border border-purple-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 hover:border-purple-300 transition-all shadow-sm flex items-center gap-2 group">
                     <i class="fas fa-download text-gray-500 group-hover:text-gray-700"></i>
                     Export
-                </button>
+                </a>
                 <x-add-staff-modal />
             </div>
         </div>

@@ -21,9 +21,18 @@ class StudentController extends Controller
 {
     public function register(Request $request, SmsService $sms)
     {
-        try {
+        // Log the request to help debug
+        Log::info('Student registration attempt', [
+            'is_ajax' => $request->ajax(),
+            'wants_json' => $request->wantsJson(),
+            'content_type' => $request->header('Content-Type'),
+            'accept' => $request->header('Accept'),
+            'has_auth' => auth()->check(),
+            'user_type' => auth()->check() ? auth()->user()->user_type : 'guest',
+            'request_data_keys' => array_keys($request->all())
+        ]);
 
-            //dd($request->all());
+        try {
             //Form validation
             $validateData = $request->validate([
                 'fname' => 'required|string|max:255',
@@ -79,7 +88,6 @@ class StudentController extends Controller
                     'phone' => $validateData['phone'],
                     'password' => $password,
                     'user_type' => 'STU',
-                    'deleted' => 0,
                     'createuser' => $validateData['email'],
                     'modifyuser' => $validateData['email'],
                 ]);
@@ -177,7 +185,12 @@ class StudentController extends Controller
                 $sms->send($phone, $message);
             }
 
-            if ($request->ajax()) {
+            // Always return JSON for API requests (ajax, wantsJson, or expectsJson)
+            // Also check Accept header to determine response type
+            $acceptsJson = $request->ajax() || $request->wantsJson() || $request->expectsJson() || 
+                          str_contains($request->header('Accept', ''), 'application/json');
+            
+            if ($acceptsJson) {
                 return response()->json([
                     'success' => true,
                     'message' => 'Account created successfully!'
@@ -185,17 +198,38 @@ class StudentController extends Controller
             } else {
                 return back()->with('Success', 'Account created successfully!');
             }
-        } catch (\Exception $e) {
-            Log::error('Registration Failed!', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Log validation errors
+            Log::warning('Student registration validation failed', [
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
             ]);
 
-            if ($request->ajax()) {
+            // Always return JSON for AJAX/API requests
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
                 return response()->json([
                     'success' => false,
-                    'message' => "Registration failed. Try again"
-                ]);
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            } else {
+                return back()->withErrors($e->errors())->withInput();
+            }
+        } catch (\Exception $e) {
+            Log::error('Student registration failed', [
+                'message' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            // Always return JSON for AJAX/API requests
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage() ?: "Registration failed. Try again"
+                ], 500);
             } else {
                 return back()->withErrors("Registration failed. Try again")->withInput();
             }

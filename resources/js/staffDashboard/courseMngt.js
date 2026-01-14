@@ -3,6 +3,20 @@
 export default function loadCourses() {
     console.log("courseMngt is loaded");
 
+    // Close any open modals when module loads
+    if (window.Alpine) {
+        document.querySelectorAll('[x-data]').forEach(element => {
+            try {
+                const data = Alpine.$data(element);
+                if (data && typeof data.modalOpen !== 'undefined' && data.modalOpen === true) {
+                    data.modalOpen = false;
+                }
+            } catch (e) {
+                // Ignore errors
+            }
+        });
+    }
+
     const courseGrid = document.getElementById('courseGrid');
     const searchCourse = document.getElementById('searchCourse');
     const createCourseBtn = document.getElementById('createCourseBtn');
@@ -115,6 +129,11 @@ export default function loadCourses() {
         });
 
         courseGrid.innerHTML = html;
+        
+        // Initialize Alpine.js on the new content
+        if (window.Alpine) {
+            window.Alpine.initTree(courseGrid);
+        }
     }
 
     // Search functionality
@@ -142,6 +161,18 @@ export default function loadCourses() {
         }
     };
     window.viewCourseRegistrations = globalFunctions.viewCourseRegistrations;
+
+    // Reload course registrations (for refreshing after cohort assignment)
+    globalFunctions.loadCourseRegistrations = async function(courseId) {
+        try {
+            const response = await axios.get(`/staff/${courseId}/registrations`);
+            renderRegistrationView(response.data.data, courseId);
+        } catch (err) {
+            console.error('Failed to reload registrations:', err);
+            alert('Failed to reload registrations');
+        }
+    };
+    window.loadCourseRegistrations = globalFunctions.loadCourseRegistrations;
 
     // Render registration view
     function renderRegistrationView(registrations, courseId) {
@@ -214,10 +245,60 @@ export default function loadCourses() {
                         </td>
                         <td class="p-4">
                             ${cohort === 'N/A' || !cohort ? `
-                                <button class="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
-                                    <i class="fas fa-plus-circle mr-1"></i>
-                                    Assign to Cohort
-                                </button>
+                                <div x-data="{ showDropdown: false, cohorts: [], loading: false, studentid: '${reg.id || reg.studentid || ''}' }" class="relative">
+                                    <button @click="
+                                        if (!showDropdown && cohorts.length === 0) {
+                                            loading = true;
+                                            axios.get('/staff/cohorts/${courseId}')
+                                                .then(r => {
+                                                    cohorts = r.data.cohorts || [];
+                                                    showDropdown = true;
+                                                    loading = false;
+                                                })
+                                                .catch(e => {
+                                                    alert('Failed to load cohorts');
+                                                    loading = false;
+                                                });
+                                        } else {
+                                            showDropdown = !showDropdown;
+                                        }
+                                    " class="px-3 py-1.5 text-xs font-medium text-purple-600 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                                        <i class="fas fa-plus-circle mr-1"></i>
+                                        <span x-show="!loading">Assign to Cohort</span>
+                                        <span x-show="loading"><i class="fas fa-spinner fa-spin"></i> Loading...</span>
+                                    </button>
+                                    <div x-show="showDropdown" @click.away="showDropdown = false" x-cloak class="absolute z-10 mt-2 w-64 bg-white border border-purple-200 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                                        <div class="p-2">
+                                            <template x-if="cohorts.length === 0">
+                                                <p class="text-xs text-gray-500 p-2">No cohorts available</p>
+                                            </template>
+                                            <template x-for="cohort in cohorts" :key="cohort.cohort_id">
+                                                <button @click="
+                                                    axios.post('/staff/assignToCohort', {
+                                                        studentid: studentid,
+                                                        cohort_id: cohort.cohort_id
+                                                    })
+                                                    .then(r => {
+                                                        if (r.data.success) {
+                                                            alert(r.data.message);
+                                                            showDropdown = false;
+                                                            window.loadCourseRegistrations('${courseId}');
+                                                        } else {
+                                                            alert(r.data.message || 'Assignment failed');
+                                                        }
+                                                    })
+                                                    .catch(e => {
+                                                        alert(e.response?.data?.message || 'Assignment failed');
+                                                    });
+                                                " class="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 rounded transition-colors">
+                                                    <div class="font-medium text-gray-900" x-text="cohort.cohort_id"></div>
+                                                    <div class="text-gray-500 text-xs mt-0.5" x-text="cohort.description || 'No description'"></div>
+                                                    <div class="text-gray-400 text-xs mt-0.5" x-text="cohort.status + ' • ' + cohort.student_count + ' students'"></div>
+                                                </button>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
                             ` : `
                                 <span class="inline-flex items-center px-2 py-1 rounded-md bg-purple-50 text-purple-700 text-xs font-medium">
                                     ${cohort}
@@ -248,6 +329,11 @@ export default function loadCourses() {
         `;
 
         registrationView.innerHTML = html;
+        
+        // Initialize Alpine.js on the new content
+        if (window.Alpine) {
+            window.Alpine.initTree(registrationView);
+        }
     }
 
     // Back to courses
@@ -260,24 +346,131 @@ export default function loadCourses() {
 
     // Edit button
     function getEditButton(course) {
+        const courseData = JSON.stringify(course).replace(/'/g, "\\'");
         return `
-            <button onclick='window.editCourse(${JSON.stringify(course).replace(/'/g, "\\'")} )' class="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Edit Course">
+        <div x-data='{
+            modalOpen: false,
+            course: ${courseData}
+        }'>
+            <button @click="modalOpen = true" class="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="Edit Course">
                 <i class="fas fa-pencil text-sm"></i>
             </button>
-        `;
+            ${getEditModal()}
+        </div>`;
+    }
+
+    function getEditModal() {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
+        return `
+        <template x-teleport="body">
+            <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+                <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div class="flex items-center justify-between p-6 border-b border-purple-100 bg-gradient-to-r from-purple-50 to-white">
+                        <h3 class="text-xl font-semibold text-gray-900">Edit Course</h3>
+                        <button @click="modalOpen = false" class="p-2 text-gray-400 hover:text-gray-600 hover:bg-purple-100 rounded-lg transition-colors">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                    <form method="POST" action="/staff/\${course.course_id}/update" @submit.prevent="
+                        axios.post('/staff/' + course.course_id + '/update', new FormData(\$event.target))
+                            .then(r => { 
+                                if(r.data.success) { 
+                                    modalOpen=false; 
+                                    loadAllCourses();
+                                } else {
+                                    alert(r.data.message || 'Update failed');
+                                }
+                            })
+                            .catch(e => {
+                                console.error('Update error:', e);
+                                alert(e.response?.data?.message || 'Update failed');
+                            })
+                    " class="p-6 max-h-[70vh] overflow-y-auto">
+                        <input type="hidden" name="_token" value="${csrfToken}">
+                        <input type="hidden" name="course_id" x-model="course.course_id">
+                        <div class="space-y-4">
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-700">Course ID</label>
+                                <input type="text" x-model="course.course_id" disabled class="w-full px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm text-gray-500 cursor-not-allowed">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-700">Course Name</label>
+                                <input type="text" name="course_name" x-model="course.course_name" required class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                            </div>
+                            <div class="space-y-1.5">
+                                <label class="text-xs font-medium text-gray-700">Description</label>
+                                <textarea name="description" x-model="course.description" rows="3" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all resize-none"></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-medium text-gray-700">Duration</label>
+                                    <input type="text" name="duration" x-model="course.duration" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                </div>
+                                <div class="space-y-1.5">
+                                    <label class="text-xs font-medium text-gray-700">Eligibility (Optional)</label>
+                                    <input type="text" name="eligibility" x-model="course.eligibility" class="w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-purple-100">
+                            <button type="button" @click="modalOpen = false" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                            <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors shadow-sm">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </template>`;
     }
 
     // Delete button
     function getDeleteButton(course) {
         return `
-            <button onclick='window.deleteCourse("${course.course_id}")' class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Course">
+        <div x-data='{
+            modalOpen: false,
+            courseId: "${course.course_id}"
+        }'>
+            <button @click="modalOpen = true" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors" title="Delete Course">
                 <i class="fas fa-trash text-sm"></i>
             </button>
-        `;
+            <template x-teleport="body">
+                <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
+                    <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                    <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+                        <div class="p-6">
+                            <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
+                                <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                            </div>
+                            <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Course?</h3>
+                            <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this course? This action cannot be undone.</p>
+                            <div class="flex items-center gap-3">
+                                <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button @click="
+                                    axios.delete('/staff/' + courseId)
+                                        .then(r => { 
+                                            if(r.data.success) { 
+                                                modalOpen=false; 
+                                                loadAllCourses();
+                                            } else {
+                                                alert(r.data.message || 'Deletion failed');
+                                            }
+                                        })
+                                        .catch(e => {
+                                            console.error('Delete error:', e);
+                                            alert(e.response?.data?.message || 'Deletion failed');
+                                        })
+                                " class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>`;
     }
 
-    // Delete course
+    // Delete course (kept for backward compatibility but now handled by modal)
     globalFunctions.deleteCourse = async function(courseId) {
+        // This is now handled by the modal, but keeping for any direct calls
         if (!confirm('Are you sure you want to delete this course?')) return;
 
         try {
@@ -293,11 +486,10 @@ export default function loadCourses() {
     };
     window.deleteCourse = globalFunctions.deleteCourse;
 
-    // Edit course (implement modal similar to create)
+    // Edit course (kept for backward compatibility but now handled by modal)
     globalFunctions.editCourse = function(course) {
-        // You can implement an edit modal similar to create modal
+        // This is now handled by the modal, but keeping for any direct calls
         console.log('Edit course:', course);
-        alert('Edit functionality - to be implemented with modal');
     };
     window.editCourse = globalFunctions.editCourse;
 

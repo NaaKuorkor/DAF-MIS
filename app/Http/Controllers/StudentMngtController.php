@@ -22,40 +22,56 @@ class StudentMngtController extends Controller
 {
     public function studentTableContent()
     {
+        try {
+            $students = TblStudent::with(
+                'cohort_registration.cohort',
+                'course_registration.course',
+                'user'
+            )->whereHas('user', function ($query) {
+                $query->where('deleted', '0');
+            })
+                ->orderBy('createdate', 'desc')
+                ->paginate(10);
 
-        $students = TblStudent::with(
-            'cohort_registration.cohort',
-            'course_registration.course',
-            'user'
-        )->whereHas('user', function ($query) {
-            $query->where('deleted', 0);
-        })
-            ->orderBy('createdate', 'desc')
-            ->paginate(10);
+            $students->getCollection()->transform(function ($student) {
+                $courseRegistration = $student->course_registration->first();
+                $cohortRegistration = $student->cohort_registration->first();
+                
+                return [
+                    'name' => trim($student->lname . ' ' . ($student->mname ?? '') . ' ' . $student->fname),
+                    'course' => $courseRegistration?->course->course_name ?? 'N/A',
+                    'cohort' => $cohortRegistration?->cohort->cohort_id ?? 'N/A',
+                    'registration_date' => $courseRegistration?->createdate ?? null,
+                    'studentid' => $student->studentid,
+                    'userid' => $student->user?->userid ?? null,
+                    'fname' => $student->fname,
+                    'mname' => $student->mname ?? '',
+                    'lname' => $student->lname,
+                    'age' => $student->age,
+                    'email' => $student->user?->email ?? '',
+                    'phone' => $student->user?->phone ?? '',
+                    'referral' => $student->referral ?? '',
+                    'residence' => $student->residence ?? '',
+                    'employment_status' => $student->employment_status ?? '',
+                    'certificate' => $student->certificate ?? '',
+                    'course_id' => $courseRegistration?->course_id ?? null,
+                    'gender' => $student->gender ?? '',
+                ];
+            });
 
-        $students->getCollection()->transform(function ($student) {
-            return [
-                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
-                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
-                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                'registration_date' => $student->course_registration[0]->createdate,
-                'studentid' => $student->studentid,
-                'userid' => $student->user->userid,
-                'fname' => $student->fname,
-                'mname' => $student->mname,
-                'lname' => $student->lname,
-                'age' => $student->age,
-                'email' => $student->user->email,
-                'phone' => $student->user->phone,
-                'referral' => $student->referral,
-                'residence' => $student->residence,
-                'employment_status' => $student->employment_status,
-                'certificate' => $student->certificate,
-            ];
-        });
-
-
-        return response()->json($students);
+            return response()->json($students);
+        } catch (\Exception $e) {
+            Log::error('Student table content failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to load students: ' . $e->getMessage(),
+                'data' => []
+            ], 500);
+        }
     }
 
     public function alphaStudentFilter()
@@ -65,30 +81,35 @@ class StudentMngtController extends Controller
             'cohort_registration.cohort',
             'course_registration.course',
             'user'
-        )->whereHas('user', function ($query) {
-            $query->where('deleted', 0);
-        })
+        )            ->whereHas('user', function ($query) {
+                $query->where('deleted', '0');
+            })
             ->orderBy('lname', 'asc')
             ->paginate(10);
 
         $students->getCollection()->transform(function ($student) {
+            $courseRegistration = $student->course_registration->first();
+            $cohortRegistration = $student->cohort_registration->first();
+            
             return [
-                'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
-                'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
-                'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                'registration_date' => $student->course_registration[0]->createdate,
+                'name' => trim($student->lname . ' ' . ($student->mname ?? '') . ' ' . $student->fname),
+                'course' => $courseRegistration?->course->course_name ?? 'N/A',
+                'course_id' => $courseRegistration?->course_id ?? 'LS101',
+                'cohort' => $cohortRegistration?->cohort->cohort_id ?? 'N/A',
+                'registration_date' => $courseRegistration?->createdate ?? null,
                 'studentid' => $student->studentid,
-                'userid' => $student->user->userid,
+                'userid' => $student->user?->userid ?? null,
                 'fname' => $student->fname,
-                'mname' => $student->mname,
+                'mname' => $student->mname ?? '',
                 'lname' => $student->lname,
+                'gender' => $student->gender ?? '',
                 'age' => $student->age,
-                'email' => $student->user->email,
-                'phone' => $student->user->phone,
-                'referral' => $student->referral,
-                'residence' => $student->residence,
-                'employment_status' => $student->employment_status,
-                'certificate' => $student->certificate,
+                'email' => $student->user?->email ?? '',
+                'phone' => $student->user?->phone ?? '',
+                'referral' => $student->referral ?? '',
+                'residence' => $student->residence ?? '',
+                'employment_status' => $student->employment_status ?? '',
+                'certificate' => $student->certificate ?? '',
             ];
         });
 
@@ -107,7 +128,9 @@ class StudentMngtController extends Controller
                 'course_registration.course',
                 'cohort_registration.cohort',
                 'user'
-            )->where(
+            )            ->whereHas('user', function ($query) {
+                $query->where('deleted', '0');
+            })->where(
                 function ($querybuilder) use ($searchTerm) {
                     $querybuilder->where('fname', 'LIKE', $searchTerm)
                         ->orWhere('lname', 'LIKE', $searchTerm)
@@ -116,26 +139,31 @@ class StudentMngtController extends Controller
 
             )->orderBy('createdate', 'desc')->paginate(10);
 
-            $students->getCollection()->transform(function ($student) {
-                return [
-                    'name' => $student->lname . ' ' . $student->mname . ' ' . $student->fname,
-                    'course' => $student->course_registration[0]->course->course_name ?? 'N/A',
-                    'cohort' => $student->cohort_registration[0]->cohort->cohort_id ?? 'N/A',
-                    'registration_date' => $student->course_registration[0]->createdate,
-                    'studentid' => $student->studentid,
-                    'userid' => $student->user->userid,
-                    'fname' => $student->fname,
-                    'mname' => $student->mname,
-                    'lname' => $student->lname,
-                    'age' => $student->age,
-                    'email' => $student->user->email,
-                    'phone' => $student->user->phone,
-                    'referral' => $student->referral,
-                    'residence' => $student->residence,
-                    'employment_status' => $student->employment_status,
-                    'certificate' => $student->certificate,
-                ];
-            });
+        $students->getCollection()->transform(function ($student) {
+            $courseRegistration = $student->course_registration->first();
+            $cohortRegistration = $student->cohort_registration->first();
+            
+            return [
+                'name' => trim($student->lname . ' ' . ($student->mname ?? '') . ' ' . $student->fname),
+                'course' => $courseRegistration?->course->course_name ?? 'N/A',
+                'course_id' => $courseRegistration?->course_id ?? 'LS101',
+                'cohort' => $cohortRegistration?->cohort->cohort_id ?? 'N/A',
+                'registration_date' => $courseRegistration?->createdate ?? null,
+                'studentid' => $student->studentid,
+                'userid' => $student->user?->userid ?? null,
+                'fname' => $student->fname,
+                'mname' => $student->mname ?? '',
+                'lname' => $student->lname,
+                'gender' => $student->gender ?? '',
+                'age' => $student->age,
+                'email' => $student->user?->email ?? '',
+                'phone' => $student->user?->phone ?? '',
+                'referral' => $student->referral ?? '',
+                'residence' => $student->residence ?? '',
+                'employment_status' => $student->employment_status ?? '',
+                'certificate' => $student->certificate ?? '',
+            ];
+        });
 
             return response()->json($students);
         } else {
@@ -187,11 +215,22 @@ class StudentMngtController extends Controller
                 'referral' => $updates['referral'],
                 'employment_status' => $updates['employment_status'],
                 'certificate' => $updates['certificate'],
-                'course' => $updates['course'],
             ];
 
             $user->update($userUpdate);
             $student->update($studentUpdate);
+
+            // Update course registration if course changed
+            if (isset($updates['course'])) {
+                $courseRegistration = TblCourseRegistration::where('studentid', $updates['studentid'])->first();
+                if ($courseRegistration) {
+                    $courseRegistration->update([
+                        'course_id' => $updates['course'],
+                        'modifyuser' => auth()->user()->email ?? 'system',
+                        'modifydate' => now(),
+                    ]);
+                }
+            }
 
             return response()->json([
                 'success' => true,

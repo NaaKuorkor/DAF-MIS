@@ -24,23 +24,24 @@ class CourseCohortController extends Controller
                 ], 404);
             }
 
+            // Try to get course registration - don't fail if not found
+            // Note: tblcourse_registration doesn't have a deleted column
             $registration = TblCourseRegistration::where('studentid', $student->studentid)
-                ->where('deleted', '0')
-                ->firstOrFail();
+                ->first();
 
-            $id = $registration->course_id;
-
-            $course = TblCourse::where('course_id', $id)
-                ->where('deleted', '0')
-                ->firstOrFail();
+            $course = null;
+            if ($registration) {
+                $course = TblCourse::where('course_id', $registration->course_id)
+                    ->where('deleted', '0')
+                    ->first();
+            }
 
             // Check cohort registration - this is the key relationship
+            // Note: tblcohort_registration doesn't have a deleted column
             $cohortRegistration = TblCohortRegistration::where('studentid', $student->studentid)
-                ->where('deleted', '0')
                 ->first();
 
             $cohort = null;
-
             if ($cohortRegistration) {
                 $cohort = TblCohort::where('cohort_id', $cohortRegistration->cohort_id)
                     ->where('deleted', '0')
@@ -62,7 +63,7 @@ class CourseCohortController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Course failed to load'
+                'message' => 'Course failed to load: ' . $e->getMessage()
             ], 500);
         }
     }

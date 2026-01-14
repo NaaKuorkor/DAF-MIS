@@ -36,7 +36,7 @@ export default function loadCohorts() {
             course_id: course.course_id,
             course_name: course.course_name,
             description: course.description || '',
-            status: 'Active', // Compute based on dates/registrations if needed
+            status: 'Active', // Compute based on dates/registrations if needed 
             start_date: course.createdate || new Date().toISOString(),
             end_date: null,
             registered: 0, // Get from course registrations count
@@ -105,7 +105,7 @@ export default function loadCohorts() {
         const statusBadge = getStatusBadge(course.status);
         const cardContent = (course.status === 'Upcoming' || course.status === 'Closing Soon') 
             ? createUpcomingContent(course)
-            : createProgressContent(course);
+            : '';
 
         return `
             <div class="bg-white border border-slate-200 rounded-xl p-5 hover:shadow-md hover:border-purple-200 transition-all duration-200 flex flex-col h-full">
@@ -150,31 +150,6 @@ export default function loadCohorts() {
         return badges[status] || '';
     }
 
-    function createProgressContent(course) {
-        if (course.status === 'Completed') {
-            return `
-                <div class="space-y-3 mb-6">
-                    <div class="w-full bg-slate-100 rounded-full h-1.5">
-                        <div class="bg-slate-400 h-1.5 rounded-full" style="width: 100%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-slate-500">
-                        <span>Completed</span>
-                        <span class="text-green-600 font-medium">Graded</span>
-                    </div>
-                </div>
-            `;
-        }
-        return `
-            <div class="space-y-3 mb-6">
-                <div class="w-full bg-slate-100 rounded-full h-1.5">
-                    <div class="bg-purple-600 h-1.5 rounded-full" style="width: ${course.progress || 0}%"></div>
-                </div>
-                <div class="flex justify-between text-xs text-slate-500">
-                    <span>Progress: ${course.progress || 0}%</span>
-                </div>
-            </div>
-        `;
-    }
 
     function createUpcomingContent(course) {
         return `

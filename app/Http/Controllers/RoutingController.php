@@ -45,9 +45,13 @@ class RoutingController extends Controller
 
     public function showStaffOverview()
     {
-        $students = TblStudent::count();
-        $staff = TblStaff::count();
-        $courses = TblCourse::count();
+        $students = TblStudent::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $staff = TblStaff::whereHas('user', function($query) {
+            $query->where('deleted', '0');
+        })->count();
+        $courses = TblCourse::where('deleted', '0')->count();
 
         $cards = [
             [
@@ -110,5 +114,10 @@ class RoutingController extends Controller
     public function showAnnouncements()
     {
         return view('components.announcements');
+    }
+
+    public function showStudentAnnouncements()
+    {
+        return view('components.student-announcements');
     }
 }

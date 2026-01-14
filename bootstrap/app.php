@@ -18,5 +18,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // Ensure validation exceptions return JSON for API requests
+        $exceptions->render(function (\Illuminate\Validation\ValidationException $e, $request) {
+            if ($request->ajax() || $request->wantsJson() || $request->expectsJson() || 
+                str_contains($request->header('Accept', ''), 'application/json')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $e->errors()
+                ], 422);
+            }
+        });
     })->create();

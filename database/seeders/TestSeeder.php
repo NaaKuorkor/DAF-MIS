@@ -24,7 +24,7 @@ class TestSeeder extends Seeder
             'phone' => '0595319756',
             'password' => Hash::make('Decode@20'),
             'user_type' => 'ADM',
-            'deleted' => 0,
+            'deleted' => '0',
         ]);
 
         $staff->staff()->create([
@@ -46,7 +46,7 @@ class TestSeeder extends Seeder
             'phone' => '0242167206',
             'password' => Hash::make('Decode@20'),
             'user_type' => 'STU',
-            'deleted' => 0,
+            'deleted' => '0',
 
         ]);
 

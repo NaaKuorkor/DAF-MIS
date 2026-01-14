@@ -32,6 +32,11 @@ export default function loadAnnouncements() {
     // Initialize
     loadAnnouncementsData();
     setupEventListeners();
+    
+    // Listen for reload events
+    window.addEventListener('reloadAnnouncements', () => {
+        loadAnnouncementsData(1, false);
+    });
 
     async function loadAnnouncementsData(page = 1, append = false) {
         if (isLoading) return;
@@ -234,6 +239,7 @@ export default function loadAnnouncements() {
             const handler = () => {
                 currentFilter = 'all';
                 updateFilterButtons('all');
+                resetComposeForm();
                 loadAnnouncementsData(1, false);
             };
             filterAll.addEventListener('click', handler);
@@ -244,6 +250,7 @@ export default function loadAnnouncements() {
             const handler = () => {
                 currentFilter = 'drafts';
                 updateFilterButtons('drafts');
+                resetComposeForm();
                 loadAnnouncementsData(1, false);
             };
             filterDrafts.addEventListener('click', handler);
@@ -254,6 +261,7 @@ export default function loadAnnouncements() {
             const handler = () => {
                 currentFilter = 'scheduled';
                 updateFilterButtons('scheduled');
+                resetComposeForm();
                 loadAnnouncementsData(1, false);
             };
             filterScheduled.addEventListener('click', handler);
@@ -323,7 +331,10 @@ export default function loadAnnouncements() {
         if (deleteAnnouncementBtn) {
             const handler = () => {
                 if (currentEditingId) {
-                    deleteAnnouncement(currentEditingId);
+                    // Close view modal first
+                    if (viewModal) viewModal.style.display = 'none';
+                    // Show delete modal
+                    window.deleteAnnouncement(currentEditingId);
                 }
             };
             deleteAnnouncementBtn.addEventListener('click', handler);
@@ -352,14 +363,36 @@ export default function loadAnnouncements() {
         Object.keys(filters).forEach(key => {
             if (filters[key]) {
                 if (key === activeFilter) {
-                    filters[key].classList.add('border-purple-600', 'text-slate-900');
+                    filters[key].classList.add('border-purple-600', 'text-slate-900', 'border-b-2', 'pb-2.5', '-mb-2.5');
                     filters[key].classList.remove('text-slate-500');
                 } else {
-                    filters[key].classList.remove('border-purple-600', 'text-slate-900');
+                    filters[key].classList.remove('border-purple-600', 'text-slate-900', 'border-b-2', 'pb-2.5', '-mb-2.5');
                     filters[key].classList.add('text-slate-500');
                 }
             }
         });
+    }
+
+    function resetComposeForm() {
+        if (announcementForm) {
+            announcementForm.reset();
+        }
+        if (scheduleToggle) {
+            scheduleToggle.checked = false;
+        }
+        if (scheduleOptions) {
+            scheduleOptions.style.display = 'none';
+        }
+        if (draftStatus) {
+            draftStatus.textContent = 'Draft';
+        }
+        currentEditingId = null;
+        
+        // Reset broadcast button text
+        const broadcastBtn = document.getElementById('broadcastBtn');
+        if (broadcastBtn) {
+            broadcastBtn.innerHTML = '<i class="fa fa-paper-plane text-xs"></i> Broadcast';
+        }
     }
 
     async function handleFormSubmit(action) {
@@ -368,6 +401,12 @@ export default function loadAnnouncements() {
 
         const formData = new FormData(form);
         formData.append('action', action);
+        
+        // Ensure audience is sent as single string value (not array)
+        const audienceSelect = document.getElementById('audienceSelect');
+        if (audienceSelect) {
+            formData.set('audience', audienceSelect.value);
+        }
 
         // Handle scheduled_at - only include if schedule toggle is checked
         if (!scheduleToggle?.checked) {
@@ -380,8 +419,9 @@ export default function loadAnnouncements() {
         try {
             let response;
             if (currentEditingId) {
-                // Update existing - FIXED: Use correct endpoint
-                response = await axios.put(`/staff/announcements/${currentEditingId}`, formData);
+                // Update existing - Use POST with _method=PUT for Laravel
+                formData.append('_method', 'PUT');
+                response = await axios.post(`/staff/announcements/${currentEditingId}`, formData);
             } else {
                 // Create new - FIXED: Use correct endpoint
                 response = await axios.post('/staff/announcements/', formData);
@@ -394,6 +434,13 @@ export default function loadAnnouncements() {
                 form.reset();
                 scheduleOptions.style.display = 'none';
                 if (scheduleToggle) scheduleToggle.checked = false;
+                
+                // Reset broadcast button text
+                const broadcastBtn = document.getElementById('broadcastBtn');
+                if (broadcastBtn) {
+                    broadcastBtn.innerHTML = '<i class="fa fa-paper-plane text-xs"></i> Broadcast';
+                }
+                
                 currentEditingId = null;
 
                 // Reload announcements
@@ -462,12 +509,23 @@ export default function loadAnnouncements() {
                 if (titleInput) titleInput.value = announcement.title || '';
                 if (contentInput) contentInput.value = announcement.content || '';
                 
-                // Set audience
+                // Set audience - handle both old array format and new single value format
                 if (audienceSelect) {
                     const audienceArray = Array.isArray(announcement.audience) ? announcement.audience : JSON.parse(announcement.audience || '[]');
-                    Array.from(audienceSelect.options).forEach(option => {
-                        option.selected = audienceArray.includes(option.value);
-                    });
+                    // Get first audience value (for backward compatibility with old data)
+                    const audienceValue = Array.isArray(audienceArray) && audienceArray.length > 0 ? audienceArray[0] : 'everyone';
+                    // Handle old format where multiple values might exist
+                    let selectedValue = 'everyone';
+                    if (audienceArray.includes('everyone')) {
+                        selectedValue = 'everyone';
+                    } else if (audienceArray.includes('all_staff')) {
+                        selectedValue = 'all_staff';
+                    } else if (audienceArray.includes('all_students')) {
+                        selectedValue = 'all_students';
+                    } else {
+                        selectedValue = audienceValue;
+                    }
+                    audienceSelect.value = selectedValue;
                 }
 
                 // Set priority
@@ -493,6 +551,16 @@ export default function loadAnnouncements() {
                 // Update status label
                 if (draftStatus) draftStatus.textContent = announcement.status.toUpperCase();
 
+                // Update broadcast button text
+                const broadcastBtn = document.getElementById('broadcastBtn');
+                if (broadcastBtn) {
+                    if (announcement.status === 'active') {
+                        broadcastBtn.innerHTML = '<i class="fa fa-paper-plane text-xs"></i> Rebroadcast';
+                    } else {
+                        broadcastBtn.innerHTML = '<i class="fa fa-pencil text-xs"></i> Update';
+                    }
+                }
+
                 // Close view modal if open
                 if (viewModal) viewModal.style.display = 'none';
 
@@ -507,33 +575,73 @@ export default function loadAnnouncements() {
         }
     };
 
-    window.deleteAnnouncement = async function(announcementId) {
-        // Use dialog similar to staff/student deletion
-        const announcementData = { announcement_id: announcementId };
-        const announcementDataStr = JSON.stringify(announcementData).replace(/'/g, "\\'");
-        
-        const deleteDialog = `
-        <div x-data='{
+    window.deleteAnnouncement = function(announcementId) {
+        // Remove any existing delete dialog
+        const existingDialog = document.getElementById('deleteAnnouncementDialog');
+        if (existingDialog) existingDialog.remove();
+
+        // Store announcementId globally temporarily to avoid escaping issues
+        window._tempAnnouncementId = announcementId;
+
+        // Create dialog container
+        const dialogContainer = document.createElement('div');
+        dialogContainer.id = 'deleteAnnouncementDialog';
+        document.body.appendChild(dialogContainer);
+
+        // Create the modal HTML - use double quotes for x-data to avoid escaping issues
+        dialogContainer.innerHTML = `
+        <div x-data="{
             modalOpen: true,
-            announcement: ${announcementDataStr},
+            announcementId: window._tempAnnouncementId,
+            deleting: false,
             async handleDelete() {
+                if (this.deleting) return;
+                this.deleting = true;
+                const deleteBtn = document.querySelector('#deleteAnnouncementDialog button[class*=\\'bg-red-600\\']');
+                let originalText = '';
+                if (deleteBtn) {
+                    deleteBtn.disabled = true;
+                    originalText = deleteBtn.innerHTML;
+                    deleteBtn.innerHTML = '<i class=\\'fas fa-spinner fa-spin\\'></i> Deleting...';
+                }
                 try {
-                    const response = await axios.delete('/staff/announcements/' + this.announcement.announcement_id);
-                    if (response.data.success) {
+                    const response = await axios.delete('/staff/announcements/' + this.announcementId);
+                    if (response.data && response.data.success) {
+                        alert(response.data.message || 'Announcement deleted successfully');
                         this.modalOpen = false;
-                        if (window.loadAnnouncements) window.loadAnnouncements();
+                        const dialog = document.getElementById('deleteAnnouncementDialog');
+                        if (dialog) dialog.remove();
+                        delete window._tempAnnouncementId;
+                        setTimeout(() => {
+                            if (window.loadAnnouncements) {
+                                window.loadAnnouncements(1, false);
+                            } else {
+                                window.dispatchEvent(new CustomEvent('reloadAnnouncements'));
+                            }
+                        }, 100);
                     } else {
-                        alert(response.data.message || 'Failed to delete announcement');
+                        alert(response.data?.message || 'Failed to delete announcement');
+                        this.deleting = false;
+                        if (deleteBtn) {
+                            deleteBtn.disabled = false;
+                            deleteBtn.innerHTML = originalText;
+                        }
                     }
                 } catch (error) {
                     console.error('Delete failed:', error);
-                    alert(error.response?.data?.message || 'Failed to delete announcement');
+                    const errorMessage = error.response?.data?.message || error.message || 'Failed to delete announcement';
+                    alert(errorMessage);
+                    this.deleting = false;
+                    if (deleteBtn) {
+                        deleteBtn.disabled = false;
+                        deleteBtn.innerHTML = originalText;
+                    }
                 }
             }
-        }'>
+        }">
             <template x-teleport="body">
                 <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
-                    <div x-show="modalOpen" @click="modalOpen = false" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+                    <div x-show="modalOpen" @click="modalOpen = false; const dialog = document.getElementById('deleteAnnouncementDialog'); if (dialog) { dialog.remove(); delete window._tempAnnouncementId; }" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
                     <div x-show="modalOpen" x-trap.inert.noscroll="modalOpen" class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <div class="p-6">
                             <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
@@ -542,24 +650,20 @@ export default function loadAnnouncements() {
                             <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">Delete Announcement?</h3>
                             <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this announcement? This action cannot be undone.</p>
                             <div class="flex items-center gap-3">
-                                <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button @click="handleDelete()" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                                <button @click="modalOpen = false; const dialog = document.getElementById('deleteAnnouncementDialog'); if (dialog) { dialog.remove(); delete window._tempAnnouncementId; }" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
+                                <button @click="handleDelete()" :disabled="deleting" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed">
+                                    <span x-show="!deleting">Delete</span>
+                                    <span x-show="deleting" class="flex items-center justify-center gap-2">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                        Deleting...
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </template>
         </div>`;
-
-        // Remove any existing delete dialog
-        const existingDialog = document.getElementById('deleteAnnouncementDialog');
-        if (existingDialog) existingDialog.remove();
-
-        // Create and append dialog
-        const dialogContainer = document.createElement('div');
-        dialogContainer.id = 'deleteAnnouncementDialog';
-        dialogContainer.innerHTML = deleteDialog;
-        document.body.appendChild(dialogContainer);
 
         // Initialize Alpine.js on the new element
         if (window.Alpine) {

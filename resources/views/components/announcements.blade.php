@@ -33,8 +33,8 @@
             <div class="flex items-center justify-between pb-2 border-b border-slate-200">
                 <div class="flex gap-6">
                     <button id="filterAll" class="text-sm font-medium text-slate-900 border-b-2 border-purple-600 pb-2.5 -mb-2.5">All Broadcasts</button>
-                    <button id="filterDrafts" class="text-sm font-medium text-slate-500 hover:text-slate-700 pb-2.5 -mb-2.5 transition-colors">Drafts</button>
-                    <button id="filterScheduled" class="text-sm font-medium text-slate-500 hover:text-slate-700 pb-2.5 -mb-2.5 transition-colors">Scheduled</button>
+                    <button id="filterDrafts" class="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Drafts</button>
+                    <button id="filterScheduled" class="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Scheduled</button>
                 </div>
                 <button class="flex items-center gap-1.5 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors">
                     <i class="fa fa-filter text-xs"></i>
@@ -92,20 +92,17 @@
                         <label class="block text-xs font-medium text-slate-500 mb-1.5">Target Audience</label>
                         <div class="relative">
                             <select 
-                                name="audience[]"
+                                name="audience"
                                 id="audienceSelect"
-                                multiple
                                 required
-                                class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 min-h-[42px] text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
+                                class="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all"
                             >
-                                <option value="all_staff">All Staff</option>
-                                <option value="all_students">All Students</option>
-                                <option value="dept_heads">Department Heads</option>
-                                <option value="academic_staff">Academic Staff</option>
+                                <option value="all_staff">Only Staff</option>
+                                <option value="all_students">Only Students</option>
                                 <option value="everyone" selected>Everyone</option>
                             </select>
                         </div>
-                        <p class="text-xs text-slate-500 mt-1.5">Hold Ctrl/Cmd to select multiple groups</p>
+                        <p class="text-xs text-slate-500 mt-1.5">Select who should receive this announcement</p>
                     </div>
 
                     <!-- Content Area -->
@@ -196,13 +193,6 @@
                 </form>
             </div>
 
-            <!-- Mini Help / Tip -->
-            <div class="mt-4 p-4 rounded-xl bg-purple-50 border border-purple-100 flex items-start gap-3">
-                <i class="fa fa-info-circle text-purple-600 shrink-0 mt-0.5"></i>
-                <p class="text-xs text-purple-800 leading-relaxed">
-                    <span class="font-semibold">Pro Tip:</span> Urgent announcements will trigger a push notification to the recipient's mobile app immediately.
-                </p>
-            </div>
         </div>
 
     </div>
