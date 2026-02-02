@@ -24,7 +24,7 @@ export default async function loadProfileDetails(){
 
     function showActionBtns(){
         if (!actionBtns || !editBtn) return;
-        
+
         actionBtns.style.display = 'flex';
         editBtn.style.display = 'none';
 
@@ -47,7 +47,7 @@ export default async function loadProfileDetails(){
 
     function hideActionBtns(restore = false){
         if (!actionBtns || !editBtn) return;
-        
+
         actionBtns.style.display = 'none';
         editBtn.style.display = 'flex';
 
@@ -81,7 +81,7 @@ export default async function loadProfileDetails(){
     async function handleProfileSubmit(e){
         e.preventDefault();
         if (!saveBtn) return;
-        
+
         const originalContent = saveBtn.innerHTML;
         saveBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
         saveBtn.disabled = true;
@@ -90,14 +90,14 @@ export default async function loadProfileDetails(){
 
         try{
             const response = await axios.post(profileForm.action, formData);
-            alert(response.data.message);
+            toast.success(response.data.message);
             hideActionBtns();
         }catch(error){
             if (error.response?.data?.errors) {
                 Object.values(error.response.data.errors)
-                    .forEach(err => alert(err[0]));
+                    .forEach(err => toast.error(err[0]));
             } else {
-                alert("Update failed");
+                toast.error("Update failed");
             }
         }finally{
             saveBtn.innerHTML = originalContent;
@@ -110,7 +110,7 @@ export default async function loadProfileDetails(){
             const inputId = btn.dataset.toggle;
             const input = document.getElementById(inputId);
             if (!input) return;
-            
+
             const icon = btn.querySelector('i');
             if (!icon) return;
 
@@ -134,7 +134,7 @@ export default async function loadProfileDetails(){
     async function handlePasswordSubmit(e){
         e.preventDefault();
         if (!changeBtn) return;
-        
+
         const originalContent = changeBtn.innerHTML;
         changeBtn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Changing...';
         changeBtn.disabled = true;
@@ -143,14 +143,14 @@ export default async function loadProfileDetails(){
 
         try{
             const response = await axios.post(passwordForm.action, formData);
-            alert(response.data.message);
+            toast.success(response.data.message);
             passwordForm.reset();
         }catch(error){
             if (error.response?.data?.errors) {
                 Object.values(error.response.data.errors)
-                    .forEach(err => alert(err[0]));
+                    .forEach(err => toast.error(err[0]));
             } else {
-                alert("Update failed");
+                toast.error("Update failed");
             }
         }finally{
             changeBtn.innerHTML = originalContent;

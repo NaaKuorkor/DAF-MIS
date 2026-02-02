@@ -12,6 +12,13 @@
         <p class="text-sm text-gray-500">Enter your credentials to access your portal</p>
     </div>
 
+     {{-- Success message --}}
+    @if (session('success'))
+    <div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-700 rounded-lg text-sm">
+        {{ session('success') }}
+    </div>
+    @endif
+
     <form action="{{ route('login') }}" method="POST" class="space-y-4">
         @csrf
 

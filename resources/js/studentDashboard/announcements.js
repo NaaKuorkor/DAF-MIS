@@ -33,7 +33,7 @@ export default function loadStudentAnnouncements() {
 
     async function loadAnnouncementsData(page = 1, append = false) {
         if (isLoading) return;
-        
+
         isLoading = true;
         currentPage = page;
 
@@ -55,13 +55,13 @@ export default function loadStudentAnnouncements() {
                 params.append('search', searchQuery);
             }
             params.append('per_page', '15');
-            
+
             const url = `/announcements/recipients/list?${params.toString()}`;
             const response = await axios.get(url);
 
             if (response.data.success) {
                 const { data, pagination } = response.data;
-                
+
                 // Render announcements
                 if (append && data.length > 0) {
                     const existingHTML = announcementsList.innerHTML;
@@ -175,7 +175,7 @@ export default function loadStudentAnnouncements() {
     function formatAudience(audience) {
         if (!audience) return 'Everyone';
         const audienceArray = Array.isArray(audience) ? audience : JSON.parse(audience || '[]');
-        
+
         const labels = {
             'all_staff': 'All Staff',
             'all_students': 'All Students',
@@ -341,7 +341,7 @@ export default function loadStudentAnnouncements() {
                 if (modalContent) modalContent.textContent = announcement.content;
                 if (modalDate) modalDate.textContent = formatDateTime(announcement.published_at || announcement.createdate);
                 if (modalPriorityBadge) modalPriorityBadge.innerHTML = getPriorityBadge(announcement.priority);
-                
+
                 // Get creator name
                 if (modalCreator && announcement.creator) {
                     modalCreator.textContent = announcement.creator.email || 'System';

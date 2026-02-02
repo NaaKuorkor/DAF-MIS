@@ -1,7 +1,7 @@
 export default function loadCourses() {
     const statsGrid = document.getElementById('course-stats-grid');
     const detailsSection = document.getElementById('course-details-section');
-    
+
     // Early return if essential elements not found
     if (!statsGrid) {
         console.warn('Course-cohort elements not found');
@@ -34,7 +34,7 @@ export default function loadCourses() {
 
 async function fetchCourseData() {
     const statsGrid = document.getElementById('course-stats-grid');
-    
+
     if (!statsGrid) {
         console.warn('Stats grid not found');
         return;
@@ -113,7 +113,7 @@ function displayCourseCards(data) {
     let cardsHTML = '';
     cards.forEach(card => {
         cardsHTML += `
-            <div class="bg-white p-6 rounded-xl border border-purple-200 shadow-sm hover:shadow-md transition-shadow">
+            <div class="bg-white p-6 rounded-xl border border-purple-200">
                 <div class="flex items-center justify-between mb-4">
                     <div class="w-10 h-10 rounded-lg ${card.bg_color} flex items-center justify-center ${card.text_color}">
                         <i class="fas ${card.icon} text-xl"></i>
@@ -231,7 +231,7 @@ function formatDate(dateString) {
 
 function showError(message) {
     const statsGrid = document.getElementById('course-stats-grid');
-    
+
     if (!statsGrid) {
         console.warn('Stats grid not found');
         return;

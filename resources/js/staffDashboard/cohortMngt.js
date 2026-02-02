@@ -31,12 +31,11 @@ export default function loadCohorts() {
 
     // Format course data to include computed fields for UI
     function formatCourseData(course) {
-        // You can enhance this with actual business logic for status, progress, etc.
         return {
             course_id: course.course_id,
             course_name: course.course_name,
             description: course.description || '',
-            status: 'Active', // Compute based on dates/registrations if needed 
+            status: 'Active', // Compute based on dates/registrations if needed
             start_date: course.createdate || new Date().toISOString(),
             end_date: null,
             registered: 0, // Get from course registrations count
@@ -50,12 +49,12 @@ export default function loadCohorts() {
         try {
             const response = await axios.get('/staff/viewCourses');
             const coursesData = response.data.data || (Array.isArray(response.data) ? response.data : []);
-            
+
             // Map courses to include computed fields
-            const courses = Array.isArray(coursesData) 
-                ? coursesData.map(formatCourseData) 
+            const courses = Array.isArray(coursesData)
+                ? coursesData.map(formatCourseData)
                 : [];
-            
+
             renderCourseCards(courses);
         } catch (error) {
             console.error('Error loading courses:', error);
@@ -70,7 +69,7 @@ export default function loadCohorts() {
 
     function renderCourseCards(courses) {
         if (!courseCardsGrid) return;
-        
+
         if (!courses || courses.length === 0) {
             courseCardsGrid.innerHTML = `
                 <div class="col-span-full text-center py-12">
@@ -80,14 +79,14 @@ export default function loadCohorts() {
             `;
             return;
         }
-        
+
         courseCardsGrid.innerHTML = courses.map(course => createCourseCard(course)).join('');
-        
+
         // Attach event listeners to buttons
         courses.forEach(course => {
             const viewBtn = document.querySelector(`[data-view-cohorts="${course.course_id}"]`);
             const openBtn = document.querySelector(`[data-open-new="${course.course_id}"]`);
-            
+
             if (viewBtn) {
                 const handler = () => viewCohorts(course.course_id, course.course_name);
                 viewBtn.addEventListener('click', handler);
@@ -103,7 +102,7 @@ export default function loadCohorts() {
 
     function createCourseCard(course) {
         const statusBadge = getStatusBadge(course.status);
-        const cardContent = (course.status === 'Upcoming' || course.status === 'Closing Soon') 
+        const cardContent = (course.status === 'Upcoming' || course.status === 'Closing Soon')
             ? createUpcomingContent(course)
             : '';
 
@@ -123,7 +122,7 @@ export default function loadCohorts() {
                         ${statusBadge}
                     </div>
                 </div>
-                
+
                 ${cardContent}
 
                 <div class="mt-auto grid grid-cols-2 gap-3 border-t border-slate-100 pt-4">
@@ -176,15 +175,15 @@ export default function loadCohorts() {
     async function viewCohorts(courseId, courseName) {
         currentCourseId = courseId;
         currentCourseName = courseName;
-        
+
         if (coursesView) coursesView.style.display = 'none';
         if (cohortsTableView) cohortsTableView.style.display = 'block';
-        
+
         const courseTitle = document.getElementById('courseTitle');
         const courseSubtitle = document.getElementById('courseSubtitle');
         if (courseTitle) courseTitle.textContent = `${courseName} - Cohorts`;
         if (courseSubtitle) courseSubtitle.textContent = `Course ID: ${courseId}`;
-        
+
         await loadCohortsTable(courseId);
     }
 
@@ -205,7 +204,7 @@ export default function loadCohorts() {
         try {
             const response = await axios.get(`/staff/cohorts/${courseId}`);
             const data = response.data;
-            
+
             renderCohortsTable(data.cohorts || []);
         } catch (error) {
             console.error('Error loading cohorts:', error);
@@ -223,7 +222,7 @@ export default function loadCohorts() {
     function renderCohortsTable(cohorts) {
         const tbody = document.getElementById('cohortsTableBody');
         if (!tbody) return;
-        
+
         if (!cohorts || cohorts.length === 0) {
             tbody.innerHTML = `
                 <tr>
@@ -236,7 +235,7 @@ export default function loadCohorts() {
             updatePaginationInfo(0);
             return;
         }
-        
+
         tbody.innerHTML = cohorts.map(cohort => `
             <tr class="group hover:bg-slate-50/80 transition-colors">
                 <td class="p-4">
@@ -276,7 +275,7 @@ export default function loadCohorts() {
                 </td>
             </tr>
         `).join('');
-        
+
         updatePaginationInfo(cohorts.length);
     }
 
@@ -284,7 +283,7 @@ export default function loadCohorts() {
         const rangeStart = document.getElementById('cohortRangeStart');
         const rangeEnd = document.getElementById('cohortRangeEnd');
         const cohortTotal = document.getElementById('cohortTotal');
-        
+
         if (rangeStart) rangeStart.textContent = '1';
         if (rangeEnd) rangeEnd.textContent = Math.min(5, total).toString();
         if (cohortTotal) cohortTotal.textContent = total.toString();
@@ -320,10 +319,10 @@ export default function loadCohorts() {
     function openNewCohortModal(courseId, courseName) {
         currentCourseId = courseId;
         currentCourseName = courseName;
-        
+
         const modalCourseId = document.getElementById('modal_course_id');
         const modalCourseTitle = document.getElementById('modalCourseTitle');
-        
+
         if (modalCourseId) modalCourseId.value = courseId;
         if (modalCourseTitle) modalCourseTitle.textContent = `For: ${courseName} (${courseId})`;
         if (createCohortModal) createCohortModal.style.display = 'flex';
@@ -359,7 +358,7 @@ export default function loadCohorts() {
             closeModalBtn.addEventListener('click', handler);
             eventListeners.push({ element: closeModalBtn, event: 'click', handler });
         }
-        
+
         if (cancelModalBtn) {
             const handler = closeCreateCohortModal;
             cancelModalBtn.addEventListener('click', handler);
@@ -394,7 +393,7 @@ export default function loadCohorts() {
 
     async function handleCreateCohort(e) {
         e.preventDefault();
-        
+
         const submitBtn = document.getElementById('submitCohortBtn');
         if (!submitBtn) return;
 
@@ -408,23 +407,23 @@ export default function loadCohorts() {
             const response = await axios.post('/staff/createCohort', formData);
 
             if (response.data.success) {
-                alert('Cohort created successfully!');
+                toast.success('Cohort created successfully!');
                 closeCreateCohortModal();
-                
+
                 // Reload cohorts table if we're viewing them
                 if (currentCourseId && cohortsTableView && cohortsTableView.style.display !== 'none') {
                     await loadCohortsTable(currentCourseId);
                 }
             } else {
-                alert(response.data.message || 'Failed to create cohort');
+                toast.error(response.data.message || 'Failed to create cohort');
             }
         } catch (error) {
             console.error('Error creating cohort:', error);
             if (error.response?.data?.errors) {
                 const errors = Object.values(error.response.data.errors).flat();
-                alert(errors.join('\n'));
+                toast.error(errors.join('\n'));
             } else {
-                alert(error.response?.data?.message || 'An error occurred while creating the cohort');
+                toast.error(error.response?.data?.message || 'An error occurred while creating the cohort');
             }
         } finally {
             submitBtn.innerHTML = originalContent;
@@ -434,7 +433,7 @@ export default function loadCohorts() {
 
     async function handleSearch(e) {
         const searchTerm = e.target.value.trim();
-        
+
         if (searchTerm === '') {
             await loadCourses();
             return;
@@ -443,8 +442,8 @@ export default function loadCohorts() {
         try {
             const response = await axios.get(`/staff/search?q=${encodeURIComponent(searchTerm)}`);
             const coursesData = response.data.data || (Array.isArray(response.data) ? response.data : []);
-            const courses = Array.isArray(coursesData) 
-                ? coursesData.map(formatCourseData) 
+            const courses = Array.isArray(coursesData)
+                ? coursesData.map(formatCourseData)
                 : [];
             renderCourseCards(courses);
         } catch (error) {
@@ -468,21 +467,21 @@ export default function loadCohorts() {
         if (!confirm('Are you sure you want to delete this cohort? This action cannot be undone.')) {
             return;
         }
-        
+
         try {
             const response = await axios.delete(`/staff/cohorts/${cohortId}`);
-            
+
             if (response.data.success) {
-                alert('Cohort deleted successfully!');
+                toast.success('Cohort deleted successfully!');
                 if (currentCourseId) {
                     await loadCohortsTable(currentCourseId);
                 }
             } else {
-                alert(response.data.message || 'Failed to delete cohort');
+                toast.error(response.data.message || 'Failed to delete cohort');
             }
         } catch (error) {
             console.error('Error deleting cohort:', error);
-            alert(error.response?.data?.message || 'Failed to delete cohort');
+            toast.error(error.response?.data?.message || 'Failed to delete cohort');
         }
     };
 

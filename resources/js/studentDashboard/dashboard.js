@@ -60,13 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             navigationMenu.appendChild(button);
 
-            // Add section divider before personal items
-            if (module.mod_label === 'Profile') {
-                const divider = document.createElement('div');
-                divider.className = "pt-4 pb-2";
-                divider.innerHTML = '<p class="px-3 text-xs font-medium text-purple-300 uppercase tracking-wider nav-text">Personal</p>';
-                navigationMenu.appendChild(divider);
-            }
+
         });
     }
 
@@ -135,10 +129,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, 300);
     }
-    
+
     // Start initialization
     initializeDashboard();
-    
+
     // Initialize announcement notifications
     let announcementNotificationsCleanup = null;
     try {
@@ -146,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
         console.error('Failed to initialize announcement notifications:', error);
     }
-    
+
     // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
         if (announcementNotificationsCleanup) {

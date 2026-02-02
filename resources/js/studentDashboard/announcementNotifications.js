@@ -42,9 +42,9 @@ export default function initStudentAnnouncementNotifications() {
      */
     async function loadAnnouncements(limit = 5) {
         if (isLoading) return;
-        
+
         isLoading = true;
-        
+
         try {
             const response = await axios.get('/announcements/recipients/list', {
                 params: {
@@ -56,7 +56,7 @@ export default function initStudentAnnouncementNotifications() {
             if (response.data.success) {
                 const announcements = response.data.data || [];
                 renderAnnouncements(announcements);
-                
+
                 // Update unread count
                 unreadCount = response.data.pagination?.total || 0;
                 updateUnreadBadge();
@@ -114,7 +114,7 @@ export default function initStudentAnnouncementNotifications() {
             const truncatedContent = content.length > 80 ? content.substring(0, 80) + '...' : content;
 
             return `
-                <div class="announcement-item p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer" 
+                <div class="announcement-item p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
                      data-announcement-id="${announcement.announcement_id}"
                      onclick="window.viewStudentAnnouncementNotification('${announcement.announcement_id}')">
                     <div class="flex items-start gap-3">
@@ -148,7 +148,7 @@ export default function initStudentAnnouncementNotifications() {
      */
     function formatTimeAgo(dateString) {
         if (!dateString) return 'Just now';
-        
+
         try {
             const date = new Date(dateString);
             const now = new Date();
@@ -158,7 +158,7 @@ export default function initStudentAnnouncementNotifications() {
             if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
             if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
             if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-            
+
             return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
         } catch (e) {
             return 'Recently';
@@ -194,7 +194,7 @@ export default function initStudentAnnouncementNotifications() {
      */
     function toggleDropdown() {
         isDropdownOpen = !isDropdownOpen;
-        
+
         if (isDropdownOpen) {
             dropdown.classList.remove('hidden');
             loadAnnouncements();
@@ -218,23 +218,23 @@ export default function initStudentAnnouncementNotifications() {
         try {
             // Mark as read
             await axios.post(`/announcements/recipients/${announcementId}/mark-read`);
-            
+
             // View announcement
             const response = await axios.get(`/announcements/recipients/${announcementId}`);
-            
+
             if (response.data.success) {
                 const announcement = response.data.data.announcement;
-                
+
                 // Show announcement in modal
                 showAnnouncementModal(announcement);
-                
+
                 // Reload dropdown
                 loadAnnouncements();
                 loadUnreadCount();
             }
         } catch (error) {
             console.error('Failed to view announcement:', error);
-            alert('Failed to load announcement');
+            toast.error('Failed to load announcement');
         }
     };
 

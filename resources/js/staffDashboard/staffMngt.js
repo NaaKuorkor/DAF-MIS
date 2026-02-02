@@ -63,11 +63,9 @@ export default function loadStaff() {
             const randomColor = colors[Math.floor(Math.random() * colors.length)];
 
             const positionBadges = {
-                'Senior Lecturer': 'bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10',
-                'Dept. Head': 'bg-blue-50 text-blue-700 ring-1 ring-inset ring-blue-700/10',
-                'Administrator': 'bg-gray-100 text-gray-700 ring-1 ring-inset ring-gray-700/10',
                 'default': 'bg-purple-50 text-purple-700 ring-1 ring-inset ring-purple-700/10'
             };
+
             const badgeClass = positionBadges[s.position] || positionBadges['default'];
 
             html += `
@@ -119,7 +117,7 @@ export default function loadStaff() {
 
     function getEditModal() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-        
+
         return `
         <template x-teleport="body">
             <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
@@ -133,14 +131,14 @@ export default function loadStaff() {
                     </div>
                     <form method="POST" action="/staff/updateStaff" @submit.prevent="
                         axios.post('/staff/updateStaff', new FormData($event.target))
-                            .then(r => { 
-                                if(r.data.success) { 
-                                    modalOpen=false; 
-                                    alert(r.data.message); 
+                            .then(r => {
+                                if(r.data.success) {
+                                    modalOpen=false;
+                                    toast.success(r.data.message);
                                     window.dispatchEvent(new CustomEvent('refreshStaffTable'));
                                 }
                             })
-                            .catch(e => alert(e.response?.data?.message || 'Update failed'))
+                            .catch(e => toast.error(e.response?.data?.message || 'Update failed'))
                     " class="p-6 max-h-[70vh] overflow-y-auto">
                         <input type="hidden" name="_token" value="${csrfToken}">
                         <input type="hidden" name="userid" x-model="staff.userid">
@@ -222,7 +220,19 @@ export default function loadStaff() {
                             <p class="text-sm text-gray-500 text-center mb-6">Are you sure you want to delete this staff member? This action cannot be undone.</p>
                             <div class="flex items-center gap-3">
                                 <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
-                                <button @click="axios.post('/staff/deleteStaff', {userid: staff.userid}).then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }}).catch(e => alert(e.response?.data?.message || 'Deletion failed'))" class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
+                                <button @click="
+                                    axios.post('/staff/deleteStaff', { userid: staff.userid })
+                                        .then(r => {
+                                            if (r.data && r.data.success) {
+                                                modalOpen = false;
+                                                toast.success(r.data.message);
+                                                window.dispatchEvent(new CustomEvent('refreshStaffTable'));
+                                            } else {
+                                                alert(r.data?.message || 'Deletion failed');
+                                            }
+                                        })
+                                        .catch(e => toast.error(e.response?.data?.message || 'Deletion failed'))
+                                " class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
                             </div>
                         </div>
                     </div>

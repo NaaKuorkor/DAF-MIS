@@ -362,30 +362,27 @@ class StudentMngtController extends Controller
                 $modulePriviledges = [
                     [
                         'userid' => $user->userid,
-                        'modid' => 'MOD001',
+                        'modid' => 'MOD012', // Courses and Cohorts
                         'mod_create' => 0,
                         'mod_read' => 1,
                         'mod_update' => 0,
                         'mod_delete' => 0,
-
                     ],
                     [
                         'userid' => $user->userid,
-                        'modid' => 'MOD004',
-                        'mod_create' => 0,
-                        'mod_read' => 1,
-                        'mod_update' => 0,
-                        'mod_delete' => 0,
-
-                    ],
-                    [
-                        'userid' => $user->userid,
-                        'modid' => 'MOD007',
+                        'modid' => 'MOD013', // Announcements
                         'mod_create' => 0,
                         'mod_read' => 1,
                         'mod_update' => 1,
                         'mod_delete' => 0,
-
+                    ],
+                    [
+                        'userid' => $user->userid,
+                        'modid' => 'MOD014', // Profile
+                        'mod_create' => 0,
+                        'mod_read' => 1,
+                        'mod_update' => 1,
+                        'mod_delete' => 0,
                     ]
                 ];
 

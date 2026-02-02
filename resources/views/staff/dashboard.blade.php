@@ -6,7 +6,7 @@
         <title>@yield('title', 'Staff Dashboard')</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         @vite(['resources/css/app.css', 'resources/js/staff.js'])
-        <script src="https://kit.fontawesome.com/856b94abea.js" crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="{{ asset('vendor/fontawesome/css/all.min.css') }}">
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="//unpkg.com/alpinejs" defer></script>
         <style>
@@ -94,7 +94,7 @@
                             <i class="fas fa-bell text-xl"></i>
                             <span id="announcementUnreadBadge" class="absolute top-1 right-1 min-w-[18px] h-[18px] bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center px-1 border-2 border-white" style="display: none;">0</span>
                         </button>
-                        
+
                         <!-- Announcements Dropdown -->
                         <div id="announcementDropdown" class="hidden absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-[600px] overflow-hidden">
                             <div class="p-4 border-b border-gray-200 flex items-center justify-between bg-gradient-to-r from-purple-50 to-purple-100">
@@ -114,7 +114,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
                     <form action="{{ route('staff.logout') }}" method="POST" class="inline">

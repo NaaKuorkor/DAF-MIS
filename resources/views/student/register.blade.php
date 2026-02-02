@@ -171,6 +171,8 @@
     .hidden-section { opacity: 0; transform: translateX(10px); pointer-events: none; position: absolute; }
     .visible-section { opacity: 1; transform: translateX(0); }
 </style>
-
-@vite(['resources/js/register.js'])
 @endsection
+
+@push('scripts')
+@vite(['resources/js/register.js'])
+@endpush

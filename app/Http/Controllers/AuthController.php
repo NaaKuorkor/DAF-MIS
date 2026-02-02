@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OTP;
 use Illuminate\Http\Request;
 use App\Models\TblUser;
 use App\Services\SmsService;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -102,13 +103,25 @@ class AuthController extends Controller
             }
 
             $otp = rand(100000, 999999);
-            
+
             // Store OTP in cache with email
             Cache::put('otp:' . $user->email, [
                 'otp' => $otp,
                 'email' => $user->email
             ], now()->addMinutes(10)); // OTP expires in 10 minutes
-            
+
+            try {
+                Mail::to($user->email)->send(new OTP($user, $otp));
+                Log::info('OTP sent to email', ['userid' => $user->userid, 'email' => $user->email]);
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send otp', [
+                    'userid' => $user->userid,
+                    'email' => $user->email,
+                    'error' => $mailError->getMessage()
+                ]);
+            }
+
+
             $message = "Below is your code for verification\n{$otp}";
 
             $phone = preg_replace('/^0/', '233', $user->phone);
@@ -128,7 +141,7 @@ class AuthController extends Controller
         }
     }
 
-    
+
     public function verifyOTP(Request $request)
     {
         $otp = $request->input('otp');
@@ -187,67 +200,69 @@ class AuthController extends Controller
 
     // Add after the forgotPassword method (around line 120)
 
-public function showForgotPassword()
-{
-    return view('forgotPassword');
-}
-
-public function showVerifyOTP(Request $request)
-{
-    // Get email from session or request
-    $email = session('reset_email') ?? $request->input('email', 'your email');
-    
-    // Mask the email for display
-    $maskedEmail = $this->maskEmail($email);
-    
-    return view('verifyOtp', compact('maskedEmail', 'email'));
-}
-
-public function showResetPassword(Request $request)
-{
-    // Validate token if using token-based reset
-    // For now, we'll assume user is authenticated or has valid session
-    return view('resetPassword');
-}
-
-public function resetPassword(Request $request)
-{
-    $fields = $request->validate([
-        'old_password' => 'required|string',
-        'new_password' => 'required|string|min:8|confirmed',
-    ]);
-
-    $user = Auth::user();
-
-    // Verify old password
-    if (!Hash::check($fields['old_password'], $user->password)) {
-        return back()->withErrors(['old_password' => 'Current password is incorrect'])->withInput();
+    public function showForgotPassword()
+    {
+        return view('forgotPassword');
     }
 
-    // Update password
-    $user->update([
-        'password' => Hash::make($fields['new_password'])
-    ]);
+    public function showVerifyOTP(Request $request)
+    {
+        // Get email from session or request
+        $email = session('reset_email') ?? $request->input('email', 'your email');
 
-    return redirect()->route('login.form')->with('success', 'Password reset successfully! Please login with your new password.');
-}
+        // Mask the email for display
+        $maskedEmail = $this->maskEmail($email);
 
-private function maskEmail($email)
-{
-    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        return 'your email';
+        return view('verifyOtp', compact('maskedEmail', 'email'));
     }
-    
-    $parts = explode('@', $email);
-    $username = $parts[0];
-    $domain = $parts[1] ?? '';
-    
-    if (strlen($username) <= 2) {
-        $maskedUsername = str_repeat('*', strlen($username));
-    } else {
-        $maskedUsername = substr($username, 0, 2) . str_repeat('*', strlen($username) - 2);
+
+    public function showResetPassword(Request $request)
+    {
+
+        return view('resetPassword');
     }
-    
-    return $maskedUsername . '@' . $domain;
-}
+
+    public function resetPassword(Request $request)
+    {
+        $fields = $request->validate([
+            'old_password' => 'required|string',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        // Update password
+        $user->update([
+            'password' => Hash::make($fields['new_password'])
+        ]);
+
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        if ($user->user_type === "STU") {
+            return redirect()->route('login.form')->with('success', 'Password reset successfully! Please login with your new password.');
+        } else {
+            return redirect()->route('staff.login.form')->with('success', 'Password reset successfully! Please login with your new password.');
+        }
+    }
+
+    private function maskEmail($email)
+    {
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return 'your email';
+        }
+
+        $parts = explode('@', $email);
+        $username = $parts[0];
+        $domain = $parts[1] ?? '';
+
+        if (strlen($username) <= 2) {
+            $maskedUsername = str_repeat('*', strlen($username));
+        } else {
+            $maskedUsername = substr($username, 0, 2) . str_repeat('*', strlen($username) - 2);
+        }
+
+        return $maskedUsername . '@' . $domain;
+    }
 }

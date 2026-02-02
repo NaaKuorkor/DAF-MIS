@@ -120,8 +120,8 @@ export default function loadStudents() {
 </div>
 <form method="POST" action="/staff/updateStudent" @submit.prevent="
 axios.post('/staff/updateStudent', new FormData($event.target))
-.then(r => { if(r.data.success) { modalOpen=false; alert(r.data.message); location.reload(); }})
-.catch(e => alert(e.response?.data?.message || 'Update failed'))
+.then(r => { if(r.data.success) { modalOpen=false; toast.success(r.data.message); location.reload(); }})
+.catch(e => toast.error(e.response?.data?.message || 'Update failed'))
 " class="p-6 max-h-[70vh] overflow-y-auto">
 <input type="hidden" name="_token" value="${document.querySelector('meta[name="csrf-token"]').content}">
 <input type="hidden" name="userid" x-model="student.userid">

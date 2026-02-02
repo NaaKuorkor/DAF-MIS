@@ -25,7 +25,9 @@ class StaffMngtController extends Controller
     {
         $staff = TblStaff::with(
             'user'
-        )->orderBy('createdate', 'desc')
+        )->whereHas('user', function ($query) {
+            $query->where('deleted', '0');
+        })->orderBy('createdate', 'desc')
             ->paginate(10);
 
 
@@ -33,13 +35,13 @@ class StaffMngtController extends Controller
             return [
                 'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
                 'staffid' => $s->staffid,
-                'userid' => $s->user->userid,
+                'userid' => $s->user?->userid,
                 'fname' => $s->fname,
                 'mname' => $s->mname,
                 'lname' => $s->lname,
                 'age' => $s->age,
-                'email' => $s->user->email,
-                'phone' => $s->user->phone,
+                'email' => $s->user?->email,
+                'phone' => $s->user?->phone,
                 'gender' => $s->gender,
                 'residence' => $s->residence,
                 'position' => $s->position,
@@ -54,20 +56,22 @@ class StaffMngtController extends Controller
     {
         $staff = TblStaff::with(
             'user'
-        )->orderBy('lname', 'desc')
+        )->whereHas('user', function ($query) {
+            $query->where('deleted', '0');
+        })->orderBy('lname', 'desc')
             ->paginate(10);
 
         $staff->getCollection()->transform(function ($s) {
             return [
                 'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
                 'staffid' => $s->staffid,
-                'userid' => $s->user->userid,
+                'userid' => $s->user?->userid,
                 'fname' => $s->fname,
                 'mname' => $s->mname,
                 'lname' => $s->lname,
                 'age' => $s->age,
-                'email' => $s->user->email,
-                'phone' => $s->user->phone,
+                'email' => $s->user?->email,
+                'phone' => $s->user?->phone,
                 'gender' => $s->gender,
                 'residence' => $s->residence,
                 'position' => $s->position,
@@ -88,7 +92,9 @@ class StaffMngtController extends Controller
             //Eagerload relationships and identify only undeleted staff
             $staff = TblStaff::with(
                 'user'
-            )->where(
+            )->whereHas('user', function ($query) {
+                $query->where('deleted', '0');
+            })->where(
                 function ($querybuilder) use ($searchTerm) {
                     $querybuilder->where('fname', 'LIKE', $searchTerm)
                         ->orWhere('lname', 'LIKE', $searchTerm)
@@ -101,13 +107,13 @@ class StaffMngtController extends Controller
                 return [
                     'name' => $s->lname . ' ' . $s->mname . ' ' . $s->fname,
                     'staffid' => $s->staffid,
-                    'userid' => $s->user->userid,
+                    'userid' => $s->user?->userid,
                     'fname' => $s->fname,
                     'mname' => $s->mname,
                     'lname' => $s->lname,
                     'age' => $s->age,
-                    'email' => $s->user->email,
-                    'phone' => $s->user->phone,
+                    'email' => $s->user?->email,
+                    'phone' => $s->user?->phone,
                     'gender' => $s->gender,
                     'residence' => $s->residence,
                     'position' => $s->position,

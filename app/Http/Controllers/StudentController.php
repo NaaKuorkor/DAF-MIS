@@ -38,18 +38,19 @@ class StudentController extends Controller
                 'fname' => 'required|string|max:255',
                 'mname' => 'nullable|string|max:255',
                 'lname' => 'required|string|max:255',
-                'email' => 'required|email',
+                'email' => 'required|email|unique:tbluser,email',
                 'phone' => 'required|string|max:15',
-                'gender' => 'required|string',
-                'age' => 'required|integer',
-                'residence' => 'required|string',
+                'password' => 'required|string|min:8|confirmed',
+                'gender' => 'required|string|in:M,F',
+                'age' => 'required|integer|min:1|max:120',
+                'residence' => 'required|string|max:255',
                 'referral' => 'required|string',
                 'employment_status' => 'required|string',
-                'certificate' => 'required|string',
-                'course' => 'required|string'
+                'certificate' => 'required|string|in:Y,N',
+                'course' => 'required|string|exists:tblcourse,course_id'
             ]);
 
-            $password = $request->password ? Hash::make($request->password) : Hash::make($request->phone);
+            $password = Hash::make($validateData['password']);
 
             //Create student to be inserted into the databases
 
@@ -120,30 +121,27 @@ class StudentController extends Controller
                 $modulePriviledges = [
                     [
                         'userid' => $user->userid,
-                        'modid' => 'MOD001',
+                        'modid' => 'MOD012', // Courses and Cohorts
                         'mod_create' => 0,
                         'mod_read' => 1,
                         'mod_update' => 0,
                         'mod_delete' => 0,
-
                     ],
                     [
                         'userid' => $user->userid,
-                        'modid' => 'MOD004',
-                        'mod_create' => 0,
-                        'mod_read' => 1,
-                        'mod_update' => 0,
-                        'mod_delete' => 0,
-
-                    ],
-                    [
-                        'userid' => $user->userid,
-                        'modid' => 'MOD007',
+                        'modid' => 'MOD013', // Announcements
                         'mod_create' => 0,
                         'mod_read' => 1,
                         'mod_update' => 1,
                         'mod_delete' => 0,
-
+                    ],
+                    [
+                        'userid' => $user->userid,
+                        'modid' => 'MOD014', // Profile
+                        'mod_create' => 0,
+                        'mod_read' => 1,
+                        'mod_update' => 1,
+                        'mod_delete' => 0,
                     ]
                 ];
 
@@ -169,20 +167,16 @@ class StudentController extends Controller
             );
 
             //Send mail with verification link.
-            Mail::to($user->email)->send(new Verify($student, $verificationLink));
-
-            if (!$request->password) {
-                //Change phone format to have the country code
-                $phone = preg_replace('/^0/', '233', $user->phone);
-                //Interpolate name, email and password within message
-                $message = "Thank you {$student->fname} for registering to be a part of DAF.\n Your login credentials are as follows.\n
-                Email : {$user->email}\n
-                Password : {$request->phone}\n
-                You have the liberty to change your password once you login.\n
-                Enjoy your time with us!
-                ";
-
-                $sms->send($phone, $message);
+            try {
+                Mail::to($user->email)->send(new Verify($student, $verificationLink));
+                Log::info('Verification email sent', ['userid' => $user->userid, 'email' => $user->email]);
+            } catch (\Exception $mailError) {
+                Log::error('Failed to send verification email', [
+                    'userid' => $user->userid,
+                    'email' => $user->email,
+                    'error' => $mailError->getMessage()
+                ]);
+                // Don't fail registration if email fails, but log it
             }
 
             // Always return JSON for API requests (ajax, wantsJson, or expectsJson)
@@ -190,26 +184,35 @@ class StudentController extends Controller
             $acceptsJson = $request->ajax() || $request->wantsJson() || $request->expectsJson() || 
                           str_contains($request->header('Accept', ''), 'application/json');
             
+            Log::info('Student registration successful', [
+                'userid' => $user->userid,
+                'email' => $user->email,
+                'accepts_json' => $acceptsJson
+            ]);
+            
             if ($acceptsJson) {
                 return response()->json([
                     'success' => true,
-                    'message' => 'Account created successfully!'
+                    'message' => 'Registration successful! Please check your email for verification link.'
                 ]);
             } else {
-                return back()->with('Success', 'Account created successfully!');
+                return redirect('/email/verify')->with('success', 'Registration successful! Please check your email for verification link.');
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Log validation errors
             Log::warning('Student registration validation failed', [
                 'errors' => $e->errors(),
-                'request_data' => $request->all()
+                'request_data' => $request->except(['password', 'password_confirmation'])
             ]);
 
             // Always return JSON for AJAX/API requests
-            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            $acceptsJson = $request->ajax() || $request->wantsJson() || $request->expectsJson() || 
+                          str_contains($request->header('Accept', ''), 'application/json');
+            
+            if ($acceptsJson) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Validation failed',
+                    'message' => 'Validation failed. Please check your input.',
                     'errors' => $e->errors()
                 ], 422);
             } else {
@@ -221,17 +224,20 @@ class StudentController extends Controller
                 'file' => $e->getFile(),
                 'line' => $e->getLine(),
                 'trace' => $e->getTraceAsString(),
-                'request_data' => $request->all()
+                'request_data' => $request->except(['password', 'password_confirmation'])
             ]);
 
             // Always return JSON for AJAX/API requests
-            if ($request->ajax() || $request->wantsJson() || $request->expectsJson()) {
+            $acceptsJson = $request->ajax() || $request->wantsJson() || $request->expectsJson() || 
+                          str_contains($request->header('Accept', ''), 'application/json');
+            
+            if ($acceptsJson) {
                 return response()->json([
                     'success' => false,
-                    'message' => $e->getMessage() ?: "Registration failed. Try again"
+                    'message' => $e->getMessage() ?: "Registration failed. Please try again."
                 ], 500);
             } else {
-                return back()->withErrors("Registration failed. Try again")->withInput();
+                return back()->withErrors("Registration failed. Please try again.")->withInput();
             }
         }
     }

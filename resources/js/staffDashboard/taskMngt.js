@@ -129,7 +129,7 @@ export default function loadTasks() {
             due_date: task.due_date ? task.due_date.split(' ')[0].split('T')[0] : ''
         };
         const taskData = JSON.stringify(formattedTask).replace(/'/g, "\\'");
-        
+
         return `
         <div x-data='{
             modalOpen: false,
@@ -144,7 +144,7 @@ export default function loadTasks() {
 
     function getEditModal() {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content || '';
-        
+
         return `
         <template x-teleport="body">
             <div x-show="modalOpen" class="fixed inset-0 z-[99] flex items-center justify-center p-4" x-cloak>
@@ -189,37 +189,37 @@ export default function loadTasks() {
                     <!-- Form -->
                     <form method="POST" action="/staff/tasks/update" @submit.prevent="
                         axios.post('/staff/tasks/' + task.task_id, new FormData($event.target))
-                            .then(r => { 
-                                if(r.data.success) { 
-                                    modalOpen=false; 
-                                    alert(r.data.message || 'Task updated successfully!');
-                                    if(window.loadTasks) window.loadTasks(); 
+                            .then(r => {
+                                if(r.data.success) {
+                                    modalOpen=false;
+                                    toast.success(r.data.message || 'Task updated successfully!');
+                                    if(window.loadTasks) window.loadTasks();
                                 } else {
-                                    alert(r.data.message || 'Task update failed');
+                                    toast.error(r.data.message || 'Task update failed');
                                 }
                             })
                             .catch(e => {
                                 if (e.response?.data?.errors) {
                                     const errors = Object.values(e.response.data.errors).flat();
-                                    alert(errors.join('\\n') || 'Validation failed');
+                                    toast.error(errors[0] || 'Validation failed');
                                 } else {
-                                    alert(e.response?.data?.message || 'Task update failed');
+                                    toast.error(e.response?.data?.message || 'Task update failed');
                                 }
                             })
                     " class="p-6 max-h-[70vh] overflow-y-auto">
                         <input type="hidden" name="_token" value="${csrfToken}">
                         <input type="hidden" name="_method" value="PUT">
-                        
+
                         <div class="space-y-6">
                             <!-- Title -->
                             <div>
                                 <label for="edit_task_title" class="block text-sm font-medium text-gray-700 mb-2">
                                     Task Title <span class="text-red-500">*</span>
                                 </label>
-                                <input 
-                                    type="text" 
-                                    id="edit_task_title" 
-                                    name="title" 
+                                <input
+                                    type="text"
+                                    id="edit_task_title"
+                                    name="title"
                                     x-model="task.title"
                                     required
                                     placeholder="Enter task title"
@@ -232,9 +232,9 @@ export default function loadTasks() {
                                 <label for="edit_task_description" class="block text-sm font-medium text-gray-700 mb-2">
                                     Description
                                 </label>
-                                <textarea 
-                                    id="edit_task_description" 
-                                    name="description" 
+                                <textarea
+                                    id="edit_task_description"
+                                    name="description"
                                     x-model="task.description"
                                     rows="4"
                                     placeholder="Enter task description (optional)"
@@ -248,10 +248,10 @@ export default function loadTasks() {
                                     <label for="edit_task_due_date" class="block text-sm font-medium text-gray-700 mb-2">
                                         Due Date <span class="text-red-500">*</span>
                                     </label>
-                                    <input 
-                                        type="date" 
-                                        id="edit_task_due_date" 
-                                        name="due_date" 
+                                    <input
+                                        type="date"
+                                        id="edit_task_due_date"
+                                        name="due_date"
                                         x-model="task.due_date"
                                         required
                                         class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all"
@@ -262,9 +262,9 @@ export default function loadTasks() {
                                     <label for="edit_task_priority" class="block text-sm font-medium text-gray-700 mb-2">
                                         Priority <span class="text-red-500">*</span>
                                     </label>
-                                    <select 
-                                        id="edit_task_priority" 
-                                        name="priority" 
+                                    <select
+                                        id="edit_task_priority"
+                                        name="priority"
                                         x-model="task.priority"
                                         required
                                         class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all"
@@ -282,9 +282,9 @@ export default function loadTasks() {
                                 <label for="edit_task_status" class="block text-sm font-medium text-gray-700 mb-2">
                                     Status <span class="text-red-500">*</span>
                                 </label>
-                                <select 
-                                    id="edit_task_status" 
-                                    name="status" 
+                                <select
+                                    id="edit_task_status"
+                                    name="status"
                                     x-model="task.status"
                                     required
                                     class="w-full px-4 py-2.5 bg-white border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-300 focus:border-purple-600 transition-all"
@@ -298,14 +298,14 @@ export default function loadTasks() {
 
                         <!-- Footer -->
                         <div class="flex items-center justify-end gap-3 mt-8 pt-6 border-t border-purple-100">
-                            <button 
-                                type="button" 
+                            <button
+                                type="button"
                                 @click="modalOpen = false"
                                 class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                             >
                                 Cancel
                             </button>
-                            <button 
+                            <button
                                 type="submit"
                                 class="flex items-center gap-2 px-6 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition-all shadow-sm shadow-purple-600/20"
                             >

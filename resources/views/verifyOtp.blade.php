@@ -25,7 +25,7 @@
         </div>
 
         <!-- OTP Form -->
-        <form action="{{ route('verifyOtp') }}" method="POST" id="otpForm">
+        <form action="{{ route('verifyOTP') }}" method="POST" id="otpForm">
             @csrf
 
             <!-- Hidden input to collect full OTP -->

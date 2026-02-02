@@ -32,7 +32,7 @@ export default function loadAnnouncements() {
     // Initialize
     loadAnnouncementsData();
     setupEventListeners();
-    
+
     // Listen for reload events
     window.addEventListener('reloadAnnouncements', () => {
         loadAnnouncementsData(1, false);
@@ -40,7 +40,7 @@ export default function loadAnnouncements() {
 
     async function loadAnnouncementsData(page = 1, append = false) {
         if (isLoading) return;
-        
+
         isLoading = true;
         currentPage = page;
 
@@ -58,14 +58,14 @@ export default function loadAnnouncements() {
             if (currentFilter !== 'all') {
                 params.append('filter', currentFilter === 'drafts' ? 'drafts' : 'scheduled');
             }
-            
+
             // FIXED: Use /list endpoint for API call
             const url = `/staff/announcements/list?${params.toString()}`;
             const response = await axios.get(url);
 
             if (response.data.success) {
                 const { data, pagination, stats } = response.data;
-                
+
                 // Update stats
                 if (activeCount) activeCount.textContent = stats?.active || 0;
                 if (scheduledCount) scheduledCount.textContent = stats?.scheduled || 0;
@@ -190,12 +190,10 @@ export default function loadAnnouncements() {
     function formatAudience(audience) {
         if (!audience) return 'Everyone';
         const audienceArray = Array.isArray(audience) ? audience : JSON.parse(audience || '[]');
-        
+
         const labels = {
             'all_staff': 'All Staff',
             'all_students': 'All Students',
-            'dept_heads': 'Department Heads',
-            'academic_staff': 'Academic Staff',
             'everyone': 'Everyone'
         };
 
@@ -387,7 +385,7 @@ export default function loadAnnouncements() {
             draftStatus.textContent = 'Draft';
         }
         currentEditingId = null;
-        
+
         // Reset broadcast button text
         const broadcastBtn = document.getElementById('broadcastBtn');
         if (broadcastBtn) {
@@ -401,7 +399,7 @@ export default function loadAnnouncements() {
 
         const formData = new FormData(form);
         formData.append('action', action);
-        
+
         // Ensure audience is sent as single string value (not array)
         const audienceSelect = document.getElementById('audienceSelect');
         if (audienceSelect) {
@@ -429,18 +427,18 @@ export default function loadAnnouncements() {
 
             if (response.data.success) {
                 alert(response.data.message || (action === 'broadcast' ? 'Announcement broadcasted successfully!' : 'Draft saved successfully!'));
-                
+
                 // Reset form
                 form.reset();
                 scheduleOptions.style.display = 'none';
                 if (scheduleToggle) scheduleToggle.checked = false;
-                
+
                 // Reset broadcast button text
                 const broadcastBtn = document.getElementById('broadcastBtn');
                 if (broadcastBtn) {
                     broadcastBtn.innerHTML = '<i class="fa fa-paper-plane text-xs"></i> Broadcast';
                 }
-                
+
                 currentEditingId = null;
 
                 // Reload announcements
@@ -487,7 +485,7 @@ export default function loadAnnouncements() {
             }
         } catch (error) {
             console.error('Error loading announcement:', error);
-            alert('Failed to load announcement details');
+            toast.error('Failed to load announcement details');
         }
     };
 
@@ -508,7 +506,7 @@ export default function loadAnnouncements() {
 
                 if (titleInput) titleInput.value = announcement.title || '';
                 if (contentInput) contentInput.value = announcement.content || '';
-                
+
                 // Set audience - handle both old array format and new single value format
                 if (audienceSelect) {
                     const audienceArray = Array.isArray(announcement.audience) ? announcement.audience : JSON.parse(announcement.audience || '[]');
@@ -571,7 +569,7 @@ export default function loadAnnouncements() {
             }
         } catch (error) {
             console.error('Error loading announcement for edit:', error);
-            alert('Failed to load announcement for editing');
+            toast.error('Failed to load announcement for editing');
         }
     };
 
@@ -620,7 +618,7 @@ export default function loadAnnouncements() {
                             }
                         }, 100);
                     } else {
-                        alert(response.data?.message || 'Failed to delete announcement');
+                        toast.error(response.data?.message || 'Failed to delete announcement');
                         this.deleting = false;
                         if (deleteBtn) {
                             deleteBtn.disabled = false;
@@ -630,7 +628,7 @@ export default function loadAnnouncements() {
                 } catch (error) {
                     console.error('Delete failed:', error);
                     const errorMessage = error.response?.data?.message || error.message || 'Failed to delete announcement';
-                    alert(errorMessage);
+                    toast.error(errorMessage);
                     this.deleting = false;
                     if (deleteBtn) {
                         deleteBtn.disabled = false;

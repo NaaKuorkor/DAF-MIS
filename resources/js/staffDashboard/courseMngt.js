@@ -31,7 +31,7 @@ export default function loadCourses() {
 
     // Track event listeners for cleanup
     const eventListeners = [];
-    
+
     // Store references to global functions for cleanup
     const globalFunctions = {
         viewCourseRegistrations: null,
@@ -129,7 +129,7 @@ export default function loadCourses() {
         });
 
         courseGrid.innerHTML = html;
-        
+
         // Initialize Alpine.js on the new content
         if (window.Alpine) {
             window.Alpine.initTree(courseGrid);
@@ -157,7 +157,7 @@ export default function loadCourses() {
             if (registrationView) registrationView.classList.remove('hidden');
         } catch (err) {
             console.error('Failed to load registrations:', err);
-            alert('Failed to load registrations');
+            toast.error('Failed to load registrations');
         }
     };
     window.viewCourseRegistrations = globalFunctions.viewCourseRegistrations;
@@ -169,7 +169,7 @@ export default function loadCourses() {
             renderRegistrationView(response.data.data, courseId);
         } catch (err) {
             console.error('Failed to reload registrations:', err);
-            alert('Failed to reload registrations');
+            toast.error('Failed to reload registrations');
         }
     };
     window.loadCourseRegistrations = globalFunctions.loadCourseRegistrations;
@@ -256,7 +256,7 @@ export default function loadCourses() {
                                                     loading = false;
                                                 })
                                                 .catch(e => {
-                                                    alert('Failed to load cohorts');
+                                                    toast.error('Failed to load cohorts');
                                                     loading = false;
                                                 });
                                         } else {
@@ -280,15 +280,15 @@ export default function loadCourses() {
                                                     })
                                                     .then(r => {
                                                         if (r.data.success) {
-                                                            alert(r.data.message);
+                                                            toast.success(r.data.message);
                                                             showDropdown = false;
                                                             window.loadCourseRegistrations('${courseId}');
                                                         } else {
-                                                            alert(r.data.message || 'Assignment failed');
+                                                            toast.error(r.data.message || 'Assignment failed');
                                                         }
                                                     })
                                                     .catch(e => {
-                                                        alert(e.response?.data?.message || 'Assignment failed');
+                                                        toast.error(e.response?.data?.message || 'Assignment failed');
                                                     });
                                                 " class="w-full text-left px-3 py-2 text-xs hover:bg-purple-50 rounded transition-colors">
                                                     <div class="font-medium text-gray-900" x-text="cohort.cohort_id"></div>
@@ -329,7 +329,7 @@ export default function loadCourses() {
         `;
 
         registrationView.innerHTML = html;
-        
+
         // Initialize Alpine.js on the new content
         if (window.Alpine) {
             window.Alpine.initTree(registrationView);
@@ -374,17 +374,17 @@ export default function loadCourses() {
                     </div>
                     <form method="POST" action="/staff/\${course.course_id}/update" @submit.prevent="
                         axios.post('/staff/' + course.course_id + '/update', new FormData(\$event.target))
-                            .then(r => { 
-                                if(r.data.success) { 
-                                    modalOpen=false; 
+                            .then(r => {
+                                if(r.data.success) {
+                                    modalOpen=false;
                                     loadAllCourses();
                                 } else {
-                                    alert(r.data.message || 'Update failed');
+                                    toast.error(r.data.message || 'Update failed');
                                 }
                             })
                             .catch(e => {
                                 console.error('Update error:', e);
-                                alert(e.response?.data?.message || 'Update failed');
+                                toast.error(e.response?.data?.message || 'Update failed');
                             })
                     " class="p-6 max-h-[70vh] overflow-y-auto">
                         <input type="hidden" name="_token" value="${csrfToken}">
@@ -447,17 +447,17 @@ export default function loadCourses() {
                                 <button @click="modalOpen = false" class="flex-1 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">Cancel</button>
                                 <button @click="
                                     axios.delete('/staff/' + courseId)
-                                        .then(r => { 
-                                            if(r.data.success) { 
-                                                modalOpen=false; 
+                                        .then(r => {
+                                            if(r.data.success) {
+                                                modalOpen=false;
                                                 loadAllCourses();
                                             } else {
-                                                alert(r.data.message || 'Deletion failed');
+                                                toast.error(r.data.message || 'Deletion failed');
                                             }
                                         })
                                         .catch(e => {
                                             console.error('Delete error:', e);
-                                            alert(e.response?.data?.message || 'Deletion failed');
+                                            toast.error(e.response?.data?.message || 'Deletion failed');
                                         })
                                 " class="flex-1 px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors shadow-sm">Delete</button>
                             </div>
@@ -468,30 +468,6 @@ export default function loadCourses() {
         </div>`;
     }
 
-    // Delete course (kept for backward compatibility but now handled by modal)
-    globalFunctions.deleteCourse = async function(courseId) {
-        // This is now handled by the modal, but keeping for any direct calls
-        if (!confirm('Are you sure you want to delete this course?')) return;
-
-        try {
-            const response = await axios.delete(`/staff/${courseId}`);
-            if (response.data.success) {
-                alert(response.data.message);
-                loadAllCourses();
-            }
-        } catch (err) {
-            console.error('Delete failed:', err);
-            alert('Failed to delete course');
-        }
-    };
-    window.deleteCourse = globalFunctions.deleteCourse;
-
-    // Edit course (kept for backward compatibility but now handled by modal)
-    globalFunctions.editCourse = function(course) {
-        // This is now handled by the modal, but keeping for any direct calls
-        console.log('Edit course:', course);
-    };
-    window.editCourse = globalFunctions.editCourse;
 
     // Create course modal trigger
     if (createCourseBtn) {
