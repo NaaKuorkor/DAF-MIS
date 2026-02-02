@@ -10,7 +10,7 @@ export default function loadTasks() {
 
     if (!taskRows) {
         console.warn('Task management elements not found');
-        return () => {};
+        return () => { };
     }
 
     let eventListeners = [];
@@ -101,7 +101,7 @@ export default function loadTasks() {
                     ${getStatusBadge(task.status)}
                 </td>
                 <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex items-center justify-end gap-2 transition-opacity">
                         ${task.status !== 'completed' ? `
                             <button onclick="window.markTaskComplete('${task.task_id}')" class="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors" title="Mark as Completed">
                                 <i class="fas fa-check-circle"></i>
@@ -440,7 +440,7 @@ export default function loadTasks() {
     }
 
     // Global functions
-    globalFunctions.markTaskComplete = async function(taskId) {
+    globalFunctions.markTaskComplete = async function (taskId) {
         try {
             const response = await axios.post(`/staff/tasks/${taskId}/complete`);
             if (response.data.success) {

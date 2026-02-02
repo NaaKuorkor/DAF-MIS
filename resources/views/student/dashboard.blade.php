@@ -83,13 +83,7 @@
         <div class="flex-1 flex flex-col h-full overflow-hidden">
 
             <!-- Header -->
-            <header class="h-16 bg-white/80 backdrop-blur-md border-b border-purple-200 flex items-center justify-between px-6 sticky top-0 z-10">
-                <div class="flex items-center flex-1">
-                    <div class="relative w-full max-w-md">
-                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
-                        <input type="text" placeholder="Search students, staff, or pages..." class="w-full pl-10 pr-4 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 transition-all placeholder:text-gray-400">
-                    </div>
-                </div>
+            <header class="h-16 bg-white/80 backdrop-blur-md border-b border-purple-200 flex items-center justify-end px-6 sticky top-0 z-10">
 
                 <div class="flex items-center gap-3">
                     <!-- Announcements Bell Icon -->
@@ -119,9 +113,7 @@
                         </div>
                     </div>
 
-                    <button class="p-2 text-gray-500 hover:bg-purple-50 rounded-full transition-colors">
-                        <i class="fas fa-question-circle text-xl"></i>
-                    </button>
+
                     <div class="h-6 w-px bg-gray-200 mx-1"></div>
 
                     <form action="{{ route('student.logout') }}" method="POST" class="inline">

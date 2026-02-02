@@ -26,7 +26,7 @@ export default function loadStaff() {
     // Early return if essential elements not found
     if (!rows) {
         console.warn('Staff management elements not found');
-        return () => {}; // Return empty cleanup function
+        return () => { }; // Return empty cleanup function
     }
 
     // Track event listeners for cleanup
@@ -90,7 +90,7 @@ export default function loadStaff() {
                     </span>
                 </td>
                 <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex items-center justify-end gap-2 transition-opacity">
                         ${getEditButton(s)}
                         ${getDeleteButton(s)}
                     </div>

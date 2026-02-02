@@ -22,7 +22,7 @@ export default function loadCohorts() {
 
     if (!courseCardsGrid || !coursesView || !cohortsTableView) {
         console.warn('Cohort management elements not found');
-        return () => {};
+        return () => { };
     }
 
     // Initialize
@@ -261,7 +261,7 @@ export default function loadCohorts() {
                     </div>
                 </td>
                 <td class="p-4 text-right">
-                    <div class="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex items-center justify-end gap-2 transition-opacity">
                         <button onclick="window.viewCohortDetails('${cohort.cohort_id}')" class="p-1.5 text-slate-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors" title="View Details">
                             <i class="fa fa-eye"></i>
                         </button>
@@ -452,18 +452,18 @@ export default function loadCohorts() {
     }
 
     // Global functions for table actions
-    globalFunctions.viewCohortDetails = async function(cohortId) {
+    globalFunctions.viewCohortDetails = async function (cohortId) {
         console.log('View cohort details:', cohortId);
         // Implement view details functionality - you can open a modal or navigate
         // For now, just log it
     };
 
-    globalFunctions.editCohort = async function(cohortId) {
+    globalFunctions.editCohort = async function (cohortId) {
         console.log('Edit cohort:', cohortId);
         // Implement edit functionality - you can populate the create modal or open an edit modal
     };
 
-    globalFunctions.deleteCohort = async function(cohortId) {
+    globalFunctions.deleteCohort = async function (cohortId) {
         if (!confirm('Are you sure you want to delete this cohort? This action cannot be undone.')) {
             return;
         }
