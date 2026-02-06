@@ -36,6 +36,19 @@
         @endforeach
     </div>
 
+    <!-- Charts Section -->
+    <!-- Charts Section -->
+    <div class="mb-8">
+        <div class="bg-white p-6 rounded-xl border border-purple-200 shadow-sm">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Registration Statistics</h3>
+            <div class="relative h-64 w-full">
+                <canvas id="registrationChart"></canvas>
+            </div>
+            <!-- Hidden element to pass data to JS -->
+            <div id="registrationChartData" data-registrations="{{ json_encode($registrationData) }}" class="hidden"></div>
+        </div>
+    </div>
+
     <!-- Recent Activity Section (Optional) -->
     @if(isset($activities) && count($activities) > 0)
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

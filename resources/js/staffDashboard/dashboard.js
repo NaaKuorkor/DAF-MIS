@@ -8,6 +8,7 @@ import loadAnnouncements from './announcements.js';
 import loadCohorts from './cohortMngt.js';
 import loadTasks from './taskMngt.js';
 import initAnnouncementNotifications from './announcementNotifications.js';
+import Chart from 'chart.js/auto';
 
 // Module registry - maps routes to their loaders
 const moduleRegistry = {
@@ -28,6 +29,9 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('Dashboard elements not found');
         return;
     }
+
+    // Chart instance variable
+    let overviewChart = null;
 
     // Icon mapping for modules
     const iconMap = {
@@ -126,7 +130,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     return moduleRegistry[route]();
                 });
             } else if (route === '/staff/overview') {
-                await displayOverview();
+                await displayOverview(false); // Pass false to avoid reloading content via axios again if not needed, but here we kind of already loaded it via axios.get(route).
+                // Actually displayOverview() calls axios.get('/overview') which is redundant if we already called axios.get(route).
+                // However, the original code had:
+                // if (moduleRegistry[route]) { ... } else if (route === '/staff/overview') { await displayOverview(); }
+                // Use initOverviewChart directly since content is already loaded? 
+                // Wait, displayOverview fetches /overview. The current route '/staff/overview' fetches getContent('/staff/overview') which returns the same view.
+                // So I can just call initOverviewChart() here.
+                initOverviewChart();
             }
         } catch (err) {
             console.error('Failed to load content:', err);
@@ -158,19 +169,112 @@ document.addEventListener('DOMContentLoaded', () => {
         activeBtn.appendChild(indicator);
     }
 
-    async function displayOverview() {
+    async function displayOverview(fetch = true) {
+        if (fetch) {
+            try {
+                const response = await axios.get('/overview');
+                dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
+            } catch (err) {
+                console.error('Failed to load overview:', err);
+                dashboardContent.innerHTML = `<p class="text-red-500">Failed to load overview.</p>`;
+                return;
+            }
+        }
+        initOverviewChart();
+    }
+
+    function initOverviewChart() {
+        const chartCanvas = document.getElementById('registrationChart');
+        const dataElement = document.getElementById('registrationChartData');
+
+        if (!chartCanvas || !dataElement) return;
+
+        // Destroy existing chart if it exists
+        if (overviewChart) {
+            overviewChart.destroy();
+            overviewChart = null;
+        }
+
         try {
-            const response = await axios.get('/overview');
-            dashboardContent.innerHTML = `<div class="content-fade">${response.data}</div>`;
-        } catch (err) {
-            console.error('Failed to load overview:', err);
-            dashboardContent.innerHTML = `<p class="text-red-500">Failed to load overview.</p>`;
+            const registrationData = JSON.parse(dataElement.dataset.registrations);
+
+            overviewChart = new Chart(chartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Student Registrations',
+                        data: registrationData,
+                        backgroundColor: 'rgba(147, 51, 234, 0.6)',
+                        borderColor: 'rgb(147, 51, 234)',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                        hoverBackgroundColor: 'rgba(147, 51, 234, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(17, 24, 39, 0.9)',
+                            padding: 12,
+                            titleFont: {
+                                size: 13,
+                                family: "'Inter', sans-serif"
+                            },
+                            bodyFont: {
+                                size: 14,
+                                family: "'Inter', sans-serif"
+                            },
+                            cornerRadius: 8,
+                            displayColors: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)',
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                },
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false,
+                                drawBorder: false
+                            },
+                            ticks: {
+                                font: {
+                                    family: "'Inter', sans-serif"
+                                }
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        } catch (e) {
+            console.error("Error initializing chart:", e);
         }
     }
 
     // Initialize
     getModules();
-    displayOverview();
+    // Use displayOverview(true) to fetch and render
+    displayOverview(true);
 
     // Initialize announcement notifications
     let announcementNotificationsCleanup = null;
@@ -184,6 +288,9 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('beforeunload', () => {
         if (announcementNotificationsCleanup) {
             announcementNotificationsCleanup();
+        }
+        if (overviewChart) {
+            overviewChart.destroy();
         }
     });
 });
